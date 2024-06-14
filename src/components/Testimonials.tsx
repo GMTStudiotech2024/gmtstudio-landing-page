@@ -1,24 +1,24 @@
 import React from 'react';
+import { FaQuoteLeft, FaQuoteRight } from 'react-icons/fa';
 
 const testimonials = [
-  { name: 'John Doe', feedback: 'Great service! Highly recommend.' },
-  { name: 'Jane Smith', feedback: 'The team is very professional and skilled.' },
-  { name: 'Samuel Green', feedback: 'Excellent work on our project!' },
-  // Add more testimonials as needed
+  { name: "John Doe", quote: "This company provided exceptional service and delivered on time." },
+  { name: "Jane Smith", quote: "Highly professional and great attention to detail." },
+  { name: "Bob Johnson", quote: "Outstanding quality and customer support." }
 ];
 
 const Testimonials: React.FC = () => {
   return (
-    <section id="testimonials" className="testimonials-section py-20 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
-      <div className="container mx-auto">
-        <h2 className="text-4xl font-bold text-center mb-12">Testimonials</h2>
-        <div className="flex flex-wrap justify-center">
+    <section id="testimonials" className="py-10 bg-gray-100 dark:bg-gray-900">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">Testimonials</h2>
+        <div className="flex justify-center space-x-4" data-aos="fade-up">
           {testimonials.map((testimonial, index) => (
-            <div className="w-full md:w-1/2 lg:w-1/3 p-4" data-aos="fade-up" data-aos-delay={`${index * 100}`} key={index}>
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                <p className="mb-4">"{testimonial.feedback}"</p>
-                <h3 className="text-2xl font-bold">{testimonial.name}</h3>
-              </div>
+            <div key={index} className="max-w-sm p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg transform transition-transform hover:scale-105 duration-300 ease-in-out">
+              <FaQuoteLeft className="text-2xl text-gray-400 dark:text-gray-600 mb-4" />
+              <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">"{testimonial.quote}"</p>
+              <FaQuoteRight className="text-2xl text-gray-400 dark:text-gray-600 mb-4" />
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">{testimonial.name}</h3>
             </div>
           ))}
         </div>
@@ -28,4 +28,3 @@ const Testimonials: React.FC = () => {
 }
 
 export default Testimonials;
-
