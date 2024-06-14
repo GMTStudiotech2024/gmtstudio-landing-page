@@ -10,17 +10,17 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-gray-100 dark:bg-gray-800 p-4 fixed w-full z-10">
+    <nav className="bg-white dark:bg-gray-900 p-4 fixed w-full z-10 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
         <div className="text-xl font-bold text-gray-900 dark:text-white">GMTStudio</div>
         <div className="hidden md:flex">
-          <a href="#hero" className="mx-2 text-gray-700 dark:text-gray-200">Home</a>
-          <a href="#features" className="mx-2 text-gray-700 dark:text-gray-200">Features</a>
-          <a href="#about" className="mx-2 text-gray-700 dark:text-gray-200">About Us</a>
-          <a href="#projects" className="mx-2 text-gray-700 dark:text-gray-200">Projects</a>
-          <a href="#testimonials" className="mx-2 text-gray-700 dark:text-gray-200">Testimonials</a>
-          <a href="#blog" className="mx-2 text-gray-700 dark:text-gray-200">Blog</a>
-          <a href="#contact" className="mx-2 text-gray-700 dark:text-gray-200">Contact</a>
+          <a href="#hero" className="mx-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Home</a>
+          <a href="#features" className="mx-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Features</a>
+          <a href="#about" className="mx-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">About Us</a>
+          <a href="#projects" className="mx-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Projects</a>
+          <a href="#testimonials" className="mx-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Testimonials</a>
+          <a href="#blog" className="mx-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Blog</a>
+          <a href="#contact" className="mx-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Contact</a>
         </div>
         <div className="md:hidden">
           <button onClick={toggleMenu} className="text-xl text-gray-900 dark:text-white">
@@ -30,14 +30,14 @@ const Navbar: React.FC = () => {
         <ThemeToggle />
       </div>
       {isOpen && (
-        <div className="md:hidden mt-4">
-          <a href="#hero" className="block px-2 py-1 text-gray-700 dark:text-gray-200">Home</a>
-          <a href="#features" className="block px-2 py-1 text-gray-700 dark:text-gray-200">Features</a>
-          <a href="#about" className="block px-2 py-1 text-gray-700 dark:text-gray-200">About Us</a>
-          <a href="#projects" className="block px-2 py-1 text-gray-700 dark:text-gray-200">Projects</a>
-          <a href="#testimonials" className="block px-2 py-1 text-gray-700 dark:text-gray-200">Testimonials</a>
-          <a href="#blog" className="block px-2 py-1 text-gray-700 dark:text-gray-200">Blog</a>
-          <a href="#contact" className="block px-2 py-1 text-gray-700 dark:text-gray-200">Contact</a>
+        <div className="md:hidden mt-4 bg-white dark:bg-gray-900 shadow-md rounded-lg p-4">
+          <a href="#hero" className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Home</a>
+          <a href="#features" className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Features</a>
+          <a href="#about" className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">About Us</a>
+          <a href="#projects" className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Projects</a>
+          <a href="#testimonials" className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Testimonials</a>
+          <a href="#blog" className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Blog</a>
+          <a href="#contact" className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Contact</a>
         </div>
       )}
     </nav>
