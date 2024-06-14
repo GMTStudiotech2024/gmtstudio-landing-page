@@ -7,11 +7,10 @@ const Hero: React.FC = () => {
       <div className="container mx-auto flex flex-col lg:flex-row items-center px-4 sm:px-6 lg:px-8">
         <div className="lg:w-1/2 w-full" data-aos="fade-right">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Deploy to the cloud with confidence
+            Welcome to <span className="text-sky-500 dark:text-yellow-300">GMTStudio !</span>
           </h1>
           <p className="text-gray-700 dark:text-gray-300 mb-6">
-            Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo.
-            Elit sunt amet fugiat veniam occaecat fugiat aliqua.
+          Unlocking new possibilities, Beyond Code, Beyond Limits.
           </p>
           <div className="space-x-4">
             <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">

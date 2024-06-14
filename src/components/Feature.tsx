@@ -9,7 +9,7 @@ const Feature: React.FC = () => {
           <div className="lg:w-1/2 w-full" data-aos="fade-right">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">Our Features</h2>
             <p className="text-gray-700 dark:text-gray-300 mb-6">
-              Explore the features that we offer to make your experience better and more efficient.
+              Explore the features that we offer to enchant your experience
             </p>
             <ul className="list-disc list-inside space-y-4 text-gray-700 dark:text-gray-300">
               <li>Feature one that is really cool</li>
@@ -27,3 +27,5 @@ const Feature: React.FC = () => {
 }
 
 export default Feature;
+
+
