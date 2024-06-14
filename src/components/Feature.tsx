@@ -1,26 +1,25 @@
 import React from 'react';
-
-const features = [
-  { title: 'Feature One', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-  { title: 'Feature Two', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-  { title: 'Feature Three', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-  // Add more features as needed
-];
+import featureImage from '../assets/images/feature.png';
 
 const Feature: React.FC = () => {
   return (
-    <section id="features" className="features-section py-20 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
-      <div className="container mx-auto">
-        <h2 className="text-4xl font-bold text-center mb-12">Our Features</h2>
-        <div className="flex flex-wrap justify-center">
-          {features.map((feature, index) => (
-            <div className="w-full md:w-1/3 p-4" data-aos="fade-up" data-aos-delay={`${index * 100}`} key={index}>
-              <div className="bg-gray-100 dark:bg-gray-900 p-6 rounded-lg shadow-lg">
-                <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
-                <p>{feature.description}</p>
-              </div>
-            </div>
-          ))}
+    <section id="features" className="py-10 bg-white dark:bg-gray-800">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row items-center">
+          <div className="lg:w-1/2 w-full" data-aos="fade-right">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">Our Features</h2>
+            <p className="text-gray-700 dark:text-gray-300 mb-6">
+              Explore the features that we offer to make your experience better and more efficient.
+            </p>
+            <ul className="list-disc list-inside space-y-4 text-gray-700 dark:text-gray-300">
+              <li>Feature one that is really cool</li>
+              <li>Feature two that is even cooler</li>
+              <li>Feature three that is the coolest of all</li>
+            </ul>
+          </div>
+          <div className="lg:w-1/2 w-full mt-10 lg:mt-0 flex justify-center" data-aos="fade-left">
+            <img src={featureImage} alt="Feature" className="rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl" />
+          </div>
         </div>
       </div>
     </section>
