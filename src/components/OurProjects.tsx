@@ -1,9 +1,9 @@
 import React from 'react';
 
 const projects = [
-  { title: 'Project One', description: 'Description of Project One' },
-  { title: 'Project Two', description: 'Description of Project Two' },
-  { title: 'Project Three', description: 'Description of Project Three' },
+  { title: 'Nothing is here', description: 'Description of Project One' },
+  { title: 'Still nothing here', description: 'Description of Project Two' },
+  { title: 'Still nothing here ', description: 'Description of Project Three' },
   // Add more projects as needed
 ];
 

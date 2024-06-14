@@ -9,13 +9,13 @@ const AboutUs: React.FC = () => {
           <div className="w-full md:w-1/2 p-4" data-aos="fade-right">
             <div className="bg-gray-100 dark:bg-gray-900 p-6 rounded-lg shadow-lg">
               <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec iaculis mauris.</p>
+              <p>We are trying to enhance user's life and create some cool game </p>
             </div>
           </div>
           <div className="w-full md:w-1/2 p-4" data-aos="fade-left">
             <div className="bg-gray-100 dark:bg-gray-900 p-6 rounded-lg shadow-lg">
               <h3 className="text-2xl font-bold mb-4">Our Vision</h3>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec iaculis mauris.</p>
+              <p>We hope to develop our first game in 2025</p>
             </div>
           </div>
         </div>
