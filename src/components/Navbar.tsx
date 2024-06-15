@@ -10,7 +10,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-purple-500 to-purple-900 dark:from-slate-900 dark:to-slate-700 p-4 fixed w-full z-10 shadow-lg">
+    <nav className="bg-gradient-to-r from-white to-white dark:from-slate-900 dark:to-slate-700 p-4 fixed w-full z-10 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
         <div className="text-xl font-bold bg-gradient-to-r from-amber-200 to-yellow-500 bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-cyan-500 dark:to-blue-500" >GMTStudio</div>
         <div className="hidden md:flex">
