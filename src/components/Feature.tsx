@@ -7,14 +7,14 @@ const Feature: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row items-center">
           <div className="lg:w-1/2 w-full" data-aos="fade-right">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">Our Features</h2>
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-purple-700 to-purple-900 bg-clip-text text-transparent mb-6">Our Features</h2>
             <p className="text-gray-700 dark:text-gray-300 mb-6">
-              Explore the features that we offer to enchant your experience
+              We Offer The Enhanced User Interface and Experience
             </p>
             <ul className="list-disc list-inside space-y-4 text-gray-700 dark:text-gray-300">
-              <li>Feature one that is really cool</li>
-              <li>Feature two that is even cooler</li>
-              <li>Feature three that is the coolest of all</li>
+              <li>By Using React JS, We Can Design Every Thing We Want</li>
+              <li>After A Lot Of Meeting, We Came Up With Large Amount Of Ideas</li>
+              <li>By The Way, Is There Easter Egg In This Website ?</li>
             </ul>
           </div>
           <div className="lg:w-1/2 w-full mt-10 lg:mt-0 flex justify-center" data-aos="fade-left">

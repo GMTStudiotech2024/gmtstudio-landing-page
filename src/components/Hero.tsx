@@ -7,9 +7,9 @@ const Hero: React.FC = () => {
       <div className="container mx-auto flex flex-col lg:flex-row items-center px-4 sm:px-6 lg:px-8">
         <div className="lg:w-1/2 w-full mb-10 lg:mb-0" data-aos="fade-right">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Welcome to <span className="bg-gradient-to-r from-amber-200 to-yellow-500 bg-clip-text text-transparent">GMTStudio!</span>
+            Welcome to <span className="bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent">GMTStudio!</span>
           </h1>
-          <p className="bg-gradient-to-r from-slate-500 via-violet-600 to-slate-800 bg-clip-text text-transparent mb-6">
+          <p className="bg-gradient-to-r from-slate-500 via-violet-600 to-slate-800 bg-clip-text text-transparent mb-6 dark:bg-gradient-to-r dark:from-amber-200 dark:to-yellow-500">
             Unlocking new possibilities, Beyond Code, Beyond Limits.
           </p>
           <div className="space-x-4">
