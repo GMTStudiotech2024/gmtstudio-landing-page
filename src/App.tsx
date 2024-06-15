@@ -12,6 +12,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Analytics } from "@vercel/analytics/react"
 
+
 const App: React.FC = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });

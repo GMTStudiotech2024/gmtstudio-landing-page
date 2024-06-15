@@ -8,8 +8,8 @@ const Feature: React.FC = () => {
         <div className="flex flex-col lg:flex-row items-center">
           <div className="lg:w-1/2 w-full" data-aos="fade-right">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">Our Features</h2>
-            <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
-              Explore the features that we offer to make your experience better and more efficient.
+            <p className="text-gray-700 dark:text-gray-300 mb-6">
+              Explore the features that we offer to enchant your experience
             </p>
             <ul className="list-disc list-inside space-y-4 text-gray-700 dark:text-gray-300">
               <li>Feature one that is really cool</li>
@@ -18,7 +18,7 @@ const Feature: React.FC = () => {
             </ul>
           </div>
           <div className="lg:w-1/2 w-full mt-10 lg:mt-0 flex justify-center" data-aos="fade-left">
-            <img src={featureImage} alt="Feature" className="rounded-lg shadow-2xl w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl transform transition-transform hover:scale-105 duration-300 ease-in-out" />
+            <img src={featureImage} alt="Feature" className="rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl" />
           </div>
         </div>
       </div>
@@ -27,3 +27,5 @@ const Feature: React.FC = () => {
 }
 
 export default Feature;
+
+
