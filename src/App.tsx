@@ -22,11 +22,11 @@ const App: React.FC = () => {
     <div className="App">
       <Navbar />
       <Hero />
-      <Feature />
-      <AboutUs />
       <OurProjects />
-      <Testimonials />
+      <Feature />
       <Blog />
+      <AboutUs />
+      <Testimonials />
       <ContactUs />
       <Footer />
       <Analytics />

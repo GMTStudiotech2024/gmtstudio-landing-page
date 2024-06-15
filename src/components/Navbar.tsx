@@ -12,7 +12,7 @@ const Navbar: React.FC = () => {
   return (
     <nav className="bg-white dark:bg-gray-900 p-4 fixed w-full z-10 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
-        <div className="text-xl font-bold text-gray-900 dark:text-white">GMTStudio</div>
+        <div className="text-xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent" >GMTStudio</div>
         <div className="hidden md:flex">
           <a href="#hero" className="mx-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Home</a>
           <a href="#features" className="mx-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Features</a>
