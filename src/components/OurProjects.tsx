@@ -31,9 +31,13 @@ const OurProjects: React.FC = () => {
                 <p className="mt-6 mb-8 text-gray-600 dark:text-gray-300 bg-gradient-to-r from-purple-500 to-purple-900 bg-clip-text text-transparent">
                   {project.description}
                 </p>
-                <button className="text-blue-500 border border-blue-500 px-4 py-2 rounded hover:bg-blue-500 hover:text-white dark:border-green-500 dark:hover:bg-green-500 dark:text-green-500 dark:hover:text-white">
-                  View Project
-                      </button>
+                <button
+  onClick={() => window.open("https://gmt-studio-ai-workspace.vercel.app/", "_blank", "noopener,noreferrer")}
+  className="text-blue-500 border border-blue-500 px-4 py-2 rounded hover:bg-blue-500 hover:text-white dark:border-green-500 dark:hover:bg-green-500 dark:text-green-500 dark:hover:text-white"
+>
+  View Project
+</button>
+
               </div>
             </div>
           ))}
