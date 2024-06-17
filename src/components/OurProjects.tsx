@@ -1,5 +1,5 @@
 import React from 'react';
-import projectImage1 from '../assets/images/blog2.png';
+import projectImage1 from '../assets/images/blog4.png';
 import projectImage2 from '../assets/images/blog1.png';
 import projectImage3 from '../assets/images/blog3.png';
 

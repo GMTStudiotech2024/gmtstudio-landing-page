@@ -1,10 +1,10 @@
 import React from 'react';
-import blogImage1 from '../assets/images/blog1.png';
+import blogImage1 from '../assets/images/blog4.png';
 import blogImage2 from '../assets/images/blog2.png';
 import blogImage3 from '../assets/images/blog3.png';
 
 const blogPosts = [
-  { image: blogImage1, title: "Blog Post One", excerpt: "A brief excerpt of the first blog post." },
+  { image: blogImage1, title: "MAZS AI", excerpt: "GMTStudio Ai workspace provide The service of Artificial intelligence " },
   { image: blogImage2, title: "Blog Post Two", excerpt: "A brief excerpt of the second blog post." },
   { image: blogImage3, title: "Blog Post Three", excerpt: "A brief excerpt of the third blog post." }
 ];
