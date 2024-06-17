@@ -4,7 +4,7 @@ import projectImage2 from '../assets/images/blog1.png';
 import projectImage3 from '../assets/images/blog3.png';
 
 const projects = [
-  { title: 'GMTStudio Landing Page', description: 'GMTStudio design their own Landing Page by using React JS with TailwindCSS', image: projectImage1 },
+  { title: 'GMTStudio AI workSpace', description: 'GMTStudio design their own AI, MAZS AI, although this is still in develop, but you can use it !', image: projectImage1 },
   { title: 'Theta Social Media Platform', description: 'By using Appwrite and Vite, we are able to design the second greatest Social Media of all time', image: projectImage2 },
   { title: 'Well, I do not know what this is', description: 'My boss did not tell me about this', image: projectImage3 },
 ];
