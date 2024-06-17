@@ -1,122 +1,33 @@
-import React, { useState, useRef } from 'react';
-import { FaPaperPlane } from 'react-icons/fa';
+import React from 'react';
+import blogImage1 from '../assets/images/blog4.png';
+import blogImage2 from '../assets/images/blog2.png';
+import blogImage3 from '../assets/images/blog3.png';
 
-interface Message {
-  sender: 'user' | 'bot';
-  text: string;
+const blogPosts = [
+  { image: blogImage1, title: "MAZS AI", excerpt: "GMTStudio Ai workspace provide The service of Artificial intelligence " },
+  { image: blogImage2, title: "Theta Social media Application", excerpt: "The newly designed website application, Which were recently updated." },
+  { image: blogImage3, title: "Blog Post Three", excerpt: "A brief excerpt of the third blog post." }
+];
+
+const Blog: React.FC = () => {
+  return (
+    <section id="blog" className="py-10 bg-white dark:bg-gray-800">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">Our Blog</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" data-aos="zoom-out-up">
+          {blogPosts.map((post, index) => (
+            <div key={index} className="rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105 duration-300 ease-in-out">
+              <img src={post.image} alt={post.title} className="w-full h-48 object-cover" />
+              <div className="p-6 bg-gray-100 dark:bg-gray-900">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{post.title}</h3>
+                <p className="text-gray-700 dark:text-gray-300">{post.excerpt}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
-const keywordResponses: { [keyword: string]: string } = {
-  // ... (your keywordResponses here)
-};
-
-const defaultResponse = 'Sorry for not understanding your words, but what are you talking about?';
-
-const Chat: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [currentBotMessage, setCurrentBotMessage] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-  const handleSendMessage = () => {
-    if (inputValue.trim() !== "") {
-      const newMessage: Message = { sender: "user", text: inputValue };
-      setMessages([...messages, newMessage]);
-      setInputValue("");
-      setIsTyping(true);
-      generateBotResponse(inputValue);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSendMessage();
-    }
-  };
-
-  const generateBotResponse = (userMessage: string) => {
-    let botResponse = defaultResponse;
-    const words = userMessage.toLowerCase().split(/\W+/);
-    for (const word of words) {
-      if (keywordResponses[word]) {
-        botResponse = keywordResponses[word];
-        break;
-      }
-    }
-    typeBotResponse(botResponse);
-  };
-
-  const typeBotResponse = (text: string) => {
-    setCurrentBotMessage('');
-    let index = 0;
-    const interval = setInterval(() => {
-      setCurrentBotMessage((prev) => prev + text[index]);
-      index++;
-      if (index === text.length) {
-        clearInterval(interval);
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { sender: 'bot', text: text },
-        ]);
-        setIsTyping(false);
-      }
-    }, 50);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  };
-
-  return (
-    <div className="flex-1 p-4 flex flex-col justify-end bg-darkGrey">
-      <div className="flex-1 overflow-auto">
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`flex ${
-              message.sender === 'user' ? 'justify-end' : 'justify-start'
-            } mb-2`}
-          >
-            <div
-              className={`rounded-xl p-2 max-w-xs ${
-                message.sender === 'user'
-                  ? 'bg-userBubble text-white'
-                  : 'bg-botBubble text-white'
-              }`}
-            >
-              {message.text}
-            </div>
-          </div>
-        ))}
-        {isTyping && (
-          <div className="flex justify-start mb-2">
-            <div className="rounded-xl p-2 max-w-xs bg-botBubble text-white">
-              {currentBotMessage}
-              <span className="blinking-cursor">|</span>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef}></div>
-      </div>
-      <div className="flex border-t border-mediumGrey p-2 bg-darkGrey">
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
-          className="flex-1 bg-mediumGrey p-2 rounded-xl"
-          placeholder="Ask anything..."
-        />
-        <button
-          onClick={handleSendMessage}
-          className="bg-sentbutton p-2.5 rounded-md flex items-center justify-center hover:bg-sentbuttonhover"
-        >
-          <FaPaperPlane />
-        </button>
-      </div>
-    </div>
-  );
-};
-
-export default Chat;
+export default Blog;
