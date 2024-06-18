@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Feature from './components/Feature';
-import AboutUs from './components/AboutUs';
 import OurProjects from './components/OurProjects';
 import Testimonials from './components/Testimonials';
 import Blog from './components/Blog';
@@ -33,7 +32,6 @@ const App: React.FC = () => {
               <OurProjects />
               <Feature />
               <Blog />
-              <AboutUs />
               <Testimonials />
               <ContactUs />
               <Footer />

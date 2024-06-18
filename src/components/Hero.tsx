@@ -1,5 +1,5 @@
 import React from 'react';
-import screenshot from '../assets/images/screenshot.png';
+import video from '../assets/images/blogImage1.mp4';
 
 const Hero: React.FC = () => {
   return (
@@ -10,15 +10,17 @@ const Hero: React.FC = () => {
             Welcome to <span className="bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent">GMTStudio!</span>
           </h1>
           <p className="text-lg mb-6 text-gray-700 dark:text-gray-300">
-            Unlocking new possibilities, Beyond Code, Beyond Limits. 
+            Beyond Code, Beyond Limits.
           </p>
           <p className="text-base mb-6 text-gray-700 dark:text-gray-300">
-            Welcome to GMTStudio Tech, your destination for innovative software solutions. We specialize in web and mobile app development, offering custom software tailored to your needs. Our expert team is committed to delivering high-quality products that drive business growth and success. Explore how we can transform your digital landscape.
+            Discover innovative software solutions with GMTStudio Tech. We specialize in web and mobile app development, creating custom software to meet your needs.
           </p>
-
         </div>
         <div className="lg:w-1/2 w-full flex justify-center" data-aos="fade-left">
-          <img src={screenshot} alt="Screenshot" className="rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl" />
+          <video className="rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl" controls>
+            <source src={video} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
         </div>
       </div>
     </section>
