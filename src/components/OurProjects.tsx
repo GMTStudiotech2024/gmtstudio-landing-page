@@ -1,7 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import projectImage1 from '../assets/images/blog4.png';
 import projectImage2 from '../assets/images/blog5.png';
-import projectImage3 from '../assets/images/blog3.png';
+import projectImage3 from '../assets/images/blog7.png';
 
 const projects = [
   { 
@@ -20,11 +21,21 @@ const projects = [
     title: 'Well, I do not know what this is', 
     description: 'My boss did not tell me about this', 
     image: projectImage3,
-    link: 'https://unknown-project.example.com' 
+    link: '/error' // We'll handle this within the component
   },
 ];
 
 const OurProjects: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleProjectClick = (link: string) => {
+    if (link === '/error') {
+      navigate('*');
+    } else {
+      window.open(link, "_blank", "noopener,noreferrer");
+    }
+  };
+
   return (
     <section id="projects" className="projects-section py-20 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -38,6 +49,7 @@ const OurProjects: React.FC = () => {
             <div 
               className="group max-w-2xl rounded-3xl border border-gray-100 bg-gray-200 p-6 shadow-2xl shadow-gray-600/10 dark:border-gray-700 dark:bg-gray-900 dark:shadow-none sm:p-8 transform transition-transform hover:scale-105 duration-300 ease-in-out" 
               key={index}
+              onClick={() => handleProjectClick(project.link)}
             >
               <div className="relative overflow-hidden rounded-xl shadow-xl shadow-rose-600/40 transition duration-500 group-hover:scale-105 group-hover:shadow-md">
                 <img 
@@ -55,7 +67,6 @@ const OurProjects: React.FC = () => {
                   {project.description}
                 </p>
                 <button
-                  onClick={() => window.open(project.link, "_blank", "noopener,noreferrer")}
                   className="text-blue-500 border border-blue-500 px-4 py-2 rounded hover:bg-blue-500 hover:text-white dark:border-green-500 dark:hover:bg-green-500 dark:text-green-500 dark:hover:text-white"
                 >
                   View Project
