@@ -6,7 +6,6 @@ import Feature from './components/Feature';
 import OurProjects from './components/OurProjects';
 import Testimonials from './components/Testimonials';
 import Blog from './components/Blog';
-import ContactUs from './components/ContactUs';
 import Footer from './components/Footer';
 import Error from './components/Error';
 import BlogPage1 from './components/BlogPage1';
@@ -33,7 +32,6 @@ const App: React.FC = () => {
               <Feature />
               <Blog />
               <Testimonials />
-              <ContactUs />
               <Footer />
             </>
           } />
