@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import blogImage1 from '../assets/images/GMTStudio-AI_studio.png';
+import blogImage1 from '../assets/images/top.png';
 
 const BlogPage1: React.FC = () => {
   const navigate = useNavigate();

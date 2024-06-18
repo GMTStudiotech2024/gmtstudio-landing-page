@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import blogImage2 from '../assets/images/Theta.png';
+import blogImage2 from '../assets/images/top.png';
 
 const BlogPage2: React.FC = () => {
   const navigate = useNavigate();
