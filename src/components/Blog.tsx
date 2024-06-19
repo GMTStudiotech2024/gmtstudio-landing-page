@@ -34,7 +34,7 @@ const Blog: React.FC = () => {
   return (
     <section id="blog" className="py-16 bg-white dark:bg-gray-800">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-12 text-center">
+        <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-12 text-center animated-gradient-a">
           Our Blog
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10" data-aos="zoom-out-up">
@@ -57,7 +57,7 @@ const Blog: React.FC = () => {
                 <p className="block font-sans text-lg font-light leading-relaxed text-gray-700 dark:text-gray-300 antialiased">
                   By {post.author} on {post.date}
                 </p>
-                <p className="block font-sans text-lg font-light leading-relaxed text-inherit antialiased">
+                <p className="block font-sans text-lg font-light leading-relaxed text-inherit antialiased text-gray-800 dark:text-white ">
                   {post.excerpt}
                 </p>
               </div>

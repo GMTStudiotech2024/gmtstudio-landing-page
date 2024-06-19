@@ -24,7 +24,7 @@ const Navbar: React.FC = () => {
           <div className="relative group">
             <button className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Products</button>
             <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-900 shadow-lg rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <a href="https://gmt-studio-ai-workspace.vercel.app/" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">GMTStudio AI WorkSpace</a>
+              <a href="https://theta-plum.vercel.app/" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">GMTStudio AI WorkSpace</a>
               <a href="https://theta-plum.vercel.app/" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Theta Social Media Platform </a>
               <a href="/OurProjects" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">I don't know what is this yet </a>
             </div>
