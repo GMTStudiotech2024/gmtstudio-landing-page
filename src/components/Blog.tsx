@@ -41,30 +41,30 @@ const Blog: React.FC = () => {
           {blogPosts.map((post, index) => (
             <div 
               key={index} 
-              className="relative flex w-80 flex-col rounded-xl bg-white bg-clip-border text-gray-700 shadow-md dark:bg-gray-900"
+              className="relative flex w-full lg:w-96 flex-col rounded-xl bg-white bg-clip-border text-gray-700 shadow-md dark:bg-gray-900"
             >
-              <div className="relative mx-4 -mt-6 h-40 overflow-hidden rounded-xl bg-blue-gray-500 bg-clip-border text-white shadow-lg shadow-blue-gray-500/40 bg-gradient-to-r from-blue-500 to-blue-600">
+              <div className="relative mx-4 -mt-6 h-56 overflow-hidden rounded-xl bg-blue-gray-500 bg-clip-border text-white shadow-lg shadow-blue-gray-500/40 bg-gradient-to-r from-blue-500 to-blue-600">
                 <img 
                   src={post.image} 
                   alt={post.title} 
                   className="w-full h-full object-cover transition-transform duration-300 ease-in-out transform hover:scale-110"
                 />
               </div>
-              <div className="p-6">
-                <h5 className="mb-2 block font-sans text-xl font-semibold leading-snug tracking-normal text-blue-gray-900 dark:text-white antialiased">
+              <div className="p-8">
+                <h5 className="mb-2 block font-sans text-2xl font-semibold leading-snug tracking-normal text-blue-gray-900 dark:text-white antialiased">
                   {post.title}
                 </h5>
-                <p className="block font-sans text-base font-light leading-relaxed text-gray-700 dark:text-gray-300 antialiased">
+                <p className="block font-sans text-lg font-light leading-relaxed text-gray-700 dark:text-gray-300 antialiased">
                   By {post.author} on {post.date}
                 </p>
-                <p className="block font-sans text-base font-light leading-relaxed text-inherit antialiased">
+                <p className="block font-sans text-lg font-light leading-relaxed text-inherit antialiased">
                   {post.excerpt}
                 </p>
               </div>
-              <div className="p-6 pt-0">
+              <div className="p-8 pt-0">
                 <a 
                   href={post.link}
-                  className="select-none rounded-lg bg-blue-500 py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-85 focus:shadow-none active:opacity-85 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                  className="select-none rounded-lg bg-blue-500 py-3 px-6 text-center align-middle font-sans text-base font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-85 focus:shadow-none active:opacity-85 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                 >
                   Read More
                 </a>
