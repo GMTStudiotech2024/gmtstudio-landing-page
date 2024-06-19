@@ -6,6 +6,12 @@ import projectImage3 from '../assets/images/blog7.png';
 
 const projects = [
   {
+    title: 'Well, I do not know what this is',
+    description: 'My boss did not tell me about this',
+    image: projectImage3,
+    link: '/error'
+  },
+  {
     title: 'GMTStudio AI workSpace',
     description: 'GMTStudio design their own AI, MAZS AI, although this is still in develop, but you can use it !',
     image: projectImage1,
@@ -16,12 +22,6 @@ const projects = [
     description: 'By using Appwrite and Vite, we are able to design the second greatest Social Media of all time',
     image: projectImage2,
     link: 'https://theta-plum.vercel.app/'
-  },
-  {
-    title: 'Well, I do not know what this is',
-    description: 'My boss did not tell me about this',
-    image: projectImage3,
-    link: '/error'
   },
 ];
 
