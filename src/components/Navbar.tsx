@@ -39,14 +39,14 @@ const Navbar: React.FC = () => {
       </div>
       {isOpen && (
         <div className="md:hidden mt-4 bg-white dark:bg-gray-900 shadow-md rounded-lg p-4">
-          <a href="#hero" className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Home</a>
+          <a href="/" className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Home</a>
           <a href="a" className="block px-2 py-1 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Research</a>
           <div className="relative">
             <button onClick={toggleProductsMenu} className="block w-full text-left px-2 py-1 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">Products</button>
             {isProductsOpen && (
               <div className="mt-2 w-full bg-white dark:bg-gray-900 shadow-lg rounded-lg">
-                <a href="/Home" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">GMTStudio AI WorkSpace</a>
-                <a href="/OurProjects" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Theta Social Media Platform</a>
+                <a href="https://theta-plum.vercel.app/" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">GMTStudio AI WorkSpace</a>
+                <a href="https://theta-plum.vercel.app/" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Theta Social Media Platform</a>
                 <a href="/OurProjects" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Product 3</a>
               </div>
             )}

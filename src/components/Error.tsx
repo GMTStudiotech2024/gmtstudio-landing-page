@@ -9,7 +9,7 @@ const Error: React.FC = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600 dark:bg-gray-900 p-4">
       <div className="text-center p-10 bg-white dark:bg-gray-800 rounded-lg shadow-2xl transform transition-transform hover:scale-105 duration-300 ease-in-out max-w-lg">
         <FaExclamationTriangle className="text-6xl text-red-600 dark:text-red-400 mb-4 animate-pulse mx-auto" />
-        <h1 className="text-9xl font-bold text-red-600 dark:text-red-400 mb-8 animate-pulse">404</h1>
+        <h1 className="text-9xl font-bold text-red-700 dark:text-red-400 mb-8 animate-pulse">404</h1>
         <p className="text-2xl text-gray-700 dark:text-gray-300 mb-8">Oops! Page Not Found</p>
         <p className="text-gray-500 dark:text-gray-400 mb-8">The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
         <div className="flex justify-center space-x-4">
