@@ -23,3 +23,22 @@ body {
 .btn-secondary {
   @apply text-blue-500 border border-blue-500 hover:bg-blue-500 hover:text-white;
 }
+.animated-gradient {
+  background: linear-gradient(270deg, #FFBF00, #FF7F50, #FF00FF, #7F00FF, #0000FF);
+  background-size: 1000% 1000%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientAnimation 5s ease infinite;
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

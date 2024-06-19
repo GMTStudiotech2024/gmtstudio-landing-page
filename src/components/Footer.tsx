@@ -2,7 +2,7 @@ import React from 'react';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="footer-section bg-gray-100 dark:bg-gray-800 py-8 text-gray-900 dark:text-white">
+    <footer className="footer-section bg-gray-400 dark:bg-gray-800 py-8 text-gray-900 dark:text-white">
       <div className="container mx-auto text-center">
         <p>&copy; 2024 GMTStudio TECH. All rights reserved.  Website Version: 💻v1.1</p>
         <div className="flex justify-center mt-4">
