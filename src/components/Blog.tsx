@@ -8,7 +8,7 @@ const blogPosts = [
     image: blogImage1, 
     title: "MAZS AI", 
     excerpt: "GMTStudio Ai workspace provides the service of Artificial Intelligence.", 
-    author: "Alston Chang", 
+    author: "Alston Chang ",
     date: "June 17, 2024",
     link: "/BlogPage1"
   },
