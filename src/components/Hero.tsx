@@ -23,7 +23,7 @@ const Hero: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-pink-500 opacity-50 rounded-lg shadow-lg"></div>
           <video className="rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl relative z-10" controls>
             <source src={video} type="video/mp4" />
-            Your browser does not support the video tag.
+            Your browser does not support the video tag. 
           </video>
         </div>
       </div>
