@@ -13,7 +13,7 @@ const Hero: React.FC = () => {
             Beyond Code, Beyond Limits.
           </h2>
           <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
-            We create innovative solutions that push the boundaries of technology. Join us on our journey to redefine the future.
+              Enhanced Tools and application to make your life easier
           </p>
           <a href="#OurProjects" className="inline-block px-8 py-3 bg-amber-500 text-white font-semibold rounded-lg shadow-md hover:bg-amber-600 transition duration-300">
             Learn More
