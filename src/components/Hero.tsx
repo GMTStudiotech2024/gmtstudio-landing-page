@@ -7,16 +7,16 @@ const Hero: React.FC = () => {
       <div className="container mx-auto flex flex-col lg:flex-row items-center px-4 sm:px-6 lg:px-8">
         <div className="lg:w-1/2 w-full mb-10 lg:mb-0" data-aos="fade-right">
         <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-      Welcome to <span className="animated-gradient">GMTStudio!</span>
+      Welcome to <span className="animated-gradient">GMTStudio</span>
     </h1>
           <h2 className="text-3xl mb-6 bg-gradient-to-r from-purple-500 to-purple-900 dark:bg-gradient-to-r dark:from-indigo-400 dark:to-cyan-400 bg-clip-text text-transparent">
-            Beyond Code, Beyond Limits.
+            Beyond Code, Beyond Limits. 
           </h2>
           <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
               Enhanced Tools and application to make your life easier
           </p>
           <a href="#OurProjects" className="inline-block px-8 py-3 bg-amber-500 text-white font-semibold rounded-lg shadow-md hover:bg-amber-600 transition duration-300">
-            Learn More
+            Learn More 
           </a>
         </div>
         <div className="lg:w-1/2 w-full flex justify-center relative" data-aos="fade-left">
