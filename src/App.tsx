@@ -14,6 +14,7 @@ import BlogPage3 from './components/BlogPage3';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Analytics } from "@vercel/analytics/react";
+import AnimatedItem from './components/AnimatedItem'; // Importing the AnimatedItem component
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -28,10 +29,18 @@ const App: React.FC = () => {
           <Route path="/" element={
             <>
               <Hero />
-              <OurProjects />
-              <Feature />
-              <Blog />
-              <Testimonials />
+              <AnimatedItem>
+                <OurProjects />
+              </AnimatedItem>
+              <AnimatedItem>
+                <Feature />
+              </AnimatedItem>
+              <AnimatedItem>
+                <Blog />
+              </AnimatedItem>
+              <AnimatedItem>
+                <Testimonials />
+              </AnimatedItem>
               <Footer />
             </>
           } />
