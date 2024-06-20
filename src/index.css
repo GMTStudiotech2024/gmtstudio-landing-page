@@ -7,7 +7,6 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* Add additional custom styles if needed */
 .hero-section {
   @apply pt-20 pb-10 bg-gray-50 dark:bg-gray-900;
 }
@@ -23,6 +22,7 @@ body {
 .btn-secondary {
   @apply text-blue-500 border border-blue-500 hover:bg-blue-500 hover:text-white;
 }
+
 .animated-gradient {
   background: linear-gradient(270deg, #FFBF00, #FF7F50, #FF00FF, #7F00FF, #0000FF);
   background-size: 1000% 1000%;
@@ -30,7 +30,6 @@ body {
   -webkit-text-fill-color: transparent;
   animation: gradientAnimation 5s ease infinite;
 }
-
 
 @keyframes gradientAnimation {
   0% {
@@ -52,33 +51,10 @@ body {
   animation: gradientAnimation 5s ease infinite;
 }
 
-@keyframes gradientAnimation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
 .animated-gradient-b {
   background: linear-gradient(270deg, #FFBF00, #FF7F50, #FF00FF, #7F00FF, #0000FF);
   background-size: 1000% 1000%;
   animation: gradientAnimation 5s ease infinite;
-}
-
-@keyframes gradientAnimation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
 }
 
 .animated-gradient-c {
@@ -89,15 +65,60 @@ body {
   animation: gradientAnimation 5s ease infinite;
 }
 
-@keyframes gradientAnimation {
-  0% {
+@keyframes fadeInUp {
+  from {
+    transform: translate3d(0, 40px, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+.animated-fade-in-up {
+  animation: fadeInUp 1s ease-out forwards;
+}
+
+/* Light mode background image */
+.light-mode-wallpaper {
+  background-image: url("../src/assets/images/Light_H.png");
+  background-size: cover;
+  background-position: center;
+}
+
+/* Dark mode background image */
+.dark-mode-wallpaper {
+  background-image: url('../src/assets/images/Dark_H.png');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Common styles for both modes */
+.wallpaper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+}
+
+.animated-gradient {
+  background: linear-gradient(135deg, #f3ec78, #af4261);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: gradient-animation 3s ease-in-out infinite;
+}
+
+@keyframes gradient-animation {
+  0%, 100% {
     background-position: 0% 50%;
   }
   50% {
     background-position: 100% 50%;
   }
-  100% {
-    background-position: 0% 50%;
-  }
 }
-
