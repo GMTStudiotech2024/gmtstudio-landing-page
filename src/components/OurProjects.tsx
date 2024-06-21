@@ -6,8 +6,8 @@ import projectImage3 from '../assets/images/blog7.png';
 
 const projects = [
   {
-    title: 'Well, I do not know what this is',
-    description: 'My boss did not tell me about this',
+    title: 'GMTStudio  SyncTask OS',
+    description: 'We called our website as the Web OS becuase we think that this is easier to announce the new update for this website.',
     image: projectImage3,
     link: '/error'
   },

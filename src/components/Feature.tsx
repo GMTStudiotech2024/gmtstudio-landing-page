@@ -42,7 +42,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
 
   return (
     <motion.div
-      className="feature-card p-6 bg-gradient-to-r from-purple-600 to-blue-500 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
+      className="feature-card p-6 bg-gradient-to-r from-purple-600 to-yellow-300 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
