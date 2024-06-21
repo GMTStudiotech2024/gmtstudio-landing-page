@@ -11,6 +11,7 @@ import Error from './components/Error';
 import BlogPage1 from './components/BlogPage1';
 import BlogPage2 from './components/BlogPage2';
 import BlogPage3 from './components/BlogPage3';
+import Research from './components/Research'
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Analytics } from "@vercel/analytics/react";
@@ -40,6 +41,7 @@ const App: React.FC = () => {
           <Route path="/blogPage2" element={<BlogPage2 />} />
           <Route path="/blogPage3" element={<BlogPage3 />} />
           <Route path="*" element={<Error />} />
+          <Route path="/research" element={<Research />} />
         </Routes>
         <Analytics />
       </div>

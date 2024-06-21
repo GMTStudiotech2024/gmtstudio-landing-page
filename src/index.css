@@ -24,14 +24,39 @@ body {
 }
 
 .animated-gradient {
+  background: linear-gradient(135deg, #f3ec78, #af4261);
+  background-size: 1000% 1000%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-animation 5s ease infinite;
+}
+
+.animated-gradient-a {
+  background: linear-gradient(270deg, #0747a1, #1065c0, #1e8ae5, #64b7f6, #bbdffb);
+  background-size: 1000% 1000%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-animation 5s ease infinite;
+}
+
+.animated-gradient-b {
   background: linear-gradient(270deg, #FFBF00, #FF7F50, #FF00FF, #7F00FF, #0000FF);
   background-size: 1000% 1000%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: gradientAnimation 5s ease infinite;
+  animation: gradient-animation 5s ease infinite;
 }
 
-@keyframes gradientAnimation {
+.animated-gradient-c {
+  border-image: linear-gradient(270deg, #FFBF00, #FF7F50, #FF00FF, #7F00FF, #0000FF);
+  border-width: 2px;
+  border-style: solid;
+  background-size: 1000% 1000%;
+  -webkit-background-clip: border;
+  animation: gradient-animation 5s ease infinite;
+}
+
+@keyframes gradient-animation {
   0% {
     background-position: 0% 50%;
   }
@@ -41,28 +66,6 @@ body {
   100% {
     background-position: 0% 50%;
   }
-}
-
-.animated-gradient-a {
-  background: linear-gradient(270deg, #0747a1, #1065c0, #1e8ae5, #64b7f6, #bbdffb);
-  background-size: 1000% 1000%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientAnimation 5s ease infinite;
-}
-
-.animated-gradient-b {
-  background: linear-gradient(270deg, #FFBF00, #FF7F50, #FF00FF, #7F00FF, #0000FF);
-  background-size: 1000% 1000%;
-  animation: gradientAnimation 5s ease infinite;
-}
-
-.animated-gradient-c {
-  border: linear-gradient(270deg, #FFBF00, #FF7F50, #FF00FF, #7F00FF, #0000FF);
-  border: 2;
-  background-size: 1000% 1000%;
-  -webkit-background-clip: border;
-  animation: gradientAnimation 5s ease infinite;
 }
 
 @keyframes fadeInUp {
@@ -104,21 +107,4 @@ body {
   justify-content: center;
   text-align: center;
   padding: 20px;
-}
-
-.animated-gradient {
-  background: linear-gradient(135deg, #f3ec78, #af4261);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: gradient-animation 3s ease-in-out infinite;
-}
-
-@keyframes gradient-animation {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
 }
