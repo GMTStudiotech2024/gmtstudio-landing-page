@@ -108,3 +108,61 @@ body {
   text-align: center;
   padding: 20px;
 }
+/* Tailwind CSS with custom classes for the glassy effect and animations */
+@layer utilities {
+  .bg-opacity-20 {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .backdrop-filter {
+    backdrop-filter: blur(10px);
+  }
+
+  .backdrop-blur-lg {
+    backdrop-filter: blur(20px);
+  }
+
+  .border-opacity-10 {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .floating-card {
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1), 10px 10px 0 rgba(74, 144, 226, 0.2);
+  }
+
+  .floating-card:hover {
+    transform: translate(-5px, -5px);
+    box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.2), 15px 15px 0 rgba(74, 144, 226, 0.4);
+  }
+
+  .animated-fade-in-up {
+    animation: fadeInUp 1s ease-in-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 20%, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .animated-gradient {
+    background: linear-gradient(90deg, #ff8a00, #e52e71);
+    background-size: 200% 200%;
+    animation: gradient-animation 3s ease infinite;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  @keyframes gradient-animation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+}
