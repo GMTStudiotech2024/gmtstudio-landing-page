@@ -33,15 +33,6 @@ const Hero: React.FC = () => {
           </a>
         </div>
       </div>
-      <div className="floating-card absolute top-1/2 right-4 transform -translate-y-1/2 p-4 w-64 h-36 rounded-lg shadow-lg bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg border border-solid border-white border-opacity-10 transition-transform duration-500 hover:scale-105">
-        <h3 className="text-xl font-bold mb-2 text-white dark:text-white">Special Event</h3>
-        <p className="text-sm text-white dark:text-gray-400 mb-2">
-          Check out our latest tools and updates.
-        </p>
-        <a href="#special-feature" className="inline-block px-4 py-2 font-semibold rounded-lg bg-purple-500 text-white dark:bg-indigo-600 transition-transform duration-500 hover:scale-105">
-          View Special Events
-        </a>
-      </div>
     </section>
   );
 };

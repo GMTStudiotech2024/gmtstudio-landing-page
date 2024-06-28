@@ -42,12 +42,12 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
 
   return (
     <motion.div
-      className="feature-card p-6 bg-gradient-to-r from-purple-600 to-yellow-300 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
+      className="feature-card p-6  rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
-      <h4 className="text-2xl font-semibold mb-4 text-white">
+      <h4 className="text-2xl font-semibold mb-4 text-black dark:text-white">
         {feature.title}
       </h4>
       <motion.div
@@ -55,11 +55,11 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
         animate={{ height: isExpanded ? 'auto' : '100px' }}
         className="overflow-hidden"
       >
-        <p className="text-lg text-gray-300 mb-4">
+        <p className="text-lg text-black dark:text-white mb-4">
           {feature.description}
         </p>
         {feature.amount && (
-          <p className="text-4xl font-bold mb-4 text-white">
+          <p className="text-4xl font-bold mb-4 text-black dark:text-white">
             {feature.amount}
           </p>
         )}
@@ -81,7 +81,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
       </motion.div>
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="mt-4 text-white hover:text-gray-300 transition-colors duration-200 flex items-center"
+        className="mt-4 text-black dark:text-white hover:text-gray-300 transition-colors duration-200 flex items-center "
       >
         {isExpanded ? 'Show Less' : 'Show More'}
         {isExpanded ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
