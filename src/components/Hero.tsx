@@ -18,13 +18,13 @@ const HeroProminent: React.FC = () => {
     >
       <div className="absolute top-4 right-4 text-right mt-14">
         <div className="animated-fade-in-up">
-          <h1 className="text-5xl sm:text-6xl font-extrabold text-white dark:text-white mb-8">
-            Welcome to <span className="animated-gradient">GMTStudio</span>
+          <h1 className="text-5xl sm:text-6xl font-extrabold text-white dark:text-white mb-8 text-shadow-lg">
+            Welcome to <span className="text-white">GMTStudio</span>
           </h1>
-          <h2 className="text-3xl mb-6 animated-gradient-b">
+          <h2 className="text-3xl mb-6 animated-gradient-b text-shadow-lg">
             Beyond Code, Beyond Limits.
           </h2>
-          <p className="text-2xl text-gray-300 dark:text-gray-300 mb-6">
+          <p className="text-2xl text-gray-300 dark:text-gray-300 mb-6 text-shadow-lg">
             Enhanced Tools and applications to make your life easier.
           </p>
           <a href="#projects" className="inline-block px-10 py-4 font-semibold rounded-lg shadow-md bg-black dark:bg-white text-white dark:text-black transform transition-transform duration-500 hover:scale-105">
