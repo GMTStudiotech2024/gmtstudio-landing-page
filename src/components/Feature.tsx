@@ -15,20 +15,20 @@ type FeatureType = {
 const features: FeatureType[] = [
   {
     title: 'MAZS AI',
-    description: 'The MAZS AI is a Chat bot that Uses NLP (Natural language processing) and responds unproperly to annoy the users',
+    description: 'The MAZS AI is a Chat bot that uses NLP (Natural Language Processing) and responds improperly to annoy users.',
     amount: 'Unlimited',
     status: 'Successfully Launched',
   },
   {
     title: 'Enhanced Database',
-    description: 'By using the new type of storing database, the MAZS AI and all the other applications can provide better user experience',
+    description: 'Using a new type of database storage, the MAZS AI and other applications can provide a better user experience.',
     status: 'For all users',
   },
   {
     title: 'Analytics',
-    description: 'There are no Analytics but just a few Braincells left over here',
+    description: 'There are no analytics but just a few brain cells left over here.',
     currency: '99+',
-    balance: 'Ya, Nothing but braincells',
+    balance: 'Ya, nothing but brain cells',
   },
 ];
 
@@ -42,46 +42,48 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
 
   return (
     <motion.div
-      className="feature-card p-6  rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
+      className="feature-card p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-gray-800"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
-      <h4 className="text-2xl font-semibold mb-4 text-black dark:text-white">
-        {feature.title}
+      <h4 className="text-2xl font-semibold mb-4 text-black dark:text-white flex items-center">
+        <span className="bg-gradient-to-r from-green-400 to-blue-500 text-transparent bg-clip-text">
+          {feature.title}
+        </span>
       </h4>
       <motion.div
         initial={false}
         animate={{ height: isExpanded ? 'auto' : '100px' }}
         className="overflow-hidden"
       >
-        <p className="text-lg text-black dark:text-white mb-4">
+        <p className="text-lg text-gray-800 dark:text-gray-300 mb-4">
           {feature.description}
         </p>
         {feature.amount && (
-          <p className="text-4xl font-bold mb-4 text-black dark:text-white">
+          <p className="text-4xl font-bold mb-4 text-gray-800 dark:text-gray-300">
             {feature.amount}
           </p>
         )}
         {feature.status && (
-          <p className="text-green-300 mb-4">
+          <p className="text-green-500 mb-4">
             {feature.status}
           </p>
         )}
         {feature.currency && (
-          <div className="text-lg text-yellow-300">
+          <div className="text-lg text-yellow-500">
             Braincell count: {feature.currency}
           </div>
         )}
         {feature.balance && (
-          <div className="text-4xl font-bold text-white">
+          <div className="text-4xl font-bold text-gray-800 dark:text-gray-300">
             {feature.balance}
           </div>
         )}
       </motion.div>
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="mt-4 text-black dark:text-white hover:text-gray-300 transition-colors duration-200 flex items-center "
+        className="mt-4 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors duration-200 flex items-center"
       >
         {isExpanded ? 'Show Less' : 'Show More'}
         {isExpanded ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
@@ -92,9 +94,9 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
 
 const Feature: React.FC = () => {
   return (
-    <section id="features" className="py-16 bg-gradient-to-b from-white to-slate-50 dark:from-gray-900 dark:to-black  text-black dark:text-white">
+    <section id="features" className="py-16 bg-gradient-to-b from-white to-slate-50 dark:from-gray-900 dark:to-black text-black dark:text-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
+        <motion.div
           className="flex flex-col lg:flex-row items-center lg:space-x-12 mb-12"
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -122,7 +124,7 @@ const Feature: React.FC = () => {
               Learn More
             </motion.a>
           </div>
-          <motion.div 
+          <motion.div
             className="lg:w-1/2 w-full flex justify-center relative"
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
