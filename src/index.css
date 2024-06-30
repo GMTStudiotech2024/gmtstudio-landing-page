@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Add your custom styles here */
+/* Custom styles */
 body {
   transition: background-color 0.3s, color 0.3s;
 }
@@ -108,6 +108,7 @@ body {
   text-align: center;
   padding: 20px;
 }
+
 /* Tailwind CSS with custom classes for the glassy effect and animations */
 @layer utilities {
   .bg-opacity-20 {
@@ -164,5 +165,42 @@ body {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
+  }
+}
+.footer-section {
+  background: linear-gradient(to bottom, #3a3a3a, #1a1a1a);
+  color: #f0f0f0;
+}
+
+.footer-section p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.footer-link {
+  margin: 0 8px;
+  color: #b3b3b3;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.footer-link:focus {
+  outline: none;
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .footer-section {
+    padding: 16px 0;
+  }
+
+  .footer-link {
+    display: block;
+    margin: 8px 0;
   }
 }

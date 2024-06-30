@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import ThemeToggle from './ThemeToggle';
 import { FaBars, FaTimes, FaSearch, FaUser, FaChevronDown } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar: React.FC = () => {
-  // State management for different menu states
   const [isOpen, setIsOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
 
-  // Effect to handle scroll position for navbar background change
   useEffect(() => {
     const handleScroll = () => {
       setScrollPosition(window.pageYOffset);
@@ -20,14 +18,11 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Toggle functions for menu states
   const toggleMenu = () => {
     setIsOpen(!isOpen);
-    if (isOpen) {
-      setIsProductsOpen(false);
-      setIsProfileOpen(false);
-      setIsSearchOpen(false);
-    }
+    setIsProductsOpen(false);
+    setIsProfileOpen(false);
+    setIsSearchOpen(false);
   };
 
   const toggleProductsMenu = () => {
@@ -48,7 +43,6 @@ const Navbar: React.FC = () => {
     setIsProfileOpen(false);
   };
 
-  // Animation variants for menu transitions
   const menuVariants = {
     hidden: { opacity: 0, y: -20 },
     visible: { opacity: 1, y: 0 },
@@ -57,41 +51,28 @@ const Navbar: React.FC = () => {
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${scrollPosition > 50 ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        {/* Logo */}
         <div className="text-2xl font-extrabold bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-cyan-600 dark:to-blue-600">
           GMTStudio
         </div>
 
-        {/* Desktop Navigation */}
         <div className="hidden lg:flex space-x-6 items-center">
           <NavLink href="/" label="Home" />
           <NavLink href="/research" label="Research" />
-          <div className="relative group">
-            <button onClick={toggleProductsMenu} className="flex items-center px-3 py-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
-              Products <FaChevronDown className="ml-1" />
-            </button>
-            <AnimatePresence>
-              {isProductsOpen && (
-                <motion.div
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                  variants={menuVariants}
-                  className="absolute left-0 mt-2 w-56 bg-white dark:bg-gray-900 shadow-lg rounded-lg overflow-hidden"
-                >
-                  <ProductLink href="https://gmt-studio-ai-workspace.vercel.app/" label="GMTStudio AI WorkSpace" />
-                  <ProductLink href="https://theta-plum.vercel.app/" label="Theta Social Media Platform" />
-                  <ProductLink href="/our-projects" label="Project 3" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          <DropdownMenu 
+            label="Products"
+            isOpen={isProductsOpen}
+            toggleMenu={toggleProductsMenu}
+            items={[
+              { href: "https://gmt-studio-ai-workspace.vercel.app/", label: "GMTStudio AI WorkSpace" },
+              { href: "https://theta-plum.vercel.app/", label: "Theta Social Media Platform" },
+              { href: "/our-projects", label: "Project 3" }
+            ]}
+          />
           <SearchButton toggleSearch={toggleSearch} isSearchOpen={isSearchOpen} />
           <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} />
           <ThemeToggle />
         </div>
 
-        {/* Mobile Navigation */}
         <div className="lg:hidden flex items-center space-x-4">
           <SearchButton toggleSearch={toggleSearch} isSearchOpen={isSearchOpen} />
           <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} />
@@ -102,7 +83,6 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -114,64 +94,77 @@ const Navbar: React.FC = () => {
           >
             <NavLink href="/" label="Home" />
             <NavLink href="/research" label="Research" />
-            <div className="relative">
-              <button onClick={toggleProductsMenu} className="flex items-center w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
-                Products <FaChevronDown className="ml-1" />
-              </button>
-              <AnimatePresence>
-                {isProductsOpen && (
-                  <motion.div
-                    initial="hidden"
-                    animate="visible"
-                    exit="hidden"
-                    variants={menuVariants}
-                    className="mt-2 w-full bg-white dark:bg-gray-900 shadow-lg rounded-lg overflow-hidden"
-                  >
-                    <ProductLink href="https://gmt-studio-ai-workspace.vercel.app/" label="GMTStudio AI WorkSpace" />
-                    <ProductLink href="https://theta-plum.vercel.app/" label="Theta Social Media Platform" />
-                    <ProductLink href="/our-projects" label="Project 3" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            <DropdownMenu 
+              label="Products"
+              isOpen={isProductsOpen}
+              toggleMenu={toggleProductsMenu}
+              items={[
+                { href: "https://gmt-studio-ai-workspace.vercel.app/", label: "GMTStudio AI WorkSpace" },
+                { href: "https://theta-plum.vercel.app/", label: "Theta Social Media Platform" },
+                { href: "/our-projects", label: "Project 3" }
+              ]}
+            />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Search Overlay */}
       <SearchOverlay isSearchOpen={isSearchOpen} toggleSearch={toggleSearch} />
-
-      {/* Profile Overlay */}
       <ProfileOverlay isProfileOpen={isProfileOpen} toggleProfileMenu={toggleProfileMenu} />
     </nav>
   );
 }
 
-// NavLink component for individual navigation links
 const NavLink: React.FC<{ href: string; label: string }> = ({ href, label }) => (
-  <a href={href} className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">{label}</a>
+  <a href={href} className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
+    {label}
+  </a>
 );
 
-// ProductLink component for product-related links
+const DropdownMenu: React.FC<{ label: string; isOpen: boolean; toggleMenu: () => void; items: { href: string; label: string }[] }> = ({ label, isOpen, toggleMenu, items }) => (
+  <div className="relative">
+    <button onClick={toggleMenu} className="flex items-center px-3 py-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
+      {label} <FaChevronDown className="ml-1" />
+    </button>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+
+          variants={{
+            hidden: { opacity: 0, y: -20 },
+            visible: { opacity: 1, y: 0 },
+          }}
+          className="absolute left-0 mt-2 w-56 bg-white dark:bg-gray-900 shadow-lg rounded-lg overflow-hidden"
+        >
+          {items.map(item => (
+            <ProductLink key={item.href} href={item.href} label={item.label} />
+          ))}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+);
+
 const ProductLink: React.FC<{ href: string; label: string }> = ({ href, label }) => (
-  <a href={href} className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300">{label}</a>
+  <a href={href} className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300">
+    {label}
+  </a>
 );
 
-// SearchButton component for the search button
 const SearchButton: React.FC<{ toggleSearch: () => void; isSearchOpen: boolean }> = ({ toggleSearch, isSearchOpen }) => (
   <button onClick={toggleSearch} className="block p-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
     <FaSearch className={`w-5 h-5 ${isSearchOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
   </button>
 );
 
-// ProfileButton component for the profile button
 const ProfileButton: React.FC<{ toggleProfileMenu: () => void; isProfileOpen: boolean }> = ({ toggleProfileMenu, isProfileOpen }) => (
   <button onClick={toggleProfileMenu} className="block p-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
     <FaUser className={`w-5 h-5 ${isProfileOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
   </button>
 );
 
-// SearchOverlay component for the search modal overlay
 const SearchOverlay: React.FC<{ isSearchOpen: boolean; toggleSearch: () => void }> = ({ isSearchOpen, toggleSearch }) => (
   <AnimatePresence>
     {isSearchOpen && (
@@ -194,7 +187,6 @@ const SearchOverlay: React.FC<{ isSearchOpen: boolean; toggleSearch: () => void 
   </AnimatePresence>
 );
 
-// ProfileOverlay component for the profile modal overlay
 const ProfileOverlay: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () => void }> = ({ isProfileOpen, toggleProfileMenu }) => (
   <AnimatePresence>
     {isProfileOpen && (
