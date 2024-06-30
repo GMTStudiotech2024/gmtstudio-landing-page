@@ -14,7 +14,7 @@ const HeroProminent: React.FC = () => {
   return (
     <section
       id="hero"
-      className={`pt-20 pb-10 h-screen flex place-items-center justify-center text-center relative ${isDarkMode ? 'dark-mode-wallpaper' : 'light-mode-wallpaper'}`}
+      className={`pt-20 h-screen flex place-items-center justify-center text-center relative ${isDarkMode ? 'dark-mode-wallpaper' : 'light-mode-wallpaper'}`}
     >
       <div className="absolute top-4 right-4 text-right mt-14">
         <div className="animated-fade-in-up">

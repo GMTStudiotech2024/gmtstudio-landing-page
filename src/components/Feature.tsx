@@ -94,7 +94,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
 
 const Feature: React.FC = () => {
   return (
-    <section id="features" className="py-16 bg-gradient-to-b from-white to-slate-50 dark:from-gray-900 dark:to-black text-black dark:text-white">
+    <section id="features" className="py-16 bg-gradient-to-b from-white to-slate-50 dark:from-gray-900 dark:to-black text-black dark:text-white  bck-cus">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="flex flex-col lg:flex-row items-center lg:space-x-12 mb-12"

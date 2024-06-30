@@ -9,7 +9,7 @@ const services = [
 
 const AboutUs: React.FC = () => {
   return (
-    <section id="about" className="py-16 bg-gray-100 dark:bg-gray-900">
+    <section id="about" className="py-16 bg-black dark:bg-gray-900 ">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-12 text-center tracking-wide">About Us</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" data-aos="fade-up">

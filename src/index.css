@@ -78,7 +78,26 @@ body {
     opacity: 1;
   }
 }
+/* main.css or a specific CSS file/module */
+.background-custom {
+  background-image: url('../src/assets/images/AAAAA.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.bck-cus{
+  background-image: url('../src/assets/images/CCCC.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 
+.bck-cus2{
+  background-image: url('../src/assets/images/1.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 .animated-fade-in-up {
   animation: fadeInUp 1s ease-out forwards;
 }
@@ -167,40 +186,39 @@ body {
     100% { background-position: 0% 50%; }
   }
 }
+@import url("https://fonts.googleapis.com/css?family=IBM+Plex+Sans:500|IBM+Plex+Sans:300");
+
 .footer-section {
-  background: linear-gradient(to bottom, #3a3a3a, #1a1a1a);
-  color: #f0f0f0;
+  background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
+  padding: 4rem 0;
+  text-align: center;
+  color: white;
+  position: relative;
 }
 
-.footer-section p {
-  margin: 0;
-  font-size: 0.9rem;
+.footer-links {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  gap: 1rem;
 }
 
 .footer-link {
-  margin: 0 8px;
-  color: #b3b3b3;
-  transition: color 0.3s ease;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 1rem;
+  color: white;
+  transition: color 0.3s;
+  padding: 0.5rem;
+  text-decoration: none;
 }
 
 .footer-link:hover {
-  color: #ffffff;
-  text-decoration: underline;
+  color: #fdbb2d;
 }
 
-.footer-link:focus {
-  outline: none;
-  color: #ffffff;
-  text-decoration: underline;
-}
-
-@media (max-width: 640px) {
-  .footer-section {
-    padding: 16px 0;
-  }
-
-  .footer-link {
-    display: block;
-    margin: 8px 0;
-  }
+.footer-section p {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.875rem;
+  color: #a8a8a8;
+  margin-top: 2rem;
 }

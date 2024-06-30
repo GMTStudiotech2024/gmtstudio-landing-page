@@ -32,7 +32,7 @@ const blogPosts = [
 
 const Blog: React.FC = () => {
   return (
-    <section id="blog" className="py-16 bg-white dark:bg-gray-800">
+    <section id="blog" className="py-16 bg-black dark:bg-gray-800 ">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-12 text-center animated-gradient-a">
           Our Blog
