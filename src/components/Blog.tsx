@@ -5,6 +5,14 @@ import blogImage3 from '../assets/images/blog7.png';
 
 const blogPosts = [
   { 
+    image: blogImage3, 
+    title: "Story Vending Machine", 
+    excerpt: "New project idea from GMTStudio ", 
+    author: "Alston Chang", 
+    date: "July 1, 2024",
+    link: "/BlogPage3"
+  },
+  { 
     image: blogImage1, 
     title: "MAZS AI", 
     excerpt: "GMTStudio Ai workspace provides the service of Artificial Intelligence.", 
@@ -19,14 +27,6 @@ const blogPosts = [
     author: "Lucus Yeh", 
     date: "May 25, 2024",
     link: "/BlogPage2"
-  },
-  { 
-    image: blogImage3, 
-    title: "Blog Post ", 
-    excerpt: "We don't have this Blog yet ", 
-    author: "Coworker", 
-    date: "June 18, 2024",
-    link: "/BlogPage3"
   }
 ];
 

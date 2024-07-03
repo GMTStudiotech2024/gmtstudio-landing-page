@@ -36,9 +36,9 @@ const App: React.FC = () => {
               <Footer />
             </>
           } />
+          <Route path="/blogPage3" element={<BlogPage3 />} />
           <Route path="/blogPage1" element={<BlogPage1 />} />
           <Route path="/blogPage2" element={<BlogPage2 />} />
-          <Route path="/blogPage3" element={<BlogPage3 />} />
           <Route path="/research" element={<Research />} />
           <Route path="*" element={<Error />} />
         </Routes>
