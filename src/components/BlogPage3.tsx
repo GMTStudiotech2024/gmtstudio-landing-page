@@ -25,7 +25,7 @@ const BlogPage3: React.FC = () => {
         </p>
         <div className="text-gray-900 dark:text-gray-100 leading-relaxed">
           <p>Hello guys ! I am happy to announce a new application that can make you more friend, and getting know with each other more and more </p>
-          <p>We called this new application a Story VEnding machine, more detailed information would come out next month</p>
+          <p>We called this new application a Story Vending machine, more detailed information would come out next month</p>
         </div>
       </main>
       <footer className="bg-gray-800 text-white py-4 text-center">
