@@ -1,0 +1,6 @@
+@media (max-width: 768px) {
+    .chat-widget {
+      display: none;
+    }
+  }
+  

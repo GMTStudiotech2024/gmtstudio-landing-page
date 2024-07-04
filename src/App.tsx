@@ -15,7 +15,10 @@ import Research from './components/Research';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Analytics } from "@vercel/analytics/react";
-import Learning from "./components/Learning"
+import Learning from "./components/Learning";
+import ChatWidget from './components/ChatWidget'; // Import the ChatWidget component
+import "./components/st.css"
+
 const App: React.FC = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -44,6 +47,7 @@ const App: React.FC = () => {
           <Route path="/Learning" element={<Learning/>}/>
         </Routes>
         <Analytics />
+        <ChatWidget /> {/* Add the ChatWidget component */}
       </div>
     </Router>
   );

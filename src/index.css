@@ -321,3 +321,8 @@ body {
   color: #a8a8a8;
   margin-top: 2rem;
 }
+@media (max-width: 768px) {
+  .chat-widget {
+    display: none;
+  }
+}
