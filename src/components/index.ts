@@ -6,3 +6,4 @@ export { default as Footer } from './Footer';
 export { default as ThemeToggle } from './ThemeToggle';
 export { default as Error} from './Error';
 export { default as Research } from "./Research";
+export {default as  Learning} from"./Learning"

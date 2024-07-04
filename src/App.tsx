@@ -15,7 +15,7 @@ import Research from './components/Research';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Analytics } from "@vercel/analytics/react";
-
+import Learning from "./components/Learning"
 const App: React.FC = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -41,6 +41,7 @@ const App: React.FC = () => {
           <Route path="/blogPage2" element={<BlogPage2 />} />
           <Route path="/research" element={<Research />} />
           <Route path="*" element={<Error />} />
+          <Route path="/Learning" element={<Learning/>}/>
         </Routes>
         <Analytics />
       </div>
