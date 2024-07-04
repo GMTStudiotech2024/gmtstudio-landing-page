@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans:500|IBM+Plex+Sans:300');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -78,26 +81,116 @@ body {
     opacity: 1;
   }
 }
-/* main.css or a specific CSS file/module */
+
+/* Blog slider styles */
+.blog-slider {
+  width: 95%;
+  position: relative;
+  max-width: 800px;
+  margin: auto;
+  background: #fff;
+  box-shadow: 0px 14px 80px rgba(34, 35, 58, 0.2);
+  padding: 25px;
+  border-radius: 25px;
+  height: 400px;
+  transition: all 0.3s;
+}
+
+.blog-slider__wrp {
+  display: flex;
+  overflow: hidden;
+}
+
+.blog-slider__item {
+  display: flex;
+  align-items: center;
+  transition: opacity 0.5s;
+  opacity: 0;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.blog-slider__item.swiper-slide-active {
+  opacity: 1;
+}
+
+.blog-slider__img {
+  width: 300px;
+  flex-shrink: 0;
+  height: 300px;
+  background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);
+  box-shadow: 4px 13px 30px 1px rgba(252, 56, 56, 0.2);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.blog-slider__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.blog-slider__content {
+  padding-left: 25px;
+}
+
+.blog-slider__code {
+  color: #7b7992;
+  margin-bottom: 15px;
+  display: block;
+  font-weight: 500;
+}
+
+.blog-slider__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0d0925;
+  margin-bottom: 20px;
+}
+
+.blog-slider__text {
+  color: #4e4a67;
+  margin-bottom: 30px;
+  line-height: 1.5em;
+}
+
+.blog-slider__button {
+  display: inline-flex;
+  background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);
+  padding: 15px 35px;
+  border-radius: 50px;
+  color: #fff;
+  box-shadow: 0px 14px 80px rgba(252, 56, 56, 0.4);
+  text-decoration: none;
+  font-weight: 500;
+  justify-content: center;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+/* Background images */
 .background-custom {
   background-image: url('../src/assets/images/AAAAA.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
-.bck-cus{
+
+.bck-cus {
   background-image: url('../src/assets/images/CCCC.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-.bck-cus2{
+.bck-cus2 {
   background-image: url('../src/assets/images/1.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
+
 .animated-fade-in-up {
   animation: fadeInUp 1s ease-out forwards;
 }
@@ -181,13 +274,19 @@ body {
   }
 
   @keyframes gradient-animation {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
   }
 }
-@import url("https://fonts.googleapis.com/css?family=IBM+Plex+Sans:500|IBM+Plex+Sans:300");
 
+/* Footer styles */
 .footer-section {
   background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
   padding: 4rem 0;

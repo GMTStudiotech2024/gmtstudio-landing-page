@@ -103,6 +103,9 @@ const Learning: React.FC = () => {
               Live Share Extension
             </a>
           </li>
+          <li>
+            Always tell the AI th enhnace and expand 
+          </li>
         </ul>
       </div>
     </div>

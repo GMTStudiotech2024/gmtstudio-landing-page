@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faExternalLinkAlt, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-import projectImage1 from '../assets/images/blog4.png';
+import projectImage1 from '../assets/images/MazsAiPic.png';
 import projectImage2 from '../assets/images/blog5.png';
 import projectImage3 from '../assets/images/Story.jpg';
 
