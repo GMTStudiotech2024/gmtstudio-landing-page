@@ -60,10 +60,30 @@ const Learning: React.FC = () => {
           After generating ideas with the AI, you may wonder how to implement them. Here are some essentials you might need:
         </p>
         <ul className="list-disc list-inside text-lg mb-4">
-          <li>Visual Studio Code</li>
-          <li>Access to fresh water to stay hydrated</li>
-          <li>A calm and focused mind</li>
-          <li>Be ready to use keyboard shortcuts like Ctrl+A, Ctrl+C, and Ctrl+V</li>
+          <li>
+            Visual Studio Code
+            <a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer" className="block mt-1 text-blue-500 underline">
+              Visual Studio Code
+            </a>
+          </li>
+          <li>
+            Access to fresh water to stay hydrated
+            <a href="https://www.healthline.com/nutrition/how-much-water-should-you-drink-per-day" target="_blank" rel="noopener noreferrer" className="block mt-1 text-blue-500 underline">
+              Stay Hydrated
+            </a>
+          </li>
+          <li>
+            A calm and focused mind
+            <a href="https://www.mindful.org/how-to-meditate/" target="_blank" rel="noopener noreferrer" className="block mt-1 text-blue-500 underline">
+              Meditation Guide
+            </a>
+          </li>
+          <li>
+            Be ready to use keyboard shortcuts like Ctrl+A, Ctrl+C, and Ctrl+V
+            <a href="https://support.microsoft.com/en-us/office/keyboard-shortcuts-in-windows-10-dcc61a57-8ff0-cffe-9796-cb9706c75eec" target="_blank" rel="noopener noreferrer" className="block mt-1 text-blue-500 underline">
+              Keyboard Shortcuts
+            </a>
+          </li>
         </ul>
 
         <h3 className="text-2xl font-bold mb-4 text-yellow-300">What If There Are Mistakes?</h3>
@@ -73,9 +93,15 @@ const Learning: React.FC = () => {
         <ul className="list-disc list-inside text-lg mb-4">
           <li>
             Use the VS Code extension called Cody to help with bugs and errors.
+            <a href="https://sourcegraph.com/cody" target="_blank" rel="noopener noreferrer" className="block mt-1 text-blue-500 underline">
+              Cody Extension
+            </a>
           </li>
           <li>
-            Summon a <span className="text-yellow-300 text-bold">Duck</span> to assist you by using the Live Share extension for collaborative debugging.
+            Summon a <span className="text-yellow-300">Duck</span> to assist you by using the Live Share extension for collaborative debugging.
+            <a href="https://marketplace.visualstudio.com/items?itemName=MS-vsliveshare.vsliveshare" target="_blank" rel="noopener noreferrer" className="block mt-1 text-blue-500 underline">
+              Live Share Extension
+            </a>
           </li>
         </ul>
       </div>
