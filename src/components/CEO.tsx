@@ -37,9 +37,9 @@ const CEOIntroduction: React.FC = () => {
   return (
     <div className="ceo-introduction">
       <h1 className="text-center text-4xl font-bold mb-8 pt-10 text-white">Meet Our Leadership Team</h1>
-      <div className="flex justify-center space-x-8">
+      <div className="flex flex-wrap justify-center space-x-0 md:space-x-8">
         {ceos.map((ceo, index) => (
-          <div key={index} className={`relative overflow-hidden w-60 h-80 rounded-3xl cursor-pointer text-2xl font-bold ${ceo.color} ceo-card`}>
+          <div key={index} className={`relative overflow-hidden w-60 h-80 m-4 rounded-3xl cursor-pointer text-2xl font-bold ${ceo.color} ceo-card`}>
             <div className="z-10 absolute w-full h-full peer"></div>
             <div className="absolute peer-hover:-top-20 peer-hover:-left-16 peer-hover:w-[140%] peer-hover:h-[140%] -top-32 -left-16 w-32 h-44 rounded-full bg-purple-300 transition-all duration-500"></div>
             <div className="absolute flex text-xl text-center items-end justify-end peer-hover:right-0 peer-hover:rounded-b-none peer-hover:bottom-0 peer-hover:items-center peer-hover:justify-center peer-hover:w-full peer-hover:h-full -bottom-32 -right-16 w-36 h-44 rounded-full bg-purple-300 transition-all duration-500">
