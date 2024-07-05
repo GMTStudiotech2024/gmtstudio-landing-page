@@ -204,7 +204,7 @@ const ProfileOverlay: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () =
             </button>
           </div>
           <div className="space-y-4">
-            <a href="/profile" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-300">Profile</a>
+            <a href="/CEO" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-300">About Three CEO</a>
             <a href="/settings" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-300">Settings</a>
             <a href="/logout" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-300">Logout</a>
             <a href="/Learning " className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-300">Project Learning</a>

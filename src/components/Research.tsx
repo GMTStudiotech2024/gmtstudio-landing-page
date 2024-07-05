@@ -1,8 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaChevronRight } from 'react-icons/fa';
+import { FaChevronRight, FaRocket, FaShieldAlt, FaBitcoin } from 'react-icons/fa';
 
-import { FaRocket, FaShieldAlt, FaBitcoin } from 'react-icons/fa';
 const ResearchCard = ({
   title,
   description,
@@ -10,7 +9,6 @@ const ResearchCard = ({
 }: {
   title: string;
   description: string;
-
   Icon: React.ComponentType<{ className: string }>;
 }) => (
   <motion.div
@@ -21,9 +19,7 @@ const ResearchCard = ({
     <div className="flex p-6 items-center space-x-4">
       <Icon className="text-4xl text-blue-500 dark:text-blue-400" />
       <div>
-        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-          {title}
-        </h3>
+        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">{title}</h3>
         <p className="mt-2 text-gray-700 dark:text-gray-300">{description}</p>
       </div>
       <FaChevronRight className="ml-auto text-gray-400 dark:text-gray-500" />
