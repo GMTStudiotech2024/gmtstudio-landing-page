@@ -29,7 +29,7 @@ interface ServiceCardProps {
 
 const ServiceCard: React.FC<ServiceCardProps> = ({ title, description }) => {
   return (
-    <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg transform transition-transform hover:scale-105 duration-300 ease-in-out">
+    <div className="bg-gray-800 dark:bg-gray-800 p-8 rounded-xl shadow-lg transform transition-transform hover:scale-105 duration-300 ease-in-out">
       <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">{title}</h3>
       <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{description}</p>
     </div>

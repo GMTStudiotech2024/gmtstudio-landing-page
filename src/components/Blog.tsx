@@ -32,16 +32,16 @@ const blogPosts = [
 
 const Blog: React.FC = () => {
   return (
-    <section id="blog" className="py-16 bg-gray-100 dark:bg-gray-800">
+    <section id="blog" className="py-16 bg-black dark:bg-gray-800">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-12 text-center">
+        <h2 className="text-4xl font-bold text-white dark:text-white mb-12 text-center">
           Our Blog
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {blogPosts.map((post, index) => (
             <div 
               key={index} 
-              className="relative flex w-full flex-col rounded-xl bg-white bg-clip-border text-gray-700 shadow-md dark:bg-gray-900 transition-transform duration-300 ease-in-out transform hover:scale-105"
+              className="relative flex w-full flex-col rounded-xl bg-gray-800 bg-clip-border text-gray-700 shadow-md dark:bg-gray-900 transition-transform duration-300 ease-in-out transform hover:scale-105"
             >
               <div className="relative mx-4 -mt-6 h-56 overflow-hidden rounded-xl bg-gradient-to-r from-red-500 to-orange-500">
                 <img 
@@ -52,10 +52,10 @@ const Blog: React.FC = () => {
               </div>
               <div className="p-8">
                 <p className="text-gray-500 dark:text-gray-400 mb-1">{post.date}</p>
-                <h5 className="mb-2 text-2xl font-semibold leading-snug tracking-normal text-gray-900 dark:text-white">
+                <h5 className="mb-2 text-2xl font-semibold leading-snug tracking-normal text-white dark:text-white">
                   {post.title}
                 </h5>
-                <p className="mb-4 text-gray-700 dark:text-gray-300">
+                <p className="mb-4 text-white dark:text-gray-300">
                   {post.excerpt}
                 </p>
                 <a 

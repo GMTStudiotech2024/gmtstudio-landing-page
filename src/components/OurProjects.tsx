@@ -53,7 +53,7 @@ const OurProjects: React.FC = () => {
           {projects.map((project, index) => (
             <div
               key={index}
-              className="group relative max-w-2xl rounded-3xl border border-gray-100 bg-gray-200 p-6 shadow-2xl shadow-gray-600/10 dark:border-gray-700 dark:bg-gray-900 dark:shadow-none sm:p-8 transform transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg"
+              className="group relative max-w-2xl rounded-3xl border border-gray-800 bg-gray-800 p-6 shadow-2xl shadow-gray-600/10 dark:border-gray-700 dark:bg-gray-900 dark:shadow-none sm:p-8 transform transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg"
               onClick={() => handleProjectClick(project.link)}
               role="button"
               aria-label={`View project ${project.title}`}
@@ -69,11 +69,11 @@ const OurProjects: React.FC = () => {
                 />
               </div>
               <div className="relative mt-6">
-                <h3 className="text-2xl font-semibold text-rose-800 dark:text-rose-300 mb-4 flex items-center">
+                <h3 className="text-2xl font-semibold text-gray-300 dark:text-gray-300 mb-4 flex items-center">
                   <FontAwesomeIcon icon={project.icon} className="mr-2" />
                   {project.title}
                 </h3>
-                <p className="mt-4 mb-8 text-gray-600 dark:text-gray-300">
+                <p className="mt-4 mb-8 text-gray-300 dark:text-gray-300">
                   {project.description}
                 </p>
                 <button

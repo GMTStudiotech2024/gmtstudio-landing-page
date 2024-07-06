@@ -42,12 +42,12 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
 
   return (
     <motion.div
-      className="feature-card p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-gray-800"
+      className="feature-card p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 bg-gray-800 dark:bg-gray-800"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
-      <h4 className="text-2xl font-semibold mb-4 text-black dark:text-white flex items-center">
+      <h4 className="text-2xl font-semibold mb-4 text-white dark:text-white flex items-center">
         <span className="bg-gradient-to-r from-green-400 to-blue-500 text-transparent bg-clip-text">
           {feature.title}
         </span>
@@ -57,7 +57,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
         animate={{ height: isExpanded ? 'auto' : '100px' }}
         className="overflow-hidden"
       >
-        <p className="text-lg text-gray-800 dark:text-gray-300 mb-4">
+        <p className="text-lg text-gray-300 dark:text-gray-300 mb-4">
           {feature.description}
         </p>
         {feature.amount && (
@@ -94,7 +94,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
 
 const Feature: React.FC = () => {
   return (
-    <section id="features" className="py-16 bg-gradient-to-b from-white to-slate-50 dark:from-gray-900 dark:to-black text-white dark:text-white  bck-cus">
+    <section id="features" className="py-16 bg-gradient-to-b from-gray-800 to-gray-800 dark:from-gray-900 dark:to-black text-white dark:text-white  bck-cus">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="flex flex-col lg:flex-row items-center lg:space-x-12 mb-12"
