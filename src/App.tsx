@@ -18,7 +18,7 @@ import { Analytics } from "@vercel/analytics/react";
 import Learning from "./components/Learning";
 import "./components/st.css"
 import "./components/CEO"
-import { CEO } from './components';
+import { CEO, ChatWidget } from './components';
 const App: React.FC = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -46,6 +46,7 @@ const App: React.FC = () => {
           <Route path="*" element={<Error />} />
           <Route path="/Learning" element={<Learning/>}/>
           <Route path="/CEO" element={<CEO />} />
+          <Route path="/ChatWidget" element={<ChatWidget />} />
         </Routes>
         <Analytics />
       </div>
