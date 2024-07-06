@@ -27,7 +27,7 @@ const HeroProminent: React.FC = () => {
           <p className="text-2xl text-gray-300 mb-6 text-shadow-lg">
             Enhanced Tools and applications to make your life easier.
           </p>
-          <a href="#projects" className="inline-block px-10 py-4 font-semibold rounded-lg shadow-md bg-black dark:bg-white text-white dark:text-black transform transition-transform duration-500 hover:scale-105">
+          <a href="#projects" className="inline-block px-10 py-4 font-semibold rounded-lg shadow-md bg-gray-400 dark:bg-black text-white dark:text-black transform transition-transform duration-500 hover:scale-105">
             Learn More
           </a>
         </div>
