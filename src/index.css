@@ -10,7 +10,6 @@ body {
   font-family: 'Fira Sans', sans-serif;
 }
 
-
 .hero-section {
   @apply pt-20 pb-10 bg-gray-50 dark:bg-gray-900;
 }
@@ -202,6 +201,7 @@ body {
   background-position: center;
   opacity: 0.5;
 }
+
 .dark-mode-wallpaper {
   background-image: url("../src/assets/images/GMTStudio_d.png");
   background-size: cover;
@@ -321,10 +321,9 @@ body {
   color: #a8a8a8;
   margin-top: 2rem;
 }
+
 @media (max-width: 768px) {
   .chat-widget {
     display: none;
   }
 }
-
-
