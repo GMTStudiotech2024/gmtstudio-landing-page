@@ -33,7 +33,7 @@ const Hero: React.FC = () => {
       >
         <div className="relative z-10 p-4 sm:p-8 max-w-4xl">
           <motion.h1
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-white mb-4"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-2 sm:mb-4"
             initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
@@ -41,7 +41,7 @@ const Hero: React.FC = () => {
             Welcome to <span className="text-indigo-400">GMTStudio</span>
           </motion.h1>
           <motion.p
-            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-300 mb-8"
+            className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-4 sm:mb-8"
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -50,7 +50,7 @@ const Hero: React.FC = () => {
           </motion.p>
           <motion.button
             onClick={handleLearnMoreClick}
-            className="inline-flex items-center px-6 py-3 sm:px-8 sm:py-4 font-semibold rounded-lg shadow-lg bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
+            className="inline-flex items-center px-4 sm:px-8 py-2 sm:py-3 font-semibold rounded-lg shadow-lg bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             initial={{ y: 20, opacity: 0 }}
