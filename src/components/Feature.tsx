@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import featureImage from '../assets/images/feature.png';
@@ -93,8 +93,16 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
 };
 
 const Feature: React.FC = () => {
+  const moreFeaturesRef = useRef<HTMLDivElement>(null);
+
+  const handleLearnMoreClick = () => {
+    if (moreFeaturesRef.current) {
+      moreFeaturesRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section id="features" className="py-16 bg-gradient-to-b from-gray-800 to-gray-800 dark:from-gray-900 dark:to-black text-white dark:text-white  bck-cus">
+    <section id="features" className="py-16 bg-gradient-to-b from-gray-800 to-gray-800 dark:from-gray-900 dark:to-black text-white dark:text-white bck-cus">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="flex flex-col lg:flex-row items-center lg:space-x-12 mb-12"
@@ -115,14 +123,14 @@ const Feature: React.FC = () => {
               <li>Optimized performance for a smooth user experience.</li>
               <li>Integrated with the latest technologies for best practices.</li>
             </ul>
-            <motion.a
-              href="#more-features"
+            <motion.button
+              onClick={handleLearnMoreClick}
               className="inline-block mt-8 px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-600 transition duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               Learn More
-            </motion.a>
+            </motion.button>
           </div>
           <motion.div
             className="lg:w-1/2 w-full flex justify-center relative"
@@ -137,7 +145,7 @@ const Feature: React.FC = () => {
             />
           </motion.div>
         </motion.div>
-        <div id="more-features">
+        <div id="more-features" ref={moreFeaturesRef}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <FeatureCard key={index} feature={feature} index={index} />

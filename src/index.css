@@ -198,14 +198,14 @@ body {
 
 /* Light mode background image */
 .light-mode-wallpaper {
-  background-image: url("../src/assets/images/GMTStudio_d.png");
+  background-image: url("../src/assets/images/GMTSS.png");
   background-size: cover;
   background-position: center;
 }
 
 /* Dark mode background image */
 .dark-mode-wallpaper {
-  background-image: url('../src/assets/images/GMTStudio_d.png');
+  background-image: url('../src/assets/images/GMTSS.png');
   background-size: cover;
   background-position: center;
 }
@@ -327,3 +327,5 @@ body {
     display: none;
   }
 }
+
+

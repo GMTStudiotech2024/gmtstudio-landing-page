@@ -1,3 +1,5 @@
+// App.tsx
+
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -12,13 +14,14 @@ import BlogPage1 from './components/BlogPage1';
 import BlogPage2 from './components/BlogPage2';
 import BlogPage3 from './components/BlogPage3';
 import Research from './components/Research';
+import Learning from './components/Learning';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Analytics } from "@vercel/analytics/react";
-import Learning from "./components/Learning";
-import "./components/st.css"
-import "./components/CEO"
+import './components/st.css';
 import { CEO } from './components';
+import CustomCursor from './components/CustomCursor'; // Import CustomCursor
+
 const App: React.FC = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -27,6 +30,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <div className="App">
+        <CustomCursor /> {/* Add CustomCursor here */}
         <Navbar />
         <Routes>
           <Route path="/" element={
@@ -43,9 +47,9 @@ const App: React.FC = () => {
           <Route path="/blogPage1" element={<BlogPage1 />} />
           <Route path="/blogPage2" element={<BlogPage2 />} />
           <Route path="/research" element={<Research />} />
+          <Route path="/learning" element={<Learning />} />
+          <Route path="/ceo" element={<CEO />} />
           <Route path="*" element={<Error />} />
-          <Route path="/Learning" element={<Learning/>}/>
-          <Route path="/CEO" element={<CEO />} />
         </Routes>
         <Analytics />
       </div>
