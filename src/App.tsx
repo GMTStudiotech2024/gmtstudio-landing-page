@@ -1,5 +1,3 @@
-// App.tsx
-
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -20,7 +18,7 @@ import 'aos/dist/aos.css';
 import { Analytics } from "@vercel/analytics/react";
 import './components/st.css';
 import { CEO } from './components';
-import CustomCursor from './components/CustomCursor'; // Import CustomCursor
+import CustomCursor from './components/CustomCursor';
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -29,28 +27,30 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <div className="App">
-        <CustomCursor /> {/* Add CustomCursor here */}
+      <div className="App bg-gray-900 min-h-screen flex flex-col">
+        <CustomCursor />
         <Navbar />
-        <Routes>
-          <Route path="/" element={
-            <>
-              <Hero />
-              <OurProjects />
-              <Feature />
-              <Blog />
-              <Testimonials />
-              <Footer />
-            </>
-          } />
-          <Route path="/blogPage3" element={<BlogPage3 />} />
-          <Route path="/blogPage1" element={<BlogPage1 />} />
-          <Route path="/blogPage2" element={<BlogPage2 />} />
-          <Route path="/research" element={<Research />} />
-          <Route path="/learning" element={<Learning />} />
-          <Route path="/ceo" element={<CEO />} />
-          <Route path="*" element={<Error />} />
-        </Routes>
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={
+              <>
+                <Hero />
+                <OurProjects />
+                <Feature />
+                <Blog />
+                <Testimonials />
+              </>
+            } />
+            <Route path="/blogPage3" element={<BlogPage3 />} />
+            <Route path="/blogPage1" element={<BlogPage1 />} />
+            <Route path="/blogPage2" element={<BlogPage2 />} />
+            <Route path="/research" element={<Research />} />
+            <Route path="/learning" element={<Learning />} />
+            <Route path="/ceo" element={<CEO />} />
+            <Route path="*" element={<Error />} />
+          </Routes>
+        </main>
+        <Footer />
         <Analytics />
       </div>
     </Router>
