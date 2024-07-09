@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './CustomCursor.css';
 
 const CustomCursor: React.FC = () => {
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [click, setClick] = useState(false);
   const [hover, setHover] = useState(false);
   const [cursorLine, setCursorLine] = useState(false);
   const [cursorButton, setCursorButton] = useState(false);
-  const [cursorInput, setCursorInput] = useState(false);
+  const cursorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const moveCursor = (e: MouseEvent) => {
-      setCursorPos({ x: e.clientX, y: e.clientY });
+      if (cursorRef.current) {
+        cursorRef.current.style.left = `${e.clientX}px`;
+        cursorRef.current.style.top = `${e.clientY}px`;
+      }
     };
 
     const handleMouseDown = () => setClick(true);
@@ -24,8 +26,6 @@ const CustomCursor: React.FC = () => {
         setHover(true);
       } else if ((e.target as Element).matches('p, span, input, textarea')) {
         setCursorLine(true);
-      } else if ((e.target as Element).matches('input, textarea')) {
-        setCursorInput(true);
       }
     };
 
@@ -36,8 +36,6 @@ const CustomCursor: React.FC = () => {
         setHover(false);
       } else if ((e.target as Element).matches('p, span, input, textarea')) {
         setCursorLine(false);
-      } else if ((e.target as Element).matches('input, textarea')) {
-        setCursorInput(false);
       }
     };
 
@@ -58,8 +56,8 @@ const CustomCursor: React.FC = () => {
 
   return (
     <div
-      className={`custom-cursor ${click ? 'click' : ''} ${hover ? 'hover' : ''} ${cursorLine ? 'cursor--text' : ''} ${cursorButton ? 'cursor-button' : ''} ${cursorInput ? 'cursor-input' : ''}`}
-      style={{ left: `${cursorPos.x}px`, top: `${cursorPos.y}px` }}
+      ref={cursorRef}
+      className={`custom-cursor ${click ? 'click' : ''} ${hover ? 'hover' : ''} ${cursorLine ? 'cursor--text' : ''} ${cursorButton ? 'cursor-button' : ''}`}
     />
   );
 };
