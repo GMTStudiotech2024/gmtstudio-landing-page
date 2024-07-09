@@ -39,7 +39,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrollPosition > 50 ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md' : 'bg-transparent'}`}>
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrollPosition > 50 ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="text-2xl font-extrabold bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-cyan-600 dark:to-blue-600">
           GMTStudio
@@ -94,7 +94,7 @@ const Navbar: React.FC = () => {
         )}
       </AnimatePresence>
 
-      <ProfileOverlay isProfileOpen={isProfileOpen} toggleProfileMenu={toggleProfileMenu} />
+      <ProfileDropdown isProfileOpen={isProfileOpen} toggleProfileMenu={toggleProfileMenu} />
     </nav>
   );
 }
@@ -143,28 +143,21 @@ const ProfileButton: React.FC<{ toggleProfileMenu: () => void; isProfileOpen: bo
   </button>
 );
 
-const ProfileOverlay: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () => void }> = ({ isProfileOpen, toggleProfileMenu }) => (
+const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () => void }> = ({ isProfileOpen, toggleProfileMenu }) => (
   <AnimatePresence>
     {isProfileOpen && (
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+        initial="hidden"
+        animate="visible"
+        exit="hidden"
+        variants={{
+          hidden: { opacity: 0, y: -20 },
+          visible: { opacity: 1, y: 0 },
+        }}
+        className="absolute right-4 mt-4 bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4 space-y-2"
       >
-        <div className="bg-white dark:bg-gray-900 w-full max-w-md rounded-lg shadow-lg p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Profile</h2>
-            <button onClick={toggleProfileMenu} className="p-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400">
-              <FaTimes className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="space-y-4">
-            <a href="/CEO" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-300">About Three CEO</a>
-
-            <a href="/Learning " className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-300">Project Learning</a>
-          </div>
-        </div>
+        <a href="/CEO" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300">About Three CEO</a>
+        <a href="/Learning " className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300">Project Learning</a>
       </motion.div>
     )}
   </AnimatePresence>

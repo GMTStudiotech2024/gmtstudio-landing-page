@@ -4,14 +4,8 @@ import { ChevronDown } from 'lucide-react';
 
 const Hero: React.FC = () => {
   const projectsRef = useRef<HTMLDivElement>(null);
-
-  const handleLearnMoreClick = () => {
-    if (projectsRef.current) {
-      projectsRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -21,12 +15,29 @@ const Hero: React.FC = () => {
     return () => darkModeMediaQuery.removeEventListener('change', handleChange);
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleLearnMoreClick = () => {
+    if (projectsRef.current) {
+      projectsRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <>
       <motion.section
         id="hero"
-        className={`min-h-screen flex items-start justify-end pt-10 pr-10 text-right relative ${isDarkMode ? 'dark-mode-wallpaper' : 'light-mode-wallpaper'}`}
+        className={`min-h-screen flex items-start justify-end pt-10 pr-10 text-right relative bg-cover bg-center transition-background ${isDarkMode ? 'dark-mode-wallpaper' : 'light-mode-wallpaper'}`}
         aria-label="Hero section with background image"
+        style={{
+          backgroundPositionY: `${scrollY * 0.3}px`,
+        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
