@@ -8,8 +8,12 @@
 body {
   transition: background-color 0.3s, color 0.3s;
   font-family: 'Fira Sans', sans-serif;
+  cursor: none; /* Hide default cursor */
 }
 
+a, button {
+  cursor: none; /* Hide default cursor */
+}
 .hero-section {
   @apply pt-20 pb-10 bg-gray-50 dark:bg-gray-900;
 }

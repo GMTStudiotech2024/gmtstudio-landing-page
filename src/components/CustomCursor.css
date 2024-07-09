@@ -1,27 +1,42 @@
 .custom-cursor {
-    position: fixed;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.8);
-    pointer-events: none;
-    transform: translate(-50%, -50%);
-    transition: transform 150ms ease, width 150ms ease, height 150ms ease, background-color 150ms ease;
-    z-index: 10000;
-  }
-  
-  .custom-cursor.click {
-    transform: translate(-50%, -50%) scale(0.75);
-    background-color: rgba(255, 255, 255, 0.9);
-  }
-  
-  .custom-cursor.hover {
-    transform: translate(-50%, -50%) scale(1.25);
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-  
-  /* Hide the default cursor */
-  body, a, button {
-    cursor: none;
-  }
-  
+  position: fixed;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: transform 150ms ease, width 150ms ease, height 150ms ease, background-color 150ms ease, border 150ms ease;
+  z-index: 10000;
+}
+
+.custom-cursor.click {
+  transform: translate(-50%, -50%) scale(0.75);
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.custom-cursor.hover {
+  transform: translate(-50%, -50%) scale(1.25);
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.custom-cursor.cursor--text {
+  background-color: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  width: 2px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+}
+
+.custom-cursor.cursor-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: transparent;
+  border: 2px solid white;
+  transform: translate(-50%, -50%);
+}
+
+body, a, button {
+  cursor: none;
+}
