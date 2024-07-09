@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaBars, FaTimes, FaSearch, FaUser, FaChevronDown } from 'react-icons/fa';
+import { FaBars, FaTimes, FaUser, FaChevronDown } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
 
@@ -7,7 +7,6 @@ const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
@@ -22,25 +21,16 @@ const Navbar: React.FC = () => {
     setIsOpen(!isOpen);
     setIsProductsOpen(false);
     setIsProfileOpen(false);
-    setIsSearchOpen(false);
   };
 
   const toggleProductsMenu = () => {
     setIsProductsOpen(!isProductsOpen);
     setIsProfileOpen(false);
-    setIsSearchOpen(false);
   };
 
   const toggleProfileMenu = () => {
     setIsProfileOpen(!isProfileOpen);
     setIsProductsOpen(false);
-    setIsSearchOpen(false);
-  };
-
-  const toggleSearch = () => {
-    setIsSearchOpen(!isSearchOpen);
-    setIsProductsOpen(false);
-    setIsProfileOpen(false);
   };
 
   const menuVariants = {
@@ -65,16 +55,13 @@ const Navbar: React.FC = () => {
             items={[
               { href: "https://gmt-studio-ai-workspace.vercel.app/", label: "GMTStudio AI WorkSpace" },
               { href: "https://theta-plum.vercel.app/", label: "Theta Social Media Platform" },
-              { href: "/our-projects", label: "Project 3" }
             ]}
           />
-          <SearchButton toggleSearch={toggleSearch} isSearchOpen={isSearchOpen} />
           <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} />
           <ThemeToggle />
         </div>
 
         <div className="lg:hidden flex items-center space-x-4">
-          <SearchButton toggleSearch={toggleSearch} isSearchOpen={isSearchOpen} />
           <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} />
           <button onClick={toggleMenu} className="text-xl text-gray-900 dark:text-white">
             {isOpen ? <FaTimes /> : <FaBars />}
@@ -101,14 +88,12 @@ const Navbar: React.FC = () => {
               items={[
                 { href: "https://gmt-studio-ai-workspace.vercel.app/", label: "GMTStudio AI WorkSpace" },
                 { href: "https://theta-plum.vercel.app/", label: "Theta Social Media Platform" },
-                { href: "/our-projects", label: "Project 3" }
               ]}
             />
           </motion.div>
         )}
       </AnimatePresence>
 
-      <SearchOverlay isSearchOpen={isSearchOpen} toggleSearch={toggleSearch} />
       <ProfileOverlay isProfileOpen={isProfileOpen} toggleProfileMenu={toggleProfileMenu} />
     </nav>
   );
@@ -131,7 +116,6 @@ const DropdownMenu: React.FC<{ label: string; isOpen: boolean; toggleMenu: () =>
           initial="hidden"
           animate="visible"
           exit="hidden"
-
           variants={{
             hidden: { opacity: 0, y: -20 },
             visible: { opacity: 1, y: 0 },
@@ -153,38 +137,10 @@ const ProductLink: React.FC<{ href: string; label: string }> = ({ href, label })
   </a>
 );
 
-const SearchButton: React.FC<{ toggleSearch: () => void; isSearchOpen: boolean }> = ({ toggleSearch, isSearchOpen }) => (
-  <button onClick={toggleSearch} className="block p-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
-    <FaSearch className={`w-5 h-5 ${isSearchOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
-  </button>
-);
-
 const ProfileButton: React.FC<{ toggleProfileMenu: () => void; isProfileOpen: boolean }> = ({ toggleProfileMenu, isProfileOpen }) => (
   <button onClick={toggleProfileMenu} className="block p-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
     <FaUser className={`w-5 h-5 ${isProfileOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
   </button>
-);
-
-const SearchOverlay: React.FC<{ isSearchOpen: boolean; toggleSearch: () => void }> = ({ isSearchOpen, toggleSearch }) => (
-  <AnimatePresence>
-    {isSearchOpen && (
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
-      >
-        <div className="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-lg shadow-lg p-6">
-          <div className="flex items-center mb-4">
-            <input type="text" className="flex-grow p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200" placeholder="Search..." />
-            <button onClick={toggleSearch} className="ml-2 p-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400">
-              <FaTimes className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </motion.div>
-    )}
-  </AnimatePresence>
 );
 
 const ProfileOverlay: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () => void }> = ({ isProfileOpen, toggleProfileMenu }) => (
@@ -205,8 +161,7 @@ const ProfileOverlay: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () =
           </div>
           <div className="space-y-4">
             <a href="/CEO" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-300">About Three CEO</a>
-            <a href="/settings" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-300">Settings</a>
-            <a href="/logout" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-300">Logout</a>
+
             <a href="/Learning " className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-300">Project Learning</a>
           </div>
         </div>
