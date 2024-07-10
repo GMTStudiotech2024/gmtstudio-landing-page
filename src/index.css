@@ -204,12 +204,14 @@ a, button {
   background-size: cover;
   background-position: center;
   opacity: 0.5;
+  background-color:#000;
 }
 .dark-mode-wallpaper {
   background-image: url("../src/assets/images/GMTStudio_d.png");
   background-size: cover;
   background-position: center;
   opacity: 0.5;
+  background-color: #000;
 }
 
 /* Common styles for both modes */
