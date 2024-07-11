@@ -45,7 +45,7 @@ const Navbar: React.FC = () => {
           GMTStudio
         </div>
 
-        <div className="hidden lg:flex space-x-6 items-center">
+        <div className="hidden lg:flex space-x-6 items-center text-white dark:text-gray-200">
           <NavLink href="/" label="Home" />
           <NavLink href="/research" label="Research" />
           <DropdownMenu 
@@ -100,14 +100,14 @@ const Navbar: React.FC = () => {
 }
 
 const NavLink: React.FC<{ href: string; label: string }> = ({ href, label }) => (
-  <a href={href} className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
+  <a href={href} className="block px-3 py-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
     {label}
   </a>
 );
 
 const DropdownMenu: React.FC<{ label: string; isOpen: boolean; toggleMenu: () => void; items: { href: string; label: string }[] }> = ({ label, isOpen, toggleMenu, items }) => (
   <div className="relative">
-    <button onClick={toggleMenu} className="flex items-center px-3 py-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
+    <button onClick={toggleMenu} className="flex items-center px-3 py-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
       {label} <FaChevronDown className="ml-1" />
     </button>
     <AnimatePresence>
