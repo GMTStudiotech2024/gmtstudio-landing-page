@@ -20,6 +20,7 @@ import { Analytics } from "@vercel/analytics/react";
 import './components/st.css';
 import { CEO } from './components';
 import CustomCursor from './components/CustomCursor';
+import { SpeedInsights } from "@vercel/speed-insights/react"
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -54,6 +55,7 @@ const App: React.FC = () => {
         </main>
         <Footer />
         <Analytics />
+        <SpeedInsights />
       </div>
     </Router>
   );
