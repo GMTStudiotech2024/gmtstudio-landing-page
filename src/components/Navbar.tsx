@@ -39,7 +39,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrollPosition > 50 ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg' : 'bg-transparent'}`}>
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrollPosition > 50 ? 'bg-slate-700/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="text-2xl font-extrabold bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-cyan-600 dark:to-blue-600">
           GMTStudio
@@ -63,7 +63,7 @@ const Navbar: React.FC = () => {
 
         <div className="lg:hidden flex items-center space-x-4">
           <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} />
-          <button onClick={toggleMenu} className="text-xl text-gray-900 dark:text-white">
+          <button onClick={toggleMenu} className="text-xl text-white dark:text-white">
             {isOpen ? <FaTimes /> : <FaBars />}
           </button>
           <ThemeToggle />
@@ -100,14 +100,14 @@ const Navbar: React.FC = () => {
 }
 
 const NavLink: React.FC<{ href: string; label: string }> = ({ href, label }) => (
-  <a href={href} className="block px-3 py-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
+  <a href={href} className="block px-3 py-2 text-blue-300 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
     {label}
   </a>
 );
 
 const DropdownMenu: React.FC<{ label: string; isOpen: boolean; toggleMenu: () => void; items: { href: string; label: string }[] }> = ({ label, isOpen, toggleMenu, items }) => (
   <div className="relative">
-    <button onClick={toggleMenu} className="flex items-center px-3 py-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
+    <button onClick={toggleMenu} className="flex items-center px-3 py-2 text-blue-300 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
       {label} <FaChevronDown className="ml-1" />
     </button>
     <AnimatePresence>
@@ -120,7 +120,7 @@ const DropdownMenu: React.FC<{ label: string; isOpen: boolean; toggleMenu: () =>
             hidden: { opacity: 0, y: -20 },
             visible: { opacity: 1, y: 0 },
           }}
-          className="absolute left-0 mt-2 w-56 bg-white dark:bg-gray-900 shadow-lg rounded-lg overflow-hidden"
+          className="absolute left-0 mt-2 w-56 bg-gray-200 dark:bg-gray-900 shadow-lg rounded-lg overflow-hidden"
         >
           {items.map(item => (
             <ProductLink key={item.href} href={item.href} label={item.label} />
@@ -138,7 +138,7 @@ const ProductLink: React.FC<{ href: string; label: string }> = ({ href, label })
 );
 
 const ProfileButton: React.FC<{ toggleProfileMenu: () => void; isProfileOpen: boolean }> = ({ toggleProfileMenu, isProfileOpen }) => (
-  <button onClick={toggleProfileMenu} className="block p-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
+  <button onClick={toggleProfileMenu} className="block p-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
     <FaUser className={`w-5 h-5 ${isProfileOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
   </button>
 );

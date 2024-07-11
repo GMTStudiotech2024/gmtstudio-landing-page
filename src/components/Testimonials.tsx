@@ -9,7 +9,7 @@ const testimonials = [
 
 const Testimonials: React.FC = () => {
   return (
-    <section id="testimonials" className="py-10 bg-black dark:bg-gray-900">
+    <section id="testimonials" className="py-10 bg-black dark:bg-gray-900 justify-center">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-4xl font-bold text-white dark:text-white mb-8">GMTStudio WorkSpace</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" data-aos="fade-up">
