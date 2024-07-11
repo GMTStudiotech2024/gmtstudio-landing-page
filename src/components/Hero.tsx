@@ -49,7 +49,7 @@ const Hero: React.FC = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
           >
-            Welcome to <span className="text-indigo-400">GMTStudio</span>
+            Welcome to <span className="text-emerald-400">GMTStudio</span>
           </motion.h1>
           <motion.p
             className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-4 sm:mb-8"
