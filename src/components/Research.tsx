@@ -38,7 +38,7 @@ const Research = () => {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-6xl font-extrabold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            NO much Resarch 
+            Not much Resarch 
           </h1>
           <p className="text-2xl mb-10 max-w-2xl">
             I don't know what to write here.
