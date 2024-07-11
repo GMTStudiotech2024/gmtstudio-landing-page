@@ -65,6 +65,7 @@ const Blog: React.FC = () => {
                   Read More
                 </a>
               </div>
+              
             </div>
           ))}
         </div>
