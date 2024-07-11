@@ -1,6 +1,14 @@
 import React from 'react';
 
 const Footer: React.FC = () => {
+  const handleScroll = (e: React.MouseEvent, targetId: string) => {
+    e.preventDefault();
+    const targetElement = document.getElementById(targetId);
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <footer className="footer-section bg-gray-900 py-8 text-white relative">
       <div className="container mx-auto px-4 md:px-8 lg:px-16">
@@ -10,13 +18,12 @@ const Footer: React.FC = () => {
             <p>&copy; 2024 GMTStudio TECH. All rights reserved. Website Version: 💻v1.6</p>
           </div>
           <div className="footer-links flex flex-wrap justify-center md:justify-end mt-4 md:mt-0 space-x-4">
-            <a href="#hero" className="footer-link">Home</a>
-            <a href="#features" className="footer-link">Features</a>
-            <a href="#about" className="footer-link">About Us</a>
-            <a href="#projects" className="footer-link">Projects</a>
-            <a href="#testimonials" className="footer-link">Testimonials</a>
-            <a href="#blog" className="footer-link">Blog</a>
-            <a href="#contact" className="footer-link">Contact</a>
+            <a href="#Hero" className="footer-link" onClick={(e) => handleScroll(e, 'Hero')}>Home</a>
+            <a href="#projects" className="footer-link" onClick={(e) => handleScroll(e, 'projects')}>Projects</a>            
+            <a href="#features" className="footer-link" onClick={(e) => handleScroll(e, 'features')}>Features</a>
+            <a href="#blog" className="footer-link" onClick={(e) => handleScroll(e, 'blog')}>Blog</a>            
+            <a href="#about" className="footer-link" onClick={(e) => handleScroll(e, 'about')}>About Us</a>
+            <a href="#testimonials" className="footer-link" onClick={(e) => handleScroll(e, 'testimonials')}>Testimonials</a>
           </div>
         </div>
       </div>
