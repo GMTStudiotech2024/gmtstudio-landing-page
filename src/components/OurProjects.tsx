@@ -8,36 +8,39 @@ import projectImage3 from '../assets/images/Story.jpg';
 
 const projects = [
   {
-    title: 'GMTStudio Story Vending Maching',
+    title: 'GMTStudio Story Vending Machine',
     description: 'New Ideas in GMTStudio',
     image: projectImage3,
     link: '/BlogPage3',
-    icon: faExclamationCircle
+    icon: faExclamationCircle,
+    isInternal: true,
   },
   {
-    title: 'GMTStudio AI workSpace',
+    title: 'GMTStudio AI WorkSpace',
     description: 'GMTStudio designed their own AI, MAZS AI. Although it is still in development, you can use it!',
     image: projectImage1,
     link: 'https://gmt-studio-ai-workspace.vercel.app/',
-    icon: faExternalLinkAlt
+    icon: faExternalLinkAlt,
+    isInternal: false,
   },
   {
     title: 'Theta Social Media Platform',
     description: 'Using Appwrite and Vite, we designed one of the greatest social media platforms of all time.',
     image: projectImage2,
     link: 'https://theta-plum.vercel.app/',
-    icon: faExternalLinkAlt
+    icon: faExternalLinkAlt,
+    isInternal: false,
   },
 ];
 
 const OurProjects: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleProjectClick = (link: string) => {
-    if (link === '/error') {
-      navigate('*');
+  const handleProjectClick = (link: string, isInternal: boolean) => {
+    if (isInternal) {
+      navigate(link);
     } else {
-      window.open(link, "_blank", "noopener,noreferrer");
+      window.open(link, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -54,11 +57,11 @@ const OurProjects: React.FC = () => {
             <div
               key={index}
               className="group relative max-w-2xl rounded-3xl border border-gray-800 bg-gray-800 p-6 shadow-2xl shadow-gray-600/10 dark:border-gray-700 dark:bg-gray-900 dark:shadow-none sm:p-8 transform transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg"
-              onClick={() => handleProjectClick(project.link)}
+              onClick={() => handleProjectClick(project.link, project.isInternal)}
               role="button"
               aria-label={`View project ${project.title}`}
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && handleProjectClick(project.link)}
+              onKeyDown={(e) => e.key === 'Enter' && handleProjectClick(project.link, project.isInternal)}
             >
               <div className="relative overflow-hidden rounded-xl shadow-xl shadow-rose-600/40 transition duration-500 group-hover:scale-105 group-hover:shadow-md">
                 <img
@@ -77,7 +80,7 @@ const OurProjects: React.FC = () => {
                   {project.description}
                 </p>
                 <button
-                  className="flex items-center text-blue-500 border border-blue-500 px-4 py-2 rounded hover:bg-blue-500 hover:text-white transition-colors duration-300 dark:border-green-500 dark:hover:bg-green-500 dark:text-green-500 dark:hover:text-white"
+                  className="flex items-center text-blue-500 dark:text-green-500 border border-blue-500 dark:border-green-500 px-4 py-2 rounded hover:bg-blue-500 dark:hover:bg-green-500 hover:text-white transition-colors duration-300 dark:hover:text-white"
                 >
                   View Project
                   <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
