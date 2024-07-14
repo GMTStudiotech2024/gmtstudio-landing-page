@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight, faExternalLinkAlt, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faExternalLinkAlt, faExclamationCircle, faRocket, faBolt, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import projectImage1 from '../assets/images/MazsAiPic.png';
 import projectImage2 from '../assets/images/blog5.png';
 import projectImage3 from '../assets/images/Story.jpg';
@@ -14,22 +14,25 @@ const projects = [
     link: '/BlogPage3',
     icon: faExclamationCircle,
     isInternal: true,
+    color: 'from-gray-700 to-gray-900',
   },
   {
     title: 'GMTStudio AI WorkSpace',
     description: 'GMTStudio designed their own AI, MAZS AI. Although it is still in development, you can use it!',
     image: projectImage1,
     link: 'https://gmt-studio-ai-workspace.vercel.app/',
-    icon: faExternalLinkAlt,
+    icon: faRocket,
     isInternal: false,
+    color: 'from-gray-700 to-gray-900',
   },
   {
     title: 'Theta Social Media Platform',
     description: 'Using Appwrite and Vite, we designed one of the greatest social media platforms of all time.',
     image: projectImage2,
     link: 'https://theta-plum.vercel.app/',
-    icon: faExternalLinkAlt,
+    icon: faGlobe,
     isInternal: false,
+    color: 'from-gray-700 to-gray-900',
   },
 ];
 
@@ -45,46 +48,47 @@ const OurProjects: React.FC = () => {
   };
 
   return (
-    <section id="projects" className="projects-section py-20 bg-white dark:bg-gray-800 text-gray-900 dark:text-white background-custom">
+    <section id="projects" className="projects-section py-20 bg-gradient-to-b from-gray-900 to-black text-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl font-bold text-center mb-12">
-          <span className="bg-gradient-to-r from-sky-400 via-violet-600 to-lime-300 bg-clip-text text-transparent">
-            What's New At GMTStudio
+        <h2 className="text-5xl font-extrabold text-center mb-16">
+          <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+            Innovations at GMTStudio
           </span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" data-aos="fade-up">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12" data-aos="fade-up">
           {projects.map((project, index) => (
             <div
               key={index}
-              className="group relative max-w-2xl rounded-3xl border border-gray-800 bg-gray-800 p-6 shadow-2xl shadow-gray-600/10 dark:border-gray-700 dark:bg-gray-900 dark:shadow-none sm:p-8 transform transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg"
+              className="group relative overflow-hidden rounded-3xl bg-gray-800 p-1 shadow-2xl transition-all duration-500 hover:scale-105 hover:shadow-lg"
               onClick={() => handleProjectClick(project.link, project.isInternal)}
               role="button"
               aria-label={`View project ${project.title}`}
               tabIndex={0}
               onKeyDown={(e) => e.key === 'Enter' && handleProjectClick(project.link, project.isInternal)}
             >
-              <div className="relative overflow-hidden rounded-xl shadow-xl shadow-rose-600/40 transition duration-500 group-hover:scale-105 group-hover:shadow-md">
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  loading="lazy"
-                  className="h-72 w-full object-cover object-top transition-transform duration-300 ease-in-out transform group-hover:scale-110"
-                />
-              </div>
-              <div className="relative mt-6">
-                <h3 className="text-2xl font-semibold text-gray-300 dark:text-gray-300 mb-4 flex items-center">
-                  <FontAwesomeIcon icon={project.icon} className="mr-2" />
-                  {project.title}
-                </h3>
-                <p className="mt-4 mb-8 text-gray-300 dark:text-gray-300">
-                  {project.description}
-                </p>
-                <button
-                  className="flex items-center text-blue-500 dark:text-green-500 border border-blue-500 dark:border-green-500 px-4 py-2 rounded hover:bg-blue-500 dark:hover:bg-green-500 hover:text-white transition-colors duration-300 dark:hover:text-white"
-                >
-                  View Project
-                  <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
-                </button>
+              <div className={`absolute inset-0 bg-gradient-to-r ${project.color} opacity-75 transition-opacity duration-500 group-hover:opacity-100`}></div>
+              <div className="relative p-6 sm:p-8">
+                <div className="overflow-hidden rounded-xl shadow-xl transition duration-500 group-hover:scale-105 group-hover:shadow-2xl">
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    loading="lazy"
+                    className="h-72 w-full object-cover object-top transition-transform duration-500 ease-in-out transform group-hover:scale-110"
+                  />
+                </div>
+                <div className="relative mt-6">
+                  <h3 className="text-2xl font-bold text-white mb-4 flex items-center">
+                    <FontAwesomeIcon icon={project.icon} className="mr-3 text-3xl" />
+                    {project.title}
+                  </h3>
+                  <p className="mt-4 mb-8 text-gray-300">
+                    {project.description}
+                  </p>
+                  <button className="flex items-center justify-center w-full bg-white text-gray-900 font-semibold px-6 py-3 rounded-full hover:bg-opacity-90 transition-all duration-300 group">
+                    <span className="mr-2">Explore Project</span>
+                    <FontAwesomeIcon icon={faBolt} className="transition-transform duration-300 group-hover:translate-x-1" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
