@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, useAnimation } from 'framer-motion';
+import { FaChevronDown, FaChevronUp, FaRocket, FaDatabase, FaChartBar } from 'react-icons/fa';
 import featureImage from '../assets/images/feature.png';
 
 type FeatureType = {
@@ -10,6 +10,7 @@ type FeatureType = {
   status?: string;
   currency?: string;
   balance?: string;
+  icon: React.ElementType;
 };
 
 const features: FeatureType[] = [
@@ -18,17 +19,20 @@ const features: FeatureType[] = [
     description: 'The MAZS AI is a Chat bot that uses NLP (Natural Language Processing) and responds improperly to annoy users.',
     amount: 'Unlimited',
     status: 'Successfully Launched',
+    icon: FaRocket,
   },
   {
     title: 'Enhanced Database',
     description: 'Using a new type of database storage, the MAZS AI and other applications can provide a better user experience.',
     status: 'For all users',
+    icon: FaDatabase,
   },
   {
     title: 'Analytics',
     description: 'There are no analytics but just a few brain cells left over here.',
     currency: '99+',
     balance: 'Ya, nothing but brain cells',
+    icon: FaChartBar,
   },
 ];
 
@@ -39,19 +43,28 @@ type FeatureCardProps = {
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const controls = useAnimation();
+
+  useEffect(() => {
+    controls.start({ opacity: 1, y: 0 });
+  }, [controls]);
 
   return (
     <motion.div
-      className="feature-card p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 bg-gray-800 dark:bg-gray-800"
+      className="feature-card p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 bg-gray-800 dark:bg-gray-800 border border-gray-700 hover:border-blue-500"
       initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={controls}
       transition={{ duration: 0.5, delay: index * 0.1 }}
+      whileHover={{ scale: 1.03 }}
     >
-      <h4 className="text-2xl font-semibold mb-4 text-white dark:text-white flex items-center">
-        <span className="bg-gradient-to-r from-green-400 to-blue-500 text-transparent bg-clip-text">
-          {feature.title}
-        </span>
-      </h4>
+      <div className="flex items-center mb-4">
+        <feature.icon className="text-4xl mr-4 text-blue-500" />
+        <h4 className="text-2xl font-semibold text-white dark:text-white">
+          <span className="bg-gradient-to-r from-green-400 to-blue-500 text-transparent bg-clip-text">
+            {feature.title}
+          </span>
+        </h4>
+      </div>
       <motion.div
         initial={false}
         animate={{ height: isExpanded ? 'auto' : '100px' }}
@@ -61,39 +74,42 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
           {feature.description}
         </p>
         {feature.amount && (
-          <p className="text-4xl font-bold mb-4 text-gray-800 dark:text-gray-300">
+          <p className="text-4xl font-bold mb-4 text-blue-400 dark:text-blue-300">
             {feature.amount}
           </p>
         )}
         {feature.status && (
-          <p className="text-green-500 mb-4">
+          <p className="text-green-500 mb-4 font-semibold">
             {feature.status}
           </p>
         )}
         {feature.currency && (
-          <div className="text-lg text-yellow-500">
+          <div className="text-lg text-yellow-500 font-semibold">
             Braincell count: {feature.currency}
           </div>
         )}
         {feature.balance && (
-          <div className="text-4xl font-bold text-gray-800 dark:text-gray-300">
+          <div className="text-4xl font-bold text-purple-400 dark:text-purple-300 mt-2">
             {feature.balance}
           </div>
         )}
       </motion.div>
-      <button
+      <motion.button
         onClick={() => setIsExpanded(!isExpanded)}
         className="mt-4 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors duration-200 flex items-center"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
       >
         {isExpanded ? 'Show Less' : 'Show More'}
         {isExpanded ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
-      </button>
+      </motion.button>
     </motion.div>
   );
 };
 
 const Feature: React.FC = () => {
   const moreFeaturesRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   const handleLearnMoreClick = () => {
     if (moreFeaturesRef.current) {
@@ -101,8 +117,29 @@ const Feature: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (moreFeaturesRef.current) {
+      observer.observe(moreFeaturesRef.current);
+    }
+
+    return () => {
+      if (moreFeaturesRef.current) {
+        observer.unobserve(moreFeaturesRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <section id="features" className="py-16 bg-gradient-to-b from-gray-800 to-gray-800 dark:from-gray-900 dark:to-black text-white dark:text-white bck-cus">
+    <section id="features" className="py-16 bg-gradient-to-b from-gray-800 to-gray-900 dark:from-gray-900 dark:to-black text-white dark:text-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="flex flex-col lg:flex-row items-center lg:space-x-12 mb-12"
@@ -146,11 +183,16 @@ const Feature: React.FC = () => {
           </motion.div>
         </motion.div>
         <div id="more-features" ref={moreFeaturesRef}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isVisible ? 1 : 0 }}
+            transition={{ duration: 0.5 }}
+          >
             {features.map((feature, index) => (
               <FeatureCard key={index} feature={feature} index={index} />
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
