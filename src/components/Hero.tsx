@@ -33,7 +33,7 @@ const Hero: React.FC = () => {
     <>
       <motion.section
         id="hero"
-        className={`min-h-screen flex items-start justify-end pt-10 pr-10 text-right relative bg-cover bg-center transition-background ${isDarkMode ? 'dark-mode-wallpaper' : 'light-mode-wallpaper'}`}
+        className={`min-h-screen flex items-center justify-center sm:justify-end pt-10 px-4 sm:pr-10 text-center sm:text-right relative bg-cover bg-center transition-background ${isDarkMode ? 'dark-mode-wallpaper' : 'light-mode-wallpaper'}`}
         aria-label="Hero section with background image"
         style={{
           backgroundPositionY: `${scrollY * 0.3}px`,
@@ -44,7 +44,7 @@ const Hero: React.FC = () => {
       >
         <div className="relative z-10 p-4 sm:p-8 max-w-4xl">
           <motion.h1
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-2 sm:mb-4"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-4 sm:mb-6"
             initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
@@ -52,7 +52,7 @@ const Hero: React.FC = () => {
             Welcome to <span className="text-emerald-400">GMTStudio</span>
           </motion.h1>
           <motion.p
-            className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-4 sm:mb-8"
+            className="text-xl sm:text-2xl md:text-3xl text-gray-300 mb-6 sm:mb-10"
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -61,7 +61,7 @@ const Hero: React.FC = () => {
           </motion.p>
           <motion.button
             onClick={handleLearnMoreClick}
-            className="inline-flex items-center px-4 sm:px-8 py-2 sm:py-3 font-semibold rounded-lg shadow-lg bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
+            className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 text-lg sm:text-xl font-semibold rounded-lg shadow-lg bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             initial={{ y: 20, opacity: 0 }}
@@ -69,7 +69,7 @@ const Hero: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
           >
             Learn More
-            <ChevronDown className="ml-2" size={20} />
+            <ChevronDown className="ml-2" size={24} />
           </motion.button>
         </div>
       </motion.section>
