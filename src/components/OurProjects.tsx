@@ -14,7 +14,7 @@ const projects = [
     link: '/BlogPage3',
     icon: faExclamationCircle,
     isInternal: true,
-    color: 'from-gray-700 to-gray-900',
+    color: 'from-gray-200 to-gray-400 dark:from-gray-700 dark:to-gray-900',
   },
   {
     title: 'GMTStudio AI WorkSpace',
@@ -23,7 +23,7 @@ const projects = [
     link: 'https://gmt-studio-ai-workspace.vercel.app/',
     icon: faRocket,
     isInternal: false,
-    color: 'from-gray-700 to-gray-900',
+    color: 'from-gray-200 to-gray-400 dark:from-gray-700 dark:to-gray-900',
   },
   {
     title: 'Theta Social Media Platform',
@@ -32,7 +32,7 @@ const projects = [
     link: 'https://theta-plum.vercel.app/',
     icon: faGlobe,
     isInternal: false,
-    color: 'from-gray-700 to-gray-900',
+    color: 'from-gray-200 to-gray-400 dark:from-gray-700 dark:to-gray-900',
   },
 ];
 
@@ -48,7 +48,7 @@ const OurProjects: React.FC = () => {
   };
 
   return (
-    <section id="projects" className="projects-section py-20 bg-gradient-to-b from-gray-900 to-black text-white">
+    <section id="projects" className="projects-section py-20 bg-gradient-to-b from-gray-200 to-gray-200 text-gray-900  dark:from-gray-900 dark:to-black dark:text-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-5xl font-extrabold text-center mb-16">
           <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">

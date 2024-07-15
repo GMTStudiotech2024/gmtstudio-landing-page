@@ -51,7 +51,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
 
   return (
     <motion.div
-      className="feature-card p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 bg-gray-800 dark:bg-gray-800 border border-gray-700 hover:border-blue-500"
+      className="feature-card p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-b from-gray-200 to-gray-200 dark:from-gray-800 dark:to-gray-800 border hover:border-blue-500 opacity-75 transition-opacity duration-500"
       initial={{ opacity: 0, y: 50 }}
       animate={controls}
       transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -59,8 +59,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
     >
       <div className="flex items-center mb-4">
         <feature.icon className="text-4xl mr-4 text-blue-500" />
-        <h4 className="text-2xl font-semibold text-white dark:text-white">
-          <span className="bg-gradient-to-r from-green-400 to-blue-500 text-transparent bg-clip-text">
+        <h4 className="text-2xl font-semibold text-dark dark:text-white">
+          <span className="bg-gradient-to-r from-green-600 to-blue-500 text-transparent bg-clip-text">
             {feature.title}
           </span>
         </h4>
@@ -70,7 +70,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
         animate={{ height: isExpanded ? 'auto' : '100px' }}
         className="overflow-hidden"
       >
-        <p className="text-lg text-gray-300 dark:text-gray-300 mb-4">
+        <p className="text-lg text-gray-900 dark:text-gray-300 dark:text-gray-300 mb-4">
           {feature.description}
         </p>
         {feature.amount && (
@@ -139,7 +139,7 @@ const Feature: React.FC = () => {
   }, []);
 
   return (
-    <section id="features" className="py-16 bg-gradient-to-b from-gray-800 to-gray-900 dark:from-gray-900 dark:to-black text-white dark:text-white">
+    <section id="features" className="py-16 bg-gradient-to-b from-gray-200 to-gray-200 dark:from-gray-900 dark:to-black text-black dark:text-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="flex flex-col lg:flex-row items-center lg:space-x-12 mb-12"
@@ -148,7 +148,7 @@ const Feature: React.FC = () => {
           transition={{ duration: 0.5 }}
         >
           <div className="lg:w-1/2 w-full mb-10 lg:mb-0">
-            <h2 className="text-5xl font-bold mb-6 text-transparent bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text">
+            <h2 className="text-5xl font-bold mb-6 text-transparent bg-gradient-to-r from-cyan-600 via-purple-500 to-pink-500 bg-clip-text">
               Our Features
             </h2>
             <p className="text-lg mb-6">

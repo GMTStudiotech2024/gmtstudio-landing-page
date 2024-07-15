@@ -42,9 +42,9 @@ const Blog: React.FC = () => {
     : blogPosts.filter(post => post.category === selectedCategory);
 
   return (
-    <section id="blog" className="py-16 bg-gradient-to-b from-black to-gray-900 dark:from-gray-900 dark:to-black">
+    <section id="blog" className="py-16 bg-gradient-to-b from-gray-200 to-gray-200 dark:from-gray-900 dark:to-black">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-5xl font-bold text-white mb-12 text-center">
+        <h2 className="text-5xl font-bold text-black dark:text-white mb-12 text-center">
           Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Blog</span>
         </h2>
         
@@ -68,7 +68,7 @@ const Blog: React.FC = () => {
           {filteredPosts.map((post, index) => (
             <div 
               key={index} 
-              className="relative flex w-full flex-col rounded-xl bg-gray-800 bg-clip-border text-gray-700 shadow-lg dark:bg-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl"
+              className="relative flex w-full flex-col rounded-xl bg-gray-400 bg-clip-border text-gray-900 shadow-lg dark:bg-gray-900 dark:text-whitetransition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl"
             >
               <div className="relative mx-4 -mt-6 h-56 overflow-hidden rounded-xl bg-gradient-to-r from-red-500 to-orange-500">
                 <img 
@@ -85,7 +85,7 @@ const Blog: React.FC = () => {
                 <h5 className="mb-2 text-2xl font-semibold leading-snug tracking-normal text-white">
                   {post.title}
                 </h5>
-                <p className="mb-4 text-gray-300">
+                <p className="mb-4 text-gray-200 dark:text-gray-200">
                   {post.excerpt}
                 </p>
                 <a 
