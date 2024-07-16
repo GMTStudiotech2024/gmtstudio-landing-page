@@ -353,9 +353,20 @@ a, button {
 }
 .char{
   transition:opacity o.1s
-}
-.bg-dark-blue {
+}.bg-dark-blue {
   background-color: hsl(240, 15%, 9%);
+}
+
+.bg-dark-green {
+  background-color: hsl(120, 15%, 9%);
+}
+
+.bg-dark-red {
+  background-color: hsl(0, 15%, 9%);
+}
+
+.bg-dark-purple {
+  background-color: hsl(300, 15%, 9%);
 }
 
 .bg-gradient-radial {

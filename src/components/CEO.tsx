@@ -20,7 +20,7 @@ const ceos: CEO[] = [
     position: 'Chief Executive Officer',
     description: 'HI guys I am one of the creator of GMTStudio, my job is to arrange Meeting and Coding, they called me duck.',
     imageUrl: 'https://example.com/alston.jpg',
-    color: 'bg-purple-400',
+    color: 'bg-dark-blue',
     skills: ['Leadership', 'Project Management', 'Coding'],
     socialMedia: {
       linkedin: 'https://linkedin.com/in/alston-chang',
@@ -33,7 +33,7 @@ const ceos: CEO[] = [
     position: 'Chief Executive Officer',
     description: 'I am one of the creator of GMTStudio, I am one year older than Alston and Willy. My nickname is Leaves.',
     imageUrl: 'https://example.com/lucus.jpg',
-    color: 'bg-blue-400',
+    color: 'bg-dark-green',
     skills: ['Strategy', 'Business Development', 'Marketing'],
     socialMedia: {
       linkedin: 'https://linkedin.com/in/lucus-yeh',
@@ -45,7 +45,7 @@ const ceos: CEO[] = [
     position: 'Chief Executive Officer',
     description: 'Hola, I am also one of the creators of GMTStudio, they called me Mu Mu Xiao, it is the Chinese version of Rowlet.',
     imageUrl: 'https://example.com/willy.jpg',
-    color: 'bg-green-400',
+    color: 'bg-dark-red',
     skills: ['Innovation', 'Product Development', 'Team Building'],
     socialMedia: {
       linkedin: 'https://linkedin.com/in/willy-lin',
@@ -70,44 +70,45 @@ const SocialIcon: React.FC<{ type: 'linkedin' | 'twitter' | 'github', url: strin
   );
 };
 
-const CEOCard: React.FC<{ ceo: CEO }> = ({ ceo }) => {
+const CEOCard: React.FC<CEO> = ({ name, position, description, imageUrl, color, skills, socialMedia }) => {
   return (
-    <div className={`w-full sm:w-96 rounded-lg overflow-hidden shadow-lg ${ceo.color} text-white`}>
-      <div className="px-6 py-4">
-        <div className="flex items-center justify-center mb-4">
-          <img className="w-24 h-24 rounded-full object-cover" src={ceo.imageUrl} alt={ceo.name} />
-        </div>
-        <div className="font-bold text-xl mb-2 text-center">{ceo.name}</div>
-        <p className="text-gray-200 text-base text-center mb-4">{ceo.position}</p>
-        <p className="text-white text-sm mb-4">{ceo.description}</p>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {ceo.skills.map((skill, index) => (
-            <span key={index} className="inline-block bg-white rounded-full px-3 py-1 text-sm font-semibold text-gray-700">
-              {skill}
-            </span>
-          ))}
+    <div className={`p-6 m-4 rounded-lg shadow-2xl text-white ${color}`}>
+      <div className="flex items-center space-x-4">
+        <img className="w-20 h-20 rounded-full" src={imageUrl} alt={name} />
+        <div>
+          <h2 className="text-2xl font-bold">{name}</h2>
+          <p className="text-sm">{position}</p>
         </div>
       </div>
-      <div className="px-6 pt-4 pb-2 flex justify-center space-x-4">
-        {ceo.socialMedia.linkedin && <SocialIcon type="linkedin" url={ceo.socialMedia.linkedin} />}
-        {ceo.socialMedia.twitter && <SocialIcon type="twitter" url={ceo.socialMedia.twitter} />}
-        {ceo.socialMedia.github && <SocialIcon type="github" url={ceo.socialMedia.github} />}
+      <p className="mt-4">{description}</p>
+      <div className="mt-4">
+        <h3 className="text-xl font-semibold">Skills</h3>
+        <ul className="list-disc list-inside">
+          {skills.map(skill => (
+            <li key={skill}>{skill}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="mt-4 flex space-x-2">
+        {socialMedia.linkedin && <SocialIcon type="linkedin" url={socialMedia.linkedin} />}
+        {socialMedia.twitter && <SocialIcon type="twitter" url={socialMedia.twitter} />}
+        {socialMedia.github && <SocialIcon type="github" url={socialMedia.github} />}
       </div>
     </div>
   );
 };
 
-const CEOIntroduction: React.FC = () => {
+const CEOList: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-16">
-      <h1 className="text-4xl font-bold text-center mb-12">Meet Our Leadership Team</h1>
-      <div className="flex flex-wrap justify-center gap-8">
-        {ceos.map((ceo, index) => (
-          <CEOCard key={index} ceo={ceo} />
+    <div className="bg-dark-blue min-h-screen p-8">
+      <h1 className="text-4xl text-center text-white mb-8">Meet Our CEOs</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {ceos.map(ceo => (
+          <CEOCard key={ceo.name} {...ceo} />
         ))}
       </div>
     </div>
   );
 };
 
-export default CEOIntroduction;
+export default CEOList;
