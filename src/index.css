@@ -354,3 +354,33 @@ a, button {
 .char{
   transition:opacity o.1s
 }
+.bg-dark-blue {
+  background-color: hsl(240, 15%, 9%);
+}
+
+.bg-gradient-radial {
+  background-image: radial-gradient(
+      at 88% 40%,
+      hsla(240, 15%, 9%, 0.3) 0px,
+      transparent 85%
+    ),
+    radial-gradient(at 49% 30%, hsla(240, 15%, 9%, 0.3) 0px, transparent 85%),
+    radial-gradient(at 14% 26%, hsla(240, 15%, 9%, 0.3) 0px, transparent 85%),
+    radial-gradient(at 0% 64%, hsla(263, 93%, 56%, 0.3) 0px, transparent 85%),
+    radial-gradient(at 41% 94%, hsla(284, 100%, 84%, 0.3) 0px, transparent 85%),
+    radial-gradient(at 100% 99%, hsla(306, 100%, 57%, 0.3) 0px, transparent 85%);
+}
+
+.shadow-2xl {
+  box-shadow: 0px -16px 24px 0px rgba(255, 255, 255, 0.25) inset,
+    0 4px 8px rgba(0, 0, 0, 0.25),
+    0 8px 16px rgba(0, 0, 0, 0.25);
+}
+
+button {
+  transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
