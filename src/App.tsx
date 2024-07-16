@@ -21,7 +21,7 @@ import './components/st.css';
 import { CEO } from './components';
 import CustomCursor from './components/CustomCursor';
 import { SpeedInsights } from "@vercel/speed-insights/react"
-
+import CookieNotifier from './components/CookieNotifier';
 const App: React.FC = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -56,6 +56,7 @@ const App: React.FC = () => {
         <Footer />
         <Analytics />
         <SpeedInsights />
+        <CookieNotifier />
       </div>
     </Router>
   );
