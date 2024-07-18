@@ -22,6 +22,7 @@ import { CEO } from './components';
 import CustomCursor from './components/CustomCursor';
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import CookieNotifier from './components/CookieNotifier';
+import Contact from './components/ContactPage'
 const App: React.FC = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -51,6 +52,7 @@ const App: React.FC = () => {
             <Route path="/learning" element={<Learning />} />
             <Route path="/ceo" element={<CEO />} />
             <Route path="*" element={<Error />} />
+            <Route path="/Contact" element={<Contact />} />
           </Routes>
         </main>
         <Footer />

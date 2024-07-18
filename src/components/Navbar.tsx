@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaBars, FaTimes, FaUser, FaChevronDown } from 'react-icons/fa';
+import { FaBars, FaTimes, FaUser, FaChevronDown, FaHome, FaFlask, FaBox, FaEnvelope } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
 
@@ -41,22 +41,29 @@ const Navbar: React.FC = () => {
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${scrollPosition > 50 ? 'bg-slate-700/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <div className="text-2xl font-extrabold bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-cyan-600 dark:to-blue-600">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-2xl font-extrabold bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-cyan-600 dark:to-blue-600"
+        >
           GMTStudio
-        </div>
+        </motion.div>
 
         <div className="hidden lg:flex space-x-6 items-center text-white dark:text-gray-200">
-          <NavLink href="/" label="Home" />
-          <NavLink href="/research" label="Research" />
+          <NavLink href="/" label="Home" icon={<FaHome />} />
+          <NavLink href="/research" label="Research" icon={<FaFlask />} />
           <DropdownMenu 
             label="Products"
+            icon={<FaBox />}
             isOpen={isProductsOpen}
             toggleMenu={toggleProductsMenu}
             items={[
-              { href: "https://gmt-studio-ai-workspace.vercel.app/", label: "GMTStudio AI WorkSpace" },
-              { href: "https://theta-plum.vercel.app/", label: "Theta Social Media Platform" },
+              { href: "https://gmt-studio-ai-workspace.vercel.app/", label: "GMTStudio AI WorkSpace", icon: <FaBox /> },
+              { href: "https://theta-plum.vercel.app/", label: "Theta Social Media Platform", icon: <FaBox /> },
             ]}
           />
+          <NavLink href="/contact" label="Contact" icon={<FaEnvelope />} />
           <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} />
           <ThemeToggle />
         </div>
@@ -79,17 +86,19 @@ const Navbar: React.FC = () => {
             variants={menuVariants}
             className="lg:hidden mt-4 bg-white dark:bg-gray-900 shadow-md rounded-lg p-4 space-y-2"
           >
-            <NavLink href="/" label="Home" />
-            <NavLink href="/research" label="Research" />
+            <NavLink href="/" label="Home" icon={<FaHome />} />
+            <NavLink href="/research" label="Research" icon={<FaFlask />} />
             <DropdownMenu 
               label="Products"
+              icon={<FaBox />}
               isOpen={isProductsOpen}
               toggleMenu={toggleProductsMenu}
               items={[
-                { href: "https://gmt-studio-ai-workspace.vercel.app/", label: "GMTStudio AI WorkSpace" },
-                { href: "https://theta-plum.vercel.app/", label: "Theta Social Media Platform" },
+                { href: "https://gmt-studio-ai-workspace.vercel.app/", label: "GMTStudio AI WorkSpace", icon: <FaBox /> },
+                { href: "https://theta-plum.vercel.app/", label: "Theta Social Media Platform", icon: <FaBox /> },
               ]}
             />
+            <NavLink href="/contact" label="Contact" icon={<FaEnvelope />} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -99,16 +108,16 @@ const Navbar: React.FC = () => {
   );
 }
 
-const NavLink: React.FC<{ href: string; label: string }> = ({ href, label }) => (
-  <a href={href} className="block px-3 py-2 text-blue-300 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
-    {label}
+const NavLink: React.FC<{ href: string; label: string; icon: React.ReactNode }> = ({ href, label, icon }) => (
+  <a href={href} className="block px-3 py-2 text-blue-300 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 flex items-center">
+    {icon} <span className="ml-2">{label}</span>
   </a>
 );
 
-const DropdownMenu: React.FC<{ label: string; isOpen: boolean; toggleMenu: () => void; items: { href: string; label: string }[] }> = ({ label, isOpen, toggleMenu, items }) => (
+const DropdownMenu: React.FC<{ label: string; icon: React.ReactNode; isOpen: boolean; toggleMenu: () => void; items: { href: string; label: string; icon: React.ReactNode }[] }> = ({ label, icon, isOpen, toggleMenu, items }) => (
   <div className="relative">
     <button onClick={toggleMenu} className="flex items-center px-3 py-2 text-blue-300 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
-      {label} <FaChevronDown className="ml-1" />
+      {icon} <span className="ml-2">{label}</span> <FaChevronDown className="ml-1" />
     </button>
     <AnimatePresence>
       {isOpen && (
@@ -123,7 +132,7 @@ const DropdownMenu: React.FC<{ label: string; isOpen: boolean; toggleMenu: () =>
           className="absolute left-0 mt-2 w-56 bg-gray-200 dark:bg-gray-900 shadow-lg rounded-lg overflow-hidden"
         >
           {items.map(item => (
-            <ProductLink key={item.href} href={item.href} label={item.label} />
+            <ProductLink key={item.href} href={item.href} label={item.label} icon={item.icon} />
           ))}
         </motion.div>
       )}
@@ -131,9 +140,9 @@ const DropdownMenu: React.FC<{ label: string; isOpen: boolean; toggleMenu: () =>
   </div>
 );
 
-const ProductLink: React.FC<{ href: string; label: string }> = ({ href, label }) => (
-  <a href={href} className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300">
-    {label}
+const ProductLink: React.FC<{ href: string; label: string; icon: React.ReactNode }> = ({ href, label, icon }) => (
+  <a href={href} className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 flex items-center">
+    {icon} <span className="ml-2">{label}</span>
   </a>
 );
 
@@ -156,8 +165,12 @@ const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () 
         }}
         className="absolute right-4 mt-4 bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4 space-y-2"
       >
-        <a href="/CEO" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300">About Three CEO</a>
-        <a href="/Learning " className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300">Project Learning</a>
+        <a href="/CEO" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 flex items-center">
+          <FaUser className="mr-2" /> About Three CEO
+        </a>
+        <a href="/Learning" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 flex items-center">
+          <FaUser className="mr-2" /> Project Learning
+        </a>
       </motion.div>
     )}
   </AnimatePresence>

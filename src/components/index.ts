@@ -9,3 +9,4 @@ export { default as Research } from "./Research";
 export {default as  Learning} from"./Learning" 
 export {default as CEO} from "./CEO"
 export {default as ChatWidget} from "./ChatWidget"
+export {default as Contact} from "./ContactPage"

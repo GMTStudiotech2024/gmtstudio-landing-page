@@ -26,7 +26,7 @@ const CookieNotifier: React.FC = () => {
         className="mt-4 w-full py-2 rounded-full shadow-md text-white bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800"
         onClick={() => setVisible(false)}
       >
-        Got it!
+        Take A Bite of the Cookie 🍪
       </button>
     </div>
   );
