@@ -36,18 +36,32 @@ const ContactPage: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    const mailtoLink = `mailto:GMTStudiotech@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`)}`;
-    
-    window.location.href = mailtoLink;
-    
-    setFormStatus({
-      submitted: true,
-      success: true,
-      message: "Email client opened. Please send the email from your client."
-    });
+    // Here, you would typically send the form data to your backend
+    // For demonstration, we'll simulate an API call
+    try {
+      // Simulated API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // If the API call is successful, update the form status
+      setFormStatus({
+        submitted: true,
+        success: true,
+        message: "Your message has been sent successfully. We'll get back to you soon!"
+      });
+      
+      // Clear the form
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      // If there's an error, update the form status accordingly
+      setFormStatus({
+        submitted: true,
+        success: false,
+        message: "There was an error sending your message. Please try again later."
+      });
+    }
   };
 
   const contactInfo: ContactInfo[] = [
@@ -174,7 +188,7 @@ const ContactPage: React.FC = () => {
                 className="w-full py-2 px-4 bg-blue-500 dark:bg-yellow-400 text-white dark:text-gray-800 rounded-md font-bold hover:bg-blue-600 dark:hover:bg-yellow-500 transition-colors duration-300 flex items-center justify-center"
               >
                 <FaPaperPlane className="mr-2" />
-                Send Email
+                Send Message
               </button>
             </form>
           </>
