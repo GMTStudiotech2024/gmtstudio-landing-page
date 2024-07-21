@@ -40,7 +40,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
         <div className="border-t border-gray-700 mt-8 pt-8 text-center">
-          <p>&copy; {currentYear} Your Company. All rights reserved.</p>
+          <p>&copy; {currentYear} GMTStudio All rights reserved.</p>
         </div>
       </div>
     </footer>
