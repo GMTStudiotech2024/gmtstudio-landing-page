@@ -60,7 +60,7 @@ const BlogList: React.FC = () => {
                 {blog.title}
               </h5>
               <p className="text-gray-600 dark:text-gray-200 mb-3 text-xs md:text-sm">
-                By {blog.author} | {blog.date} | {blog.readTime} min read
+                By {blog.author} | {blog.date} | {blog.readTime} Times read
               </p>
               <p className="block font-sans text-sm md:text-base font-light leading-relaxed text-inherit antialiased">
                 {blog.excerpt}
