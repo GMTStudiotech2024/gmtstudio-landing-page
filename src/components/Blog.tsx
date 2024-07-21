@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom'; // Make sure to import Link
 import blogImage1 from '../assets/images/MazsAiPic.png';
 import blogImage2 from '../assets/images/blog2.png';
 import blogImage3 from '../assets/images/Story.jpg';
@@ -97,6 +98,15 @@ const Blog: React.FC = () => {
               </div>
             </div>
           ))}
+        </div>
+        
+        <div className="flex justify-center mt-10">
+          <Link
+            to="/Latest"
+            className="px-6 py-3 rounded-lg bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold text-lg transition-all hover:shadow-lg focus:shadow-none hover:from-orange-500 hover:to-red-500"
+          >
+            .... More News
+          </Link>
         </div>
       </div>
     </section>

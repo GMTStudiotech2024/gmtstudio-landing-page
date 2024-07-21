@@ -1,84 +1,143 @@
 import React, { useState } from 'react';
+import blogImage1 from '../assets/images/MazsAiPic.png';
+import blogImage2 from '../assets/images/blog2.png';
+import blogImage3 from '../assets/images/Story.jpg';
 
-interface Blog {
-  id: number;
-  title: string;
-  excerpt: string;
-  date: string;
-  author: string;
-  category: string;
-  readTime: number;
-}
-
-const blogs: Blog[] = [
-  { id: 1, title: 'GMTStudio AI workspace', excerpt: 'New UI design for GMTStudio AI Workspace', date: '2024-07-19', author: 'Alston Chang', category: 'Artificial Intelligence', readTime: 8 },
-  { id: 2, title: 'Story Vending Machine', excerpt: 'New project idea from GMTStudio', date: '2024-07-01', author: 'Lucus Yeh', category: 'Design', readTime: 6 },
-  { id: 3, title: 'Theta Social Media Application', excerpt: 'The newly designed website application, which was recently updated.', date: '2024-05-17', author: 'Alston Chang', category: 'Social Media', readTime: 5 },
+const blogPosts = [
+  { 
+    image: blogImage1, 
+    title: "UI of GMTStudio AI Workspace", 
+    excerpt: "New UI design for GMTStudio AI Workspace", 
+    author: "Alston Chang", 
+    date: "July 21, 2024",
+    link: "/BlogPage1",
+    category: "AI"
+  },
+  { 
+    image: blogImage3, 
+    title: "Front-end develop", 
+    excerpt: "new update of current develop", 
+    author: "Alston Chang", 
+    date: "July 21, 2024",
+    link: "/BlogPage3",
+    category: "Innovation"
+  },
+  { 
+    image: blogImage2, 
+    title: "Bug fixed ", 
+    excerpt: "The newly designed website application, which was recently updated.", 
+    author: "Lucus Yeh", 
+    date: "July 20, 2024",
+    link: "/BlogPage2",
+    category: "Social Media"
+  },
+  { 
+    image: blogImage3, 
+    title: "New Project in queue", 
+    excerpt: "New project idea from GMTStudio", 
+    author: "Alston Chang", 
+    date: "July 01, 2024",
+    link: "/BlogPage3",
+    category: "Innovation"
+  },
+  { 
+    image: blogImage1, 
+    title: "Enhance database for AI", 
+    excerpt: "Add more database ", 
+    author: "Alston Chang", 
+    date: "June 20, 2024",
+    link: "/BlogPage1",
+    category: "AI"
+  },
+  { 
+    image: blogImage1, 
+    title: "Launch GMTStudio AI workspace", 
+    excerpt: "Add more database ", 
+    author: "Alston Chang", 
+    date: "May 26, 2024",
+    link: "/BlogPage1",
+    category: "AI"
+  },
+  { 
+    image: blogImage2, 
+    title: "Launch new application", 
+    excerpt: "Theta Social Media is now launch in Beta version", 
+    author: "Lucus Yeh", 
+    date: "May 25, 2024",
+    link: "/BlogPage2",
+    category: "Social Media"
+  }
+  
 ];
 
-const BlogList: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+const Latest: React.FC = () => {
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const categories = ['All', ...Array.from(new Set(blogPosts.map(post => post.category)))];
 
-  const filteredBlogs = selectedCategory
-    ? blogs.filter(blog => blog.category === selectedCategory)
-    : blogs;
-
-  const categories = Array.from(new Set(blogs.map(blog => blog.category)));
+  const filteredPosts = selectedCategory === 'All' 
+    ? blogPosts 
+    : blogPosts.filter(post => post.category === selectedCategory);
 
   return (
-    <div className="container mx-auto p-4 bg-gray-100 dark:bg-gray-900 min-h-screen">
-      <h1 className="text-3xl md:text-4xl font-bold mb-6 text-center text-gray-800 dark:text-white mt-6 md:mt-10">Our Blog</h1>
-      
-      <div className="mb-10 flex flex-wrap justify-center gap-3">
-        <button
-          className={`px-3 py-1 md:px-4 md:py-2 rounded-full text-sm md:text-base ${!selectedCategory ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-          onClick={() => setSelectedCategory(null)}
-        >
-          All
-        </button>
-        {categories.map(category => (
-          <button
-            key={category}
-            className={`px-3 py-1 md:px-4 md:py-2 rounded-full text-sm md:text-base ${selectedCategory === category ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-            onClick={() => setSelectedCategory(category)}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
+    <section id="blog" className="py-16 bg-gradient-to-b from-gray-200 to-gray-200 dark:from-gray-900 dark:to-black">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-5xl font-bold text-black dark:text-white mb-12 text-center">
+          Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Latest News</span>
+        </h2>
+        
+        <div className="flex justify-center mb-8">
+          {categories.map((category, index) => (
+            <button
+              key={index}
+              onClick={() => setSelectedCategory(category)}
+              className={`mx-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                selectedCategory === category
+                  ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6 mt-15 md:mt-15 py-16">
-        {filteredBlogs.map((blog) => (
-          <div key={blog.id} className="relative flex flex-col rounded-xl bg-white dark:bg-gray-700 bg-clip-border text-gray-700 dark:text-white shadow-md py-9">
-            <div className="relative mx-4 -mt-6 h-32 md:h-40 overflow-hidden rounded-xl bg-blue-gray-500 bg-clip-border text-white shadow-lg shadow-blue-gray-500/40 bg-gradient-to-r from-blue-500 to-blue-600">
-              <div className="flex items-center justify-center h-full">
-                <span className="text-xl md:text-2xl font-bold">{blog.category}</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          {filteredPosts.map((post, index) => (
+            <div 
+              key={index} 
+              className="relative flex w-full flex-col rounded-xl bg-gray-400 bg-clip-border text-gray-900 shadow-lg dark:bg-gray-900 dark:text-whitetransition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl"
+            >
+              <div className="relative mx-4 -mt-6 h-56 overflow-hidden rounded-xl bg-gradient-to-r from-red-500 to-orange-500">
+                <img 
+                  src={post.image} 
+                  alt={post.title} 
+                  className="w-full h-full object-cover transition-transform duration-300 ease-in-out transform hover:scale-110"
+                />
+                <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                  <span className="text-white text-lg font-bold">{post.category}</span>
+                </div>
+              </div>
+              <div className="p-8">
+                <p className="text-gray-400 mb-1 text-sm">{post.date} • {post.author}</p>
+                <h5 className="mb-2 text-2xl font-semibold leading-snug tracking-normal text-white">
+                  {post.title}
+                </h5>
+                <p className="mb-4 text-gray-200 dark:text-gray-200">
+                  {post.excerpt}
+                </p>
+                <a 
+                  href={post.link}
+                  className="inline-block rounded-lg bg-gradient-to-r from-red-500 to-orange-500 py-3 px-6 text-center text-base font-bold uppercase text-white transition-all hover:shadow-lg focus:shadow-none hover:from-orange-500 hover:to-red-500"
+                >
+                  Read More
+                </a>
               </div>
             </div>
-            <div className="p-4 md:p-6">
-              <h5 className="mb-2 block font-sans text-lg md:text-xl font-semibold leading-snug tracking-normal text-blue-gray-900 dark:text-blue-gray-200 antialiased">
-                {blog.title}
-              </h5>
-              <p className="text-gray-600 dark:text-gray-200 mb-3 text-xs md:text-sm">
-                By {blog.author} | {blog.date} | {blog.readTime} Times read
-              </p>
-              <p className="block font-sans text-sm md:text-base font-light leading-relaxed text-inherit antialiased">
-                {blog.excerpt}
-              </p>
-            </div>
-            <div className="p-4 md:p-6 pt-0 mt-auto">
-              <a
-                href={`/blog/${blog.id}`}
-                className="inline-block w-full select-none rounded-lg bg-blue-500 py-2 md:py-3 px-4 md:px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-              >
-                Read More
-              </a>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 
-export default BlogList;
+export default Latest;
