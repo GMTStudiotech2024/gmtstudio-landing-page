@@ -18,12 +18,12 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Analytics } from "@vercel/analytics/react";
 import './components/st.css';
-import { CEO } from './components';
 import CustomCursor from './components/CustomCursor';
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import CookieNotifier from './components/CookieNotifier';
 import Contact from './components/ContactPage'
 import SignUpLoginPage from './components/SignUp'
+import Latest from './components/Latest'
 const App: React.FC = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -51,10 +51,10 @@ const App: React.FC = () => {
             <Route path="/blogPage2" element={<BlogPage2 />} />
             <Route path="/research" element={<Research />} />
             <Route path="/learning" element={<Learning />} />
-            <Route path="/ceo" element={<CEO />} />
             <Route path="*" element={<Error />} />
             <Route path="/Contact" element={<Contact />} />
             <Route path="/SignUp" element={<SignUpLoginPage />} />
+            <Route path="/Latest" element={<Latest />} />
           </Routes>
         </main>
         <Footer />
