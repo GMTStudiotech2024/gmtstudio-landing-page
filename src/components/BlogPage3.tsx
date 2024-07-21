@@ -25,7 +25,8 @@ const BlogPage3: React.FC = () => {
         </p>
         <div className="text-gray-900 dark:text-gray-100 leading-relaxed">
           <p>Hello guys ! I am happy to announce a new application that can make you more friend, and getting know with each other more and more </p>
-          <p>We called this new application a Story Vending machine, more detailed information would come out next month</p>
+          <p>Today I am going to introduce our latest product called Story Vending Machine, We are currently developing the User Interface or so called Front-end of this website! </p>
+          <p>You might wondering what is this, well this is the answer of your question, Story vending machine is an platform that you can share your daily lifes, your interest, all you want to share, and when people spent their tokens randomly gets your story, you got that token, the token is used to see others lives, get GMTStudio VIP, the Free test of Mazs AI, and even more.  </p>
         </div>
       </main>
       <footer className="bg-gray-800 text-white py-4 text-center">

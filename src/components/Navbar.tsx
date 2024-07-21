@@ -171,6 +171,9 @@ const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () 
         <a href="/Learning" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 flex items-center">
           <FaUser className="mr-2" /> Project Learning
         </a>
+        <a href="/SignUp" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 flex items-center">
+          <FaUser className="mr-2" /> SignUp / Login
+        </a>
       </motion.div>
     )}
   </AnimatePresence>

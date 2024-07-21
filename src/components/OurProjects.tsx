@@ -9,21 +9,21 @@ import { Tooltip, TooltipWrapper } from 'react-tooltip';
 
 const projects = [
   {
-    title: 'GMTStudio Story Vending Machine',
-    description: 'New Ideas in GMTStudio',
-    image: projectImage3,
-    link: '/BlogPage3',
-    icon: faExclamationCircle,
-    isInternal: true,
-    color: 'from-gray-200 to-gray-400 dark:from-gray-700 dark:to-gray-900',
-  },
-  {
     title: 'GMTStudio AI WorkSpace',
     description: 'GMTStudio designed their own AI, MAZS AI. Although it is still in development, you can use it!',
     image: projectImage1,
     link: 'https://gmt-studio-ai-workspace.vercel.app/',
     icon: faRocket,
     isInternal: false,
+    color: 'from-gray-200 to-gray-400 dark:from-gray-700 dark:to-gray-900',
+  },
+  {
+    title: 'GMTStudio Story Vending Machine',
+    description: 'New Ideas in GMTStudio, We are currently developing the front end! ',
+    image: projectImage3,
+    link: '/BlogPage3',
+    icon: faExclamationCircle,
+    isInternal: true,
     color: 'from-gray-200 to-gray-400 dark:from-gray-700 dark:to-gray-900',
   },
   {

@@ -45,7 +45,7 @@ const Blog: React.FC = () => {
     <section id="blog" className="py-16 bg-gradient-to-b from-gray-200 to-gray-200 dark:from-gray-900 dark:to-black">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-5xl font-bold text-black dark:text-white mb-12 text-center">
-          Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Blog</span>
+          Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Latest News</span>
         </h2>
         
         <div className="flex justify-center mb-8">
