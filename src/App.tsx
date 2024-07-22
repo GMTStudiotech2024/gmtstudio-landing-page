@@ -24,6 +24,15 @@ import CookieNotifier from './components/CookieNotifier';
 import Contact from './components/ContactPage'
 import SignUpLoginPage from './components/SignUp'
 import Latest from './components/Latest'
+import NEWS1 from './components/News/NEWS1';
+import NEWS2 from './components/News/NEWS2';
+import NEWS3 from './components/News/NEWS3';
+import NEWS4 from './components/News/NEWS4';
+import NEWS5 from './components/News/NEWS5';
+import NEWS6 from './components/News/NEWS6';
+import NEWS7 from './components/News/NEWS7';
+import NEWS8 from './components/News/NEWS8';
+import NEWS9 from './components/News/NEWS9';
 const App: React.FC = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -49,6 +58,16 @@ const App: React.FC = () => {
             <Route path="/blogPage3" element={<BlogPage3 />} />
             <Route path="/blogPage1" element={<BlogPage1 />} />
             <Route path="/blogPage2" element={<BlogPage2 />} />
+            <Route path="/news1" element={<NEWS1 />} />
+            <Route path="/news2" element={<NEWS2 />} />
+            <Route path="/news3" element={<NEWS3 />} />
+            <Route path="/news4" element={<NEWS4 />} />
+            <Route path="/news5" element={<NEWS5 />} />
+            <Route path="/news6" element={<NEWS6 />} />
+            <Route path="/news7" element={<NEWS7 />} />
+            <Route path="/news8" element={<NEWS8 />} />
+            <Route path="/news9" element={<NEWS9 />} />
+
             <Route path="/research" element={<Research />} />
             <Route path="/learning" element={<Learning />} />
             <Route path="*" element={<Error />} />

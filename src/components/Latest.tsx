@@ -12,7 +12,7 @@ const blogPosts = [
     excerpt: "New UI design for GMTStudio AI Workspace", 
     author: "Alston Chang", 
     date: "July 21, 2024",
-    link: "/BlogPage1",
+    link: "/NEWS9",
     category: "AI Development"
   },
   { 
@@ -21,7 +21,7 @@ const blogPosts = [
     excerpt: "new update of current develop", 
     author: "Alston Chang", 
     date: "July 21, 2024",
-    link: "/BlogPage3",
+    link: "/NEWS8",
     category: "Development log"
   },
   { 
@@ -30,7 +30,7 @@ const blogPosts = [
     excerpt: "The error of database is fixed", 
     author: "Lucus Yeh", 
     date: "July 20, 2024",
-    link: "/BlogPage2",
+    link: "/NEWS7",
     category: "Social Media"
   },
   { 
@@ -39,7 +39,7 @@ const blogPosts = [
     excerpt: "Trying to fix the bug inside code", 
     author: "Lucus Yeh", 
     date: "July 20, 2024",
-    link: "/BlogPage2",
+    link: "/NEWS6",
     category: "Social Media"
   },
   { 
@@ -48,7 +48,7 @@ const blogPosts = [
     excerpt: "New project idea from GMTStudio", 
     author: "Alston Chang", 
     date: "July 01, 2024",
-    link: "/BlogPage3",
+    link: "/NEWS5",
     category: "New Project"
   },
   { 
@@ -57,7 +57,7 @@ const blogPosts = [
     excerpt: "Update Mazs AI to v0.61.2", 
     author: "Alston Chang", 
     date: "June 20, 2024",
-    link: "/BlogPage1",
+    link: "/NEWS4",
     category: "AI Development"
   },
   { 
@@ -66,16 +66,16 @@ const blogPosts = [
     excerpt: "Provide Mazs AI for free to use", 
     author: "Alston Chang", 
     date: "May 26, 2024",
-    link: "/BlogPage1",
+    link: "/NEWS3",
     category: "AI Development"
   },
   { 
     image: Theta, 
-    title: "Launch Social Mediaapplication", 
+    title: "Launch Social Media application", 
     excerpt: "Theta Social Media is now launch in Beta version", 
     author: "Lucus Yeh", 
     date: "May 25, 2024",
-    link: "/BlogPage2",
+    link: "/NEWS2",
     category: "Social Media"
   },
   { 
@@ -84,7 +84,7 @@ const blogPosts = [
     excerpt: "Currently developing new project, about Social media platform", 
     author: "Lucus Yeh", 
     date: "April 01, 2024",
-    link: "/BlogPage2",
+    link: "/NEWS1",
     category: "Social Media"
   },
   
