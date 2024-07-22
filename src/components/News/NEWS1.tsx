@@ -22,9 +22,7 @@ const NEWS1: React.FC = () => {
           By Alston Chang, April 01, 2024
         </p>
         <div className="text-gray-900 dark:text-gray-100 leading-relaxed">
-          <p>Theta Social Media Application has recently undergone a major update, bringing a fresh new design and enhanced features to its users. The updated interface is more intuitive and user-friendly, allowing for a smoother experience.</p>
-          <p>New features include enhanced privacy settings, more robust content sharing options, and integration with other popular social media platforms. The update aims to provide users with more control over their online presence and improve the overall user experience.</p>
-          <p>Stay connected with your friends and family, share your moments, and enjoy the new and improved Theta Social Media Application.</p>
+          <p>We are currently Develop a new project, which is basically a social media application.</p>
         </div>
       </main>
       <footer className="bg-gray-800 text-white py-4 text-center">
