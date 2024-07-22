@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import blogImage1 from '../assets/images/MazsAiPic.png';
 import blogImage2 from '../assets/images/blog2.png';
 import blogImage3 from '../assets/images/Story.jpg';
+import Theta from '../assets/images/feature.png'
 
 const blogPosts = [
   { 
@@ -59,7 +60,7 @@ const blogPosts = [
     category: "AI"
   },
   { 
-    image: blogImage2, 
+    image: Theta, 
     title: "Launch new application", 
     excerpt: "Theta Social Media is now launch in Beta version", 
     author: "Lucus Yeh", 
