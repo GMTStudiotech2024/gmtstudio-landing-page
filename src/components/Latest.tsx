@@ -77,7 +77,16 @@ const blogPosts = [
     date: "May 25, 2024",
     link: "/BlogPage2",
     category: "Social Media"
-  }
+  },
+  { 
+    image: ThetaDev, 
+    title: "New project in queue", 
+    excerpt: "Currently developing new project, about Social media platform", 
+    author: "Lucus Yeh", 
+    date: "April 01, 2024",
+    link: "/BlogPage2",
+    category: "Social Media"
+  },
   
 ];
 
