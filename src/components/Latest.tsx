@@ -21,7 +21,7 @@ const blogPosts = [
     author: "Alston Chang", 
     date: "July 21, 2024",
     link: "/BlogPage3",
-    category: "Innovation"
+    category: "Development log"
   },
   { 
     image: blogImage2, 
@@ -39,12 +39,12 @@ const blogPosts = [
     author: "Alston Chang", 
     date: "July 01, 2024",
     link: "/BlogPage3",
-    category: "Innovation"
+    category: "New Project"
   },
   { 
     image: blogImage1, 
     title: "Enhance database for AI", 
-    excerpt: "Add more database ", 
+    excerpt: "Update Mazs AI to v0.61.2", 
     author: "Alston Chang", 
     date: "June 20, 2024",
     link: "/BlogPage1",
@@ -53,7 +53,7 @@ const blogPosts = [
   { 
     image: blogImage1, 
     title: "Launch GMTStudio AI workspace", 
-    excerpt: "Add more database ", 
+    excerpt: "Provide Mazs AI for free to use", 
     author: "Alston Chang", 
     date: "May 26, 2024",
     link: "/BlogPage1",
@@ -61,7 +61,7 @@ const blogPosts = [
   },
   { 
     image: Theta, 
-    title: "Launch new application", 
+    title: "Launch Social Mediaapplication", 
     excerpt: "Theta Social Media is now launch in Beta version", 
     author: "Lucus Yeh", 
     date: "May 25, 2024",

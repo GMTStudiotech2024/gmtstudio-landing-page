@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'; // Make sure to import Link
 import blogImage1 from '../assets/images/MazsAiPic.png';
 import blogImage2 from '../assets/images/blog2.png';
 import blogImage3 from '../assets/images/Story.jpg';
+import { FaChevronDown } from 'react-icons/fa';
 
 const blogPosts = [
   { 
@@ -103,9 +104,9 @@ const Blog: React.FC = () => {
         <div className="flex justify-center mt-10">
           <Link
             to="/Latest"
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold text-lg transition-all hover:shadow-lg focus:shadow-none hover:from-orange-500 hover:to-red-500"
+            className="mt-4 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors duration-200 flex items-center "
           >
-            .... More News
+            More News <FaChevronDown />
           </Link>
         </div>
       </div>
