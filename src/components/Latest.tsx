@@ -3,6 +3,7 @@ import blogImage1 from '../assets/images/MazsAiPic.png';
 import blogImage2 from '../assets/images/blog2.png';
 import blogImage3 from '../assets/images/Story.jpg';
 import Theta from '../assets/images/feature.png'
+import ThetaDev from '../assets/images/large-image.png'
 
 const blogPosts = [
   { 
@@ -12,7 +13,7 @@ const blogPosts = [
     author: "Alston Chang", 
     date: "July 21, 2024",
     link: "/BlogPage1",
-    category: "AI"
+    category: "AI Development"
   },
   { 
     image: blogImage3, 
@@ -25,8 +26,17 @@ const blogPosts = [
   },
   { 
     image: blogImage2, 
+    title: "Error of Database", 
+    excerpt: "The error of database is fixed", 
+    author: "Lucus Yeh", 
+    date: "July 20, 2024",
+    link: "/BlogPage2",
+    category: "Social Media"
+  },
+  { 
+    image: ThetaDev, 
     title: "Bug fixed ", 
-    excerpt: "The newly designed website application, which was recently updated.", 
+    excerpt: "Trying to fix the bug inside code", 
     author: "Lucus Yeh", 
     date: "July 20, 2024",
     link: "/BlogPage2",
@@ -48,7 +58,7 @@ const blogPosts = [
     author: "Alston Chang", 
     date: "June 20, 2024",
     link: "/BlogPage1",
-    category: "AI"
+    category: "AI Development"
   },
   { 
     image: blogImage1, 
@@ -57,7 +67,7 @@ const blogPosts = [
     author: "Alston Chang", 
     date: "May 26, 2024",
     link: "/BlogPage1",
-    category: "AI"
+    category: "AI Development"
   },
   { 
     image: Theta, 
