@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import blogImage1 from '../assets/images/MazsAiPic.png';
 import blogImage2 from '../assets/images/blog2.png';
 import blogImage3 from '../assets/images/Story.jpg';
-import Theta from '../assets/images/feature.png'
-import ThetaDev from '../assets/images/large-image.png'
+import Theta from '../assets/images/feature.png';
+import ThetaDev from '../assets/images/large-image.png';
 
 const blogPosts = [
   { 
@@ -35,7 +35,7 @@ const blogPosts = [
   },
   { 
     image: ThetaDev, 
-    title: "Bug fixed ", 
+    title: "Bug fixed", 
     excerpt: "Trying to fix the bug inside code", 
     author: "Lucus Yeh", 
     date: "July 20, 2024",
@@ -87,7 +87,6 @@ const blogPosts = [
     link: "/NEWS1",
     category: "Social Media"
   },
-  
 ];
 
 const Latest: React.FC = () => {
@@ -105,12 +104,12 @@ const Latest: React.FC = () => {
           Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Latest News</span>
         </h2>
         
-        <div className="flex justify-center mb-8">
+        <div className="flex flex-wrap justify-center mb-8">
           {categories.map((category, index) => (
             <button
               key={index}
               onClick={() => setSelectedCategory(category)}
-              className={`mx-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`mx-2 my-1 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 selectedCategory === category
                   ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white'
                   : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
@@ -121,11 +120,11 @@ const Latest: React.FC = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {filteredPosts.map((post, index) => (
             <div 
               key={index} 
-              className="relative flex w-full flex-col rounded-xl bg-gray-400 bg-clip-border text-gray-900 shadow-lg dark:bg-gray-900 dark:text-whitetransition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl"
+              className="relative flex w-full flex-col rounded-xl bg-gray-400 bg-clip-border text-gray-900 shadow-lg dark:bg-gray-900 dark:text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl"
             >
               <div className="relative mx-4 -mt-6 h-56 overflow-hidden rounded-xl bg-gradient-to-r from-red-500 to-orange-500">
                 <img 
