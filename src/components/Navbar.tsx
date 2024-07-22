@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { FaBars, FaTimes, FaUser, FaChevronDown, FaHome, FaFlask, FaBox, FaEnvelope } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
+import { account } from '../appwriteConfig'; // Assuming this is your Appwrite account configuration
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +17,19 @@ const Navbar: React.FC = () => {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userData = await account.get(); // Fetch user data from Appwrite
+        setUser(userData);
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    };
+
+    fetchUser();
   }, []);
 
   const toggleMenu = () => {
@@ -31,6 +46,17 @@ const Navbar: React.FC = () => {
   const toggleProfileMenu = () => {
     setIsProfileOpen(!isProfileOpen);
     setIsProductsOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await account.deleteSession('current'); // Logout the user
+      setUser(null);
+      alert('Logged out successfully');
+    } catch (error) {
+      console.error('Failed to log out:', error);
+      alert('An error occurred during logout');
+    }
   };
 
   const menuVariants = {
@@ -64,12 +90,12 @@ const Navbar: React.FC = () => {
             ]}
           />
           <NavLink href="/contact" label="Contact" icon={<FaEnvelope />} />
-          <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} />
+          <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} user={user} />
           <ThemeToggle />
         </div>
 
         <div className="lg:hidden flex items-center space-x-4">
-          <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} />
+          <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} user={user} />
           <button onClick={toggleMenu} className="text-xl text-white dark:text-white">
             {isOpen ? <FaTimes /> : <FaBars />}
           </button>
@@ -103,10 +129,10 @@ const Navbar: React.FC = () => {
         )}
       </AnimatePresence>
 
-      <ProfileDropdown isProfileOpen={isProfileOpen} toggleProfileMenu={toggleProfileMenu} />
+      <ProfileDropdown isProfileOpen={isProfileOpen} toggleProfileMenu={toggleProfileMenu} handleLogout={handleLogout} user={user} />
     </nav>
   );
-}
+};
 
 const NavLink: React.FC<{ href: string; label: string; icon: React.ReactNode }> = ({ href, label, icon }) => (
   <a href={href} className="block px-3 py-2 text-blue-300 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 flex items-center">
@@ -146,13 +172,21 @@ const ProductLink: React.FC<{ href: string; label: string; icon: React.ReactNode
   </a>
 );
 
-const ProfileButton: React.FC<{ toggleProfileMenu: () => void; isProfileOpen: boolean }> = ({ toggleProfileMenu, isProfileOpen }) => (
-  <button onClick={toggleProfileMenu} className="block p-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
-    <FaUser className={`w-5 h-5 ${isProfileOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
+const ProfileButton: React.FC<{ toggleProfileMenu: () => void; isProfileOpen: boolean; user: any }> = ({ toggleProfileMenu, isProfileOpen, user }) => (
+  <button onClick={toggleProfileMenu} className="block p-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 relative">
+    {user && user.image ? (
+      <img
+        src={user.image}
+        alt="User"
+        className="w-8 h-8 rounded-full border-2 border-transparent hover:border-blue-500 dark:hover:border-yellow-400"
+      />
+    ) : (
+      <FaUser className={`w-5 h-5 ${isProfileOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
+    )}
   </button>
 );
 
-const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () => void }> = ({ isProfileOpen, toggleProfileMenu }) => (
+const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () => void; handleLogout: () => void; user: any }> = ({ isProfileOpen, toggleProfileMenu, handleLogout, user }) => (
   <AnimatePresence>
     {isProfileOpen && (
       <motion.div
@@ -174,6 +208,11 @@ const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () 
         <a href="/SignUp" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 flex items-center">
           <FaUser className="mr-2" /> SignUp / Login
         </a>
+        {user && (
+          <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-800 transition-colors duration-300 flex items-center">
+            <FaUser className="mr-2" /> Logout
+          </button>
+        )}
       </motion.div>
     )}
   </AnimatePresence>
