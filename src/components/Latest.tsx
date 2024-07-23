@@ -109,7 +109,7 @@ const Latest: React.FC = () => {
             <button
               key={index}
               onClick={() => setSelectedCategory(category)}
-              className={`mx-2 my-1 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`mx-2 my-1 px-4 py-2 rounded-full text-sm font-medium transition-all transform hover:scale-105 ${
                 selectedCategory === category
                   ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white'
                   : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
@@ -124,9 +124,9 @@ const Latest: React.FC = () => {
           {filteredPosts.map((post, index) => (
             <div 
               key={index} 
-              className="relative flex w-full flex-col rounded-xl bg-gray-400 bg-clip-border text-gray-900 shadow-lg dark:bg-gray-900 dark:text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl"
+              className="relative flex w-full flex-col rounded-xl bg-gray-100 dark:bg-gray-800 shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl"
             >
-              <div className="relative mx-4 -mt-6 h-56 overflow-hidden rounded-xl bg-gradient-to-r from-red-500 to-orange-500">
+              <div className="relative mx-4 -mt-6 h-56 overflow-hidden rounded-xl">
                 <img 
                   src={post.image} 
                   alt={post.title} 
@@ -136,12 +136,12 @@ const Latest: React.FC = () => {
                   <span className="text-white text-lg font-bold">{post.category}</span>
                 </div>
               </div>
-              <div className="p-8">
-                <p className="text-gray-400 mb-1 text-sm">{post.date} • {post.author}</p>
-                <h5 className="mb-2 text-2xl font-semibold leading-snug tracking-normal text-white">
+              <div className="p-6">
+                <p className="text-gray-500 mb-1 text-sm">{post.date} • {post.author}</p>
+                <h5 className="mb-2 text-2xl font-semibold leading-snug tracking-normal text-gray-900 dark:text-white">
                   {post.title}
                 </h5>
-                <p className="mb-4 text-gray-200 dark:text-gray-200">
+                <p className="mb-4 text-gray-700 dark:text-gray-300">
                   {post.excerpt}
                 </p>
                 <a 
