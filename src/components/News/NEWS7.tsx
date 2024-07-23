@@ -24,7 +24,7 @@ const NEWS7: React.FC = () => {
             <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
               <img src="/api/placeholder/40/40" alt="Author" className="w-10 h-10 rounded-full mr-4" />
               <div>
-                <span>By Alston Chang, Chief Technology Officer</span>
+                <span>By Alston Chang, Chief Executive Officer</span>
                 <span className="mx-2">•</span>
                 <span>July 20, 2024</span>
               </div>
