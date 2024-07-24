@@ -14,7 +14,7 @@ const blogPosts = [
     author: "Alston Chang", 
     date: "July 24, 2024",
     link: "/NEWS10",
-    category: "Social Media"
+    category: "Development Log"
   },
   { 
     image: blogImage1, 
