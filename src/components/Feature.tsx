@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
-import { FaChevronDown, FaChevronUp, FaRocket, FaDatabase, FaChartBar } from 'react-icons/fa';
+import { CloudArrowUpIcon, LockClosedIcon, ServerIcon } from '@heroicons/react/20/solid';
 import featureImage from '../assets/images/feature.png';
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+
 
 type FeatureType = {
   title: string;
@@ -15,24 +17,19 @@ type FeatureType = {
 
 const features: FeatureType[] = [
   {
-    title: 'MAZS AI',
-    description: 'The MAZS AI is a Chat bot that uses NLP (Natural Language Processing) and responds improperly to annoy users.',
-    amount: 'Unlimited',
-    status: 'Successfully Launched',
-    icon: FaRocket,
+    title: 'Push to deploy.',
+    description: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.',
+    icon: CloudArrowUpIcon,
   },
   {
-    title: 'Enhanced Database',
-    description: 'Using a new type of database storage, the MAZS AI and other applications can provide a better user experience.',
-    status: 'For all users',
-    icon: FaDatabase,
+    title: 'SSL certificates.',
+    description: 'Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo.',
+    icon: LockClosedIcon,
   },
   {
-    title: 'Analytics',
-    description: 'There are no analytics but just a few brain cells left over here.',
-    currency: '99+',
-    balance: 'Ya, nothing but brain cells',
-    icon: FaChartBar,
+    title: 'Database backups.',
+    description: 'Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.',
+    icon: ServerIcon,
   },
 ];
 
@@ -51,26 +48,22 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
 
   return (
     <motion.div
-      className="feature-card p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-b from-gray-200 to-gray-200 dark:from-gray-800 dark:to-gray-800 border hover:border-blue-500 opacity-75 transition-opacity duration-500"
+      className="relative p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 bg-white dark:bg-gray-800"
       initial={{ opacity: 0, y: 50 }}
       animate={controls}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ scale: 1.03 }}
     >
-      <div className="flex items-center mb-4">
-        <feature.icon className="text-4xl mr-4 text-blue-500" />
-        <h4 className="text-2xl font-semibold text-dark dark:text-white">
-          <span className="bg-gradient-to-r from-green-600 to-blue-500 text-transparent bg-clip-text">
-            {feature.title}
-          </span>
-        </h4>
+      <div className="absolute left-1 top-1 h-10 w-10">
+        <feature.icon className="text-indigo-600" aria-hidden="true" />
       </div>
+      <h4 className="text-2xl font-semibold text-gray-900 dark:text-white pl-12">{feature.title}</h4>
       <motion.div
         initial={false}
         animate={{ height: isExpanded ? 'auto' : '100px' }}
-        className="overflow-hidden"
+        className="overflow-hidden mt-4"
       >
-        <p className="text-lg text-gray-900 dark:text-gray-300 dark:text-gray-300 mb-4">
+        <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
           {feature.description}
         </p>
         {feature.amount && (
@@ -96,7 +89,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => {
       </motion.div>
       <motion.button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="mt-4 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors duration-200 flex items-center"
+        className="mt-4 text-indigo-600 dark:text-indigo-300 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors duration-200 flex items-center"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
@@ -139,8 +132,8 @@ const Feature: React.FC = () => {
   }, []);
 
   return (
-    <section id="features" className="py-16 bg-gradient-to-b from-gray-200 to-gray-200 dark:from-gray-900 dark:to-black text-black dark:text-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="features" className="py-24 bg-white dark:bg-gray-900 text-black dark:text-white">
+      <div className="container mx-auto px-6 lg:px-8">
         <motion.div
           className="flex flex-col lg:flex-row items-center lg:space-x-12 mb-12"
           initial={{ opacity: 0, y: -50 }}
