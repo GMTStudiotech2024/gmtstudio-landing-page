@@ -4,10 +4,11 @@ import blogImage2 from '../assets/images/blog2.png';
 import blogImage3 from '../assets/images/Story.jpg';
 import Theta from '../assets/images/feature.png';
 import ThetaDev from '../assets/images/large-image.png';
+import WebDev from '../assets/images/1.png'
 
 const blogPosts = [
   {
-    image: blogImage1,
+    image: WebDev,
     title: "Official Website Update",
     excerpt:"New update and GMTStudio Official Website",
     author: "Alston Chang",

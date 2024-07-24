@@ -56,11 +56,6 @@ const NEWS9 = () => {
               </ul>
 
               <p>Stay tuned for more updates as we continue to refine and enhance the GMTStudio AI Workspace. We're committed to supporting the AI community with cutting-edge tools that drive innovation and discovery.</p>
-
-              <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
-                <p className="font-semibold text-blue-800 dark:text-blue-200">Ready to experience the future of AI development?</p>
-                <a href="https://gmt-studio-ai-workspace.vercel.app/" className="inline-block mt-2 px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300">Try GMTStudio AI Studio 0.62.0 Now</a>
-              </div>
             </div>
           </div>
           <div className="px-8 py-4 bg-gray-50 dark:bg-gray-700 flex items-center justify-between">
