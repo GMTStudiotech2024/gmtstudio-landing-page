@@ -9,11 +9,11 @@ import { FaChevronDown } from 'react-icons/fa';
 const blogPosts = [
   { 
     image: DEV , 
-    title: "Theta Social Media Application", 
-    excerpt: "The newly designed website application, which was recently updated.", 
-    author: "Lucus Yeh", 
-    date: "May 25, 2024",
-    link: "/BlogPage2",
+    title: "GMTStudio's Official website Update", 
+    excerpt: "We added some new feature to our official website, let's hop into the introduction of the new feature!", 
+    author: "Alston Chang", 
+    date: "July 24, 2024",
+    link: "/NEWS10",
     category: "Social Media"
   },
   { 
