@@ -33,6 +33,7 @@ import NEWS6 from './components/News/NEWS6';
 import NEWS7 from './components/News/NEWS7';
 import NEWS8 from './components/News/NEWS8';
 import NEWS9 from './components/News/NEWS9';
+import NEWS10 from './components/News/NEWS10'
 const App: React.FC = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -67,6 +68,7 @@ const App: React.FC = () => {
             <Route path="/news7" element={<NEWS7 />} />
             <Route path="/news8" element={<NEWS8 />} />
             <Route path="/news9" element={<NEWS9 />} />
+            <Route path="/news10" element={<NEWS10 />} />
 
             <Route path="/research" element={<Research />} />
             <Route path="/learning" element={<Learning />} />

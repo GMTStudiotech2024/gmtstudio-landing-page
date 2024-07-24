@@ -6,6 +6,15 @@ import Theta from '../assets/images/feature.png';
 import ThetaDev from '../assets/images/large-image.png';
 
 const blogPosts = [
+  {
+    image: blogImage1,
+    title: "Official Website Update",
+    excerpt:"New update and GMTStudio Official Website",
+    author: "Alston Chang",
+    date: "July 24, 2024",
+    link: "/NEWS10",
+    category: "Development log"
+  },
   { 
     image: blogImage1, 
     title: "UI of GMTStudio AI Workspace", 
