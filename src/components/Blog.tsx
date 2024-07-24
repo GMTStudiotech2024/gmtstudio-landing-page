@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom'; // Make sure to import Link
 import blogImage1 from '../assets/images/MazsAiPic.png';
-import blogImage2 from '../assets/images/blog2.png';
+import DEV from '../assets/images/1.png'
 import blogImage3 from '../assets/images/Story.jpg';
 import { FaChevronDown } from 'react-icons/fa';
 
+
 const blogPosts = [
+  { 
+    image: DEV , 
+    title: "Theta Social Media Application", 
+    excerpt: "The newly designed website application, which was recently updated.", 
+    author: "Lucus Yeh", 
+    date: "May 25, 2024",
+    link: "/BlogPage2",
+    category: "Social Media"
+  },
   { 
     image: blogImage1, 
     title: "GMTStudio AI Workspace", 
@@ -24,15 +34,6 @@ const blogPosts = [
     link: "/BlogPage3",
     category: "Innovation"
   },
-  { 
-    image: blogImage2, 
-    title: "Theta Social Media Application", 
-    excerpt: "The newly designed website application, which was recently updated.", 
-    author: "Lucus Yeh", 
-    date: "May 25, 2024",
-    link: "/BlogPage2",
-    category: "Social Media"
-  }
 ];
 
 const Blog: React.FC = () => {
