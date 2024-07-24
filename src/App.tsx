@@ -34,6 +34,7 @@ import NEWS7 from './components/News/NEWS7';
 import NEWS8 from './components/News/NEWS8';
 import NEWS9 from './components/News/NEWS9';
 import NEWS10 from './components/News/NEWS10'
+import Dashboard from './components/Dashboard';
 const App: React.FC = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -76,6 +77,7 @@ const App: React.FC = () => {
             <Route path="/Contact" element={<Contact />} />
             <Route path="/SignUp" element={<SignUpLoginPage />} />
             <Route path="/Latest" element={<Latest />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
         </main>
         <Footer />
