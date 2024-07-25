@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useEffect } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import { User, Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -11,11 +11,15 @@ interface AuthorizedUser {
 const authorizedUsers: AuthorizedUser[] = [
   { userId: 'Alston@20070119', passcode: 'GMT001A' },
   { userId: 'Lucas@Yeh', passcode: 'GMT002A' },
-  { userId: 'user3@example.com', passcode: 'password3' },
+  { userId: 'Willy@lin', passcode: 'GMT003A' },
   // Add more users as needed
 ];
 
-const SignUpLoginPage: React.FC = () => {
+interface SignUpLoginPageProps {
+  setIsAuthenticated: (authenticated: boolean) => void;
+}
+
+const SignUpLoginPage: React.FC<SignUpLoginPageProps> = ({ setIsAuthenticated }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,6 +36,7 @@ const SignUpLoginPage: React.FC = () => {
     try {
       const user = authorizedUsers.find(u => u.userId === email && u.passcode === password);
       if (user) {
+        setIsAuthenticated(true);
         setIsLoggedIn(true);
         setTimeout(() => {
           navigate('/dashboard');

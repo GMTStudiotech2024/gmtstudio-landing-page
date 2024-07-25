@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -13,17 +13,17 @@ import BlogPage2 from './components/BlogPage2';
 import BlogPage3 from './components/BlogPage3';
 import Research from './components/Research';
 import Learning from './components/Learning';
-import AboutUs from './components/AboutUs'
+import AboutUs from './components/AboutUs';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from '@vercel/analytics/react';
 import './components/st.css';
 import CustomCursor from './components/CustomCursor';
-import { SpeedInsights } from "@vercel/speed-insights/react"
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import CookieNotifier from './components/CookieNotifier';
-import Contact from './components/ContactPage'
-import SignUpLoginPage from './components/SignUp'
-import Latest from './components/Latest'
+import Contact from './components/ContactPage';
+import SignUpLoginPage from './components/SignUp';
+import Latest from './components/Latest';
 import NEWS1 from './components/News/NEWS1';
 import NEWS2 from './components/News/NEWS2';
 import NEWS3 from './components/News/NEWS3';
@@ -33,9 +33,13 @@ import NEWS6 from './components/News/NEWS6';
 import NEWS7 from './components/News/NEWS7';
 import NEWS8 from './components/News/NEWS8';
 import NEWS9 from './components/News/NEWS9';
-import NEWS10 from './components/News/NEWS10'
+import NEWS10 from './components/News/NEWS10';
 import Dashboard from './components/Dashboard';
+import PrivateRoute from './components/PrivateRoute'; // Import the PrivateRoute component
+
 const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
@@ -70,14 +74,20 @@ const App: React.FC = () => {
             <Route path="/news8" element={<NEWS8 />} />
             <Route path="/news9" element={<NEWS9 />} />
             <Route path="/news10" element={<NEWS10 />} />
-
             <Route path="/research" element={<Research />} />
             <Route path="/learning" element={<Learning />} />
             <Route path="*" element={<Error />} />
-            <Route path="/Contact" element={<Contact />} />
-            <Route path="/SignUp" element={<SignUpLoginPage />} />
-            <Route path="/Latest" element={<Latest />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/signup" element={<SignUpLoginPage setIsAuthenticated={setIsAuthenticated} />} />
+            <Route path="/latest" element={<Latest />} />
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute isAuthenticated={isAuthenticated}>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
           </Routes>
         </main>
         <Footer />
