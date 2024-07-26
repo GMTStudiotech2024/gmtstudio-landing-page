@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Star, Zap, Shield } from 'lucide-react';
 
 const Hero: React.FC = () => {
   const projectsRef = useRef<HTMLDivElement>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -18,6 +19,7 @@ const Hero: React.FC = () => {
   useEffect(() => {
     const handleScroll = () => {
       setScrollY(window.scrollY);
+      setIsVisible(window.scrollY > 100);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -28,6 +30,12 @@ const Hero: React.FC = () => {
       projectsRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  const features = [
+    { icon: <Star className="w-6 h-6 text-yellow-400" />, text: "Premium Quality" },
+    { icon: <Zap className="w-6 h-6 text-blue-400" />, text: "Lightning Fast" },
+    { icon: <Shield className="w-6 h-6 text-green-400" />, text: "Secure & Reliable" },
+  ];
 
   return (
     <>
@@ -59,23 +67,31 @@ const Hero: React.FC = () => {
           >
             Enhanced tools and applications to make your life easier.
           </motion.p>
-          <motion.button
-            onClick={handleLearnMoreClick}
-            className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 text-lg sm:text-xl font-semibold rounded-lg shadow-lg bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+          <motion.div
+            className="flex flex-wrap justify-center sm:justify-end gap-4 mb-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            Learn More
-            <ChevronDown className="ml-2" size={24} />
-          </motion.button>
+            {features.map((feature, index) => (
+              <div key={index} className="flex items-center bg-gray-800 bg-opacity-70 rounded-full px-4 py-2">
+                {feature.icon}
+                <span className="ml-2 text-white">{feature.text}</span>
+              </div>
+            ))}
+          </motion.div>
+         
         </div>
       </motion.section>
-      <div ref={projectsRef} id="projects" className="bg-gray-900">
-        {/* Projects content here */}
-      </div>
+      <motion.div
+        className={`fixed bottom-8 right-8 bg-indigo-600 p-3 rounded-full cursor-pointer ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+      >
+        <ChevronDown className="text-white transform rotate-180" size={24} />
+      </motion.div>
     </>
   );
 };

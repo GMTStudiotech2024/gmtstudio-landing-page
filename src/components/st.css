@@ -136,4 +136,24 @@
     justify-content: space-between;
     width: 100%;
   }
+  @media (max-width: 768px) {
+    .chat-widget {
+      display: none;
+    }
+    .chat-icon {
+      display: block;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+  }
   
+  @media (min-width: 769px) {
+    .chat-widget {
+      display: block;
+    }
+    .chat-icon {
+      display: none;
+    }
+  }

@@ -35,19 +35,26 @@ import NEWS8 from './components/News/NEWS8';
 import NEWS9 from './components/News/NEWS9';
 import NEWS10 from './components/News/NEWS10';
 import Dashboard from './components/Dashboard';
-import PrivateRoute from './components/PrivateRoute'; // Import the PrivateRoute component
+import PrivateRoute from './components/PrivateRoute';
+import ChatWidget from './components/ChatWidget';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
 
+  const toggleChat = () => {
+    setIsChatOpen(!isChatOpen);
+  };
+
   return (
     <Router>
       <div className="App bg-gray-900 min-h-screen flex flex-col">
         <CustomCursor />
+        {isChatOpen && <ChatWidget onClose={toggleChat} />}
         <Navbar />
         <main className="flex-grow">
           <Routes>
