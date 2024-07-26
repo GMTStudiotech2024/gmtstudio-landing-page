@@ -5,7 +5,10 @@ import {
   BarChart,
   TrendingUp,
   Bell,
-  MessageSquare
+  MessageSquare,
+  LogOut,
+  Settings,
+  User
 } from 'lucide-react';
 import GMTStudio from '../assets/images/GMTStudio.png';
 
@@ -22,6 +25,7 @@ interface ProjectProgress {
 
 const Dashboard: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [projects, setProjects] = useState<ProjectProgress[]>([]);
@@ -80,11 +84,30 @@ const Dashboard: React.FC = () => {
                 )}
               </div>
               <div className="relative">
-                <button className="flex items-center space-x-2 focus:outline-none">
+                <button 
+                  className="flex items-center space-x-2 focus:outline-none"
+                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                >
                   <img className="h-8 w-8 rounded-full" src={GMTStudio} alt="User avatar" />
                   <span className="hidden md:inline-block font-medium text-gray-700 dark:text-gray-300">Developer</span>
                   <ChevronDown size={20} className="text-gray-500 dark:text-gray-300" />
                 </button>
+                {isUserDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 z-10">
+                    <a href="/" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">
+                      <User className="inline-block mr-2" size={16} />
+                      Profile
+                    </a>
+                    <a href="/" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">
+                      <Settings className="inline-block mr-2" size={16} />
+                      Settings
+                    </a>
+                    <a href="/" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">
+                      <LogOut className="inline-block mr-2" size={16} />
+                      Sign out
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           </div>
