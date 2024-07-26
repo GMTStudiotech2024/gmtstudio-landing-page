@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ChevronDown, 
-  X, 
-  Home, 
   Users, 
-  Settings, 
-  LogOut,
   BarChart,
-  PieChart,
   TrendingUp,
-  DollarSign,
   Bell,
-  Calendar,
   MessageSquare
 } from 'lucide-react';
+import GMTStudio from '../assets/images/GMTStudio.png';
 
 interface Notification {
   id: number;
@@ -31,7 +25,7 @@ const Dashboard: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [projects, setProjects] = useState<ProjectProgress[]>([]);
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const [isDarkMode] = useState<boolean>(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -54,9 +48,6 @@ const Dashboard: React.FC = () => {
     ]);
   }, []);
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
 
   return (
     <div className={`${isDarkMode ? 'dark' : ''}`}>
@@ -78,7 +69,7 @@ const Dashboard: React.FC = () => {
                     {notifications.map((notification) => (
                       <a
                         key={notification.id}
-                        href="#"
+                        href="/"
                         className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
                       >
                         <p className="font-medium">{notification.message}</p>
@@ -90,7 +81,7 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="relative">
                 <button className="flex items-center space-x-2 focus:outline-none">
-                  <img className="h-8 w-8 rounded-full" src="https://via.placeholder.com/32" alt="User avatar" />
+                  <img className="h-8 w-8 rounded-full" src={GMTStudio} alt="User avatar" />
                   <span className="hidden md:inline-block font-medium text-gray-700 dark:text-gray-300">Developer</span>
                   <ChevronDown size={20} className="text-gray-500 dark:text-gray-300" />
                 </button>
