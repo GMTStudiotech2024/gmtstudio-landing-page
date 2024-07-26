@@ -12,6 +12,8 @@ const authorizedUsers: AuthorizedUser[] = [
   { userId: 'Alston@20070119', passcode: 'GMT001A' },
   { userId: 'Lucas@Yeh', passcode: 'GMT002A' },
   { userId: 'Willy@lin', passcode: 'GMT003A' },
+  { userId: 'jerry20070513@gmail.com', passcode: 'GMT004A' },
+  { userId: 'Waiting@666', passcode: 'GMT005A' }
 ];
 
 interface SignUpLoginPageProps {
