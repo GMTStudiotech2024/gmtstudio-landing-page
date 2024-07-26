@@ -22,7 +22,7 @@ const blogPosts = [
     excerpt: "New UI design for GMTStudio AI Workspace", 
     author: "Alston Chang", 
     date: "July 21, 2024",
-    link: "/BlogPage1",
+    link: "/NEWS9",
     category: "AI"
   },
   { 
@@ -31,7 +31,7 @@ const blogPosts = [
     excerpt: "New project idea from GMTStudio", 
     author: "Alston Chang", 
     date: "July 1, 2024",
-    link: "/BlogPage3",
+    link: "/NEWS8",
     category: "Innovation"
   },
 ];
