@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { FaChevronRight, FaRocket, FaCodeBranch, FaMap, FaSearch, FaUsers, FaChartLine, FaMicrochip, FaCloud, FaDna, FaGlobeAmericas } from 'react-icons/fa';
+import { FaChevronRight, FaRocket, FaCodeBranch, FaMap, FaSearch, FaUsers,  FaMicrochip,  } from 'react-icons/fa';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const ResearchCard = ({

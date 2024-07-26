@@ -12,7 +12,6 @@ const authorizedUsers: AuthorizedUser[] = [
   { userId: 'Alston@20070119', passcode: 'GMT001A' },
   { userId: 'Lucas@Yeh', passcode: 'GMT002A' },
   { userId: 'Willy@lin', passcode: 'GMT003A' },
-  // Add more users as needed
 ];
 
 interface SignUpLoginPageProps {
@@ -23,13 +22,28 @@ const SignUpLoginPage: React.FC<SignUpLoginPageProps> = ({ setIsAuthenticated })
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
+  const validateForm = () => {
+    if (!email) {
+      setError('Email is required');
+      return false;
+    }
+    if (!password) {
+      setError('Password is required');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     setLoading(true);
     setError(null);
 
@@ -38,14 +52,19 @@ const SignUpLoginPage: React.FC<SignUpLoginPageProps> = ({ setIsAuthenticated })
       if (user) {
         setIsAuthenticated(true);
         setIsLoggedIn(true);
+        if (rememberMe) {
+          localStorage.setItem('rememberedUser', email);
+        } else {
+          localStorage.removeItem('rememberedUser');
+        }
         await new Promise(resolve => setTimeout(resolve, 4000));
         navigate('/dashboard');
       } else {
-        setError('Access denied. Contact support for beta access.');
+        setError('Invalid email or password. Please try again.');
       }
     } catch (error) {
       console.error(error);
-      setError('System error. Please try again later.');
+      setError('An unexpected error occurred. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -153,6 +172,26 @@ const SignUpLoginPage: React.FC<SignUpLoginPageProps> = ({ setIsAuthenticated })
                   >
                     {showPassword ? <EyeOff /> : <Eye />}
                   </button>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-white dark:text-gray-300">
+                    Remember me
+                  </label>
+                </div>
+                <div className="text-sm">
+                  <a href="#" className="font-medium text-blue-300 hover:text-blue-400 dark:text-blue-400 dark:hover:text-blue-300">
+                    Forgot your password?
+                  </a>
                 </div>
               </div>
               <div>
