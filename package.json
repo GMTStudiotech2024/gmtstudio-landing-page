@@ -21,6 +21,7 @@
     "aos": "^2.3.4",
     "appwrite": "^15.0.0",
     "framer-motion": "^11.2.11",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.395.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

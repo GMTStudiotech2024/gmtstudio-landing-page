@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaBars, FaTimes, FaUser, FaChevronDown, FaHome, FaFlask, FaBox, FaEnvelope } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
-import { account } from '../appwriteConfig'; // Assuming this is your Appwrite account configuration
+import { account } from '../appwriteConfig';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,7 +22,7 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userData = await account.get(); // Fetch user data from Appwrite
+        const userData = await account.get();
         setUser(userData);
       } catch (error) {
         console.error('Failed to fetch user data:', error);
@@ -50,7 +50,7 @@ const Navbar: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await account.deleteSession('current'); // Logout the user
+      await account.deleteSession('current');
       setUser(null);
       alert('Logged out successfully');
     } catch (error) {
@@ -135,7 +135,7 @@ const Navbar: React.FC = () => {
 };
 
 const NavLink: React.FC<{ href: string; label: string; icon: React.ReactNode }> = ({ href, label, icon }) => (
-  <a href={href} className="block px-3 py-2 text-blue-300 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 flex items-center">
+  <a href={href} className="flex px-3 py-2 text-blue-300 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 items-center">
     {icon} <span className="ml-2">{label}</span>
   </a>
 );
@@ -167,13 +167,13 @@ const DropdownMenu: React.FC<{ label: string; icon: React.ReactNode; isOpen: boo
 );
 
 const ProductLink: React.FC<{ href: string; label: string; icon: React.ReactNode }> = ({ href, label, icon }) => (
-  <a href={href} className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 flex items-center">
+  <a href={href} className="flex px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 items-center">
     {icon} <span className="ml-2">{label}</span>
   </a>
 );
 
 const ProfileButton: React.FC<{ toggleProfileMenu: () => void; isProfileOpen: boolean; user: any }> = ({ toggleProfileMenu, isProfileOpen, user }) => (
-  <button onClick={toggleProfileMenu} className="block p-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 relative">
+  <button onClick={toggleProfileMenu} className="flex p-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 relative">
     {user && user.image ? (
       <img
         src={user.image}
@@ -199,17 +199,17 @@ const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () 
         }}
         className="absolute right-4 mt-4 bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4 space-y-2"
       >
-        <a href="/Latest" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 flex items-center">
+        <a href="/Latest" className="flex px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 items-center">
           <FaUser className="mr-2" /> Latest Update
         </a>
-        <a href="/Learning" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 flex items-center">
+        <a href="/Learning" className="flex px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 items-center">
           <FaUser className="mr-2" /> Project Learning
         </a>
-        <a href="/SignUp" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 flex items-center">
+        <a href="/SignUp" className="flex px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 items-center">
           <FaUser className="mr-2" /> SignUp / Login
         </a>
         {user && (
-          <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-800 transition-colors duration-300 flex items-center">
+          <button onClick={handleLogout} className="flex w-full text-left px-4 py-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-800 transition-colors duration-300 items-center">
             <FaUser className="mr-2" /> Logout
           </button>
         )}
