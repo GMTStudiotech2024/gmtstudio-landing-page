@@ -1,63 +1,102 @@
-// src/components/UpcomingEvents.tsx
-import React from 'react';
-import { motion } from 'framer-motion';
-import { CalendarIcon, AcademicCapIcon, LightBulbIcon } from '@heroicons/react/24/outline'; // Importing icons from Heroicons
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CalendarIcon, AcademicCapIcon, LightBulbIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
 const eventsData = [
   {
     title: 'New Game Announce Event',
     date: 'February 01, 2025',
-    description: 'The new game will be announce on February 1st 2025, which will be availble to all the players after event announcing date',
-    icon: LightBulbIcon, // Assigning an icon to each event
-    link: '',
+    description: 'The new game will be announced on February 1st 2025, which will be available to all players after the event.',
+    icon: LightBulbIcon,
+    color: 'bg-purple-100 dark:bg-purple-900',
+    textColor: 'text-purple-600 dark:text-purple-300',
+    location: 'Online Event',
+    time: '2:00 PM EST',
   },
   {
     title: 'Yearly Developer Event',
     date: 'July 04, 2025',
-    description: 'Yearly Developer of GMTStudio will be held on July 4th, 2025',
+    description: 'Yearly Developer event of GMTStudio will be held on July 4th, 2025',
     icon: AcademicCapIcon,
-    link: '',
+    color: 'bg-green-100 dark:bg-green-900',
+    textColor: 'text-green-600 dark:text-green-300',
+    location: 'Taipei, Taiwan',
+    time: '12:00 AM EST',
   },
   {
     title: 'Application Event',
-    date: 'to be confirmed',
+    date: 'To be confirmed',
     description: 'Announcing the Big Update for our Application',
     icon: CalendarIcon,
-    link: '',
+    color: 'bg-blue-100 dark:bg-blue-900',
+    textColor: 'text-blue-600 dark:text-blue-300',
+    location: 'To be announced',
+    time: 'TBA',
   },
 ];
 
 const eventVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 50 },
   visible: { opacity: 1, y: 0 },
 };
 
 const UpcomingEvents: React.FC = () => {
+  const [expandedEvent, setExpandedEvent] = useState<number | null>(null);
+
   return (
-    <section className="upcoming-events py-16 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-      <div className="container mx-auto px-6">
-        <h2 className="text-4xl font-bold mb-8 text-center text-gray-800 dark:text-gray-200">Upcoming Events</h2>
-        <div className="flex flex-wrap -mx-4">
+    <section className="upcoming-events py-24 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.h2 
+          className="text-6xl font-extrabold mb-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          Upcoming Events
+        </motion.h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {eventsData.map((event, index) => (
             <motion.div
               key={index}
-              className="w-full md:w-1/3 px-4 mb-8 md:mb-0"
+              className={`rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 ${event.color}`}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.5, delay: index * 0.2 }}
               variants={eventVariants}
             >
-              <div className="event-item bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
-                <div className="icon mb-4 flex justify-center">
-                  <event.icon className="h-12 w-12 text-blue-500 dark:text-blue-300" /> {/* Icon displayed */}
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <event.icon className={`h-12 w-12 ${event.textColor}`} />
+                  <span className={`text-sm font-semibold ${event.textColor}`}>{event.date}</span>
                 </div>
-                <h3 className="text-2xl font-semibold mb-2">{event.title}</h3>
-                <p className="text-gray-500 dark:text-gray-400 mb-4">{event.date}</p>
+                <h3 className={`text-2xl font-bold mb-3 ${event.textColor}`}>{event.title}</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">{event.description}</p>
-                <a href={event.link} className="text-blue-500 dark:text-blue-400 hover:underline">
-                  Not avialable Yet
-                </a>
+                <div className="flex justify-between items-center">
+                  <button 
+                    className={`mt-4 px-4 py-2 rounded-full ${event.textColor} border border-current hover:bg-opacity-10 hover:bg-current transition-colors duration-300`}
+                    onClick={() => setExpandedEvent(expandedEvent === index ? null : index)}
+                  >
+                    {expandedEvent === index ? 'Less Info' : 'More Info'}
+                  </button>
+                  <ChevronDownIcon 
+                    className={`h-6 w-6 ${event.textColor} transition-transform duration-300 ${expandedEvent === index ? 'transform rotate-180' : ''}`}
+                  />
+                </div>
+                <AnimatePresence>
+                  {expandedEvent === index && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="mt-4 pt-4 border-t border-current"
+                    >
+                      <p className={`${event.textColor} font-semibold`}>Location: {event.location}</p>
+                      <p className={`${event.textColor} font-semibold`}>Time: {event.time}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </motion.div>
           ))}
