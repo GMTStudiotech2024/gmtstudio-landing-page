@@ -35,9 +35,9 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     // Simulating fetching notifications
     setNotifications([
-      { id: 1, message: "New project assigned", time: "2 hours ago" },
-      { id: 2, message: "Meeting scheduled for tomorrow", time: "5 hours ago" },
-      { id: 3, message: "Deadline reminder: Story Vending Machine", time: "1 day ago" },
+      { id: 1, message: "Nothing is here ! ", time: "2 hours ago" },
+      { id: 2, message: "UI Update", time: "2 days ago" },
+      { id: 3, message: "Idea Update", time: "10 day ago" },
     ]);
 
     // Simulating fetching project progress
