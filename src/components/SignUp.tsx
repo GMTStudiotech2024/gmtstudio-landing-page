@@ -1,6 +1,6 @@
 import React, { useState, FormEvent } from 'react';
 import { motion } from 'framer-motion';
-import { User, Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import {  Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface AuthorizedUser {
