@@ -5,10 +5,11 @@ import blogImage3 from '../assets/images/Story.jpg';
 import Theta from '../assets/images/feature.png';
 import ThetaDev from '../assets/images/large-image.png';
 import WebDev from '../assets/images/1.png'
+import Beta from '../assets/images/cool_design.png'
 
 const blogPosts = [
   {
-    image: WebDev,
+    image: Beta,
     title: "GMTStudio Beta",
     excerpt: "Beta version of website from GMTStudio",
     author: "Alston Chang",
