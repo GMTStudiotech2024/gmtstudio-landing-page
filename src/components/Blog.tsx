@@ -4,11 +4,12 @@ import blogImage1 from '../assets/images/MazsAiPic.png';
 import DEV from '../assets/images/1.png'
 import blogImage3 from '../assets/images/Story.jpg';
 import { FaChevronDown } from 'react-icons/fa';
+import Beta from '../assets/images/cool_design.png'
 
 
 const blogPosts = [
   { 
-    image: DEV, 
+    image: Beta, 
     title: "GMTStudio Beta", 
     excerpt: "Beta version of website from GMTStudio", 
     author: "Alston Chang", 
