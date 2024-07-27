@@ -9,6 +9,15 @@ import WebDev from '../assets/images/1.png'
 const blogPosts = [
   {
     image: WebDev,
+    title: "GMTStudio Beta",
+    excerpt: "Beta version of website from GMTStudio",
+    author: "Alston Chang",
+    date: "July 27, 2024",
+    link: "/NEWS11",
+    category: "Development Log"
+  },
+  {
+    image: WebDev,
     title: "Official Website Update",
     excerpt:"New update and GMTStudio Official Website",
     author: "Alston Chang",

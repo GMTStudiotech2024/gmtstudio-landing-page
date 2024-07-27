@@ -8,6 +8,15 @@ import { FaChevronDown } from 'react-icons/fa';
 
 const blogPosts = [
   { 
+    image: DEV, 
+    title: "GMTStudio Beta", 
+    excerpt: "Beta version of website from GMTStudio", 
+    author: "Alston Chang", 
+    date: "July 27, 2024",
+    link: "/NEWS11",
+    category: "Development Log"
+  },
+  { 
     image: DEV , 
     title: "GMTStudio's Official website Update", 
     excerpt: "We added some new feature to our official website, let's hop into the introduction of the new feature!", 
@@ -25,15 +34,7 @@ const blogPosts = [
     link: "/NEWS9",
     category: "AI"
   },
-  { 
-    image: blogImage3, 
-    title: "Story Vending Machine", 
-    excerpt: "New project idea from GMTStudio", 
-    author: "Alston Chang", 
-    date: "July 1, 2024",
-    link: "/NEWS8",
-    category: "Innovation"
-  },
+
 ];
 
 const Blog: React.FC = () => {
