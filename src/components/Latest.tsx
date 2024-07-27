@@ -14,7 +14,7 @@ const blogPosts = [
     author: "Alston Chang",
     date: "July 27, 2024",
     link: "/NEWS11",
-    category: "Development Log"
+    category: "Development log"
   },
   {
     image: WebDev,
