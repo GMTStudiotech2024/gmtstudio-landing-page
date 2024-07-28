@@ -8,9 +8,6 @@ import Testimonials from './components/Testimonials';
 import Blog from './components/Blog';
 import Footer from './components/Footer';
 import Error from './components/Error';
-import BlogPage1 from './components/BlogPage1';
-import BlogPage2 from './components/BlogPage2';
-import BlogPage3 from './components/BlogPage3';
 import Research from './components/Research';
 import Learning from './components/Learning';
 import AboutUs from './components/AboutUs';
@@ -37,20 +34,15 @@ import NEWS10 from './components/News/NEWS10';
 import NEWS11 from './components/News/NEWS11';
 import Dashboard from './components/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
-import ChatWidget from './components/ChatWidget';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
 
-  const toggleChat = () => {
-    setIsChatOpen(!isChatOpen);
-  };
 
 
 
@@ -58,7 +50,6 @@ const App: React.FC = () => {
     <Router>
       <div className="App bg-gray-900 min-h-screen flex flex-col">
         <CustomCursor />
-        {isChatOpen && <ChatWidget onClose={toggleChat} />}
         <Navbar />
         <main className="flex-grow">
           <Routes>
@@ -74,9 +65,6 @@ const App: React.FC = () => {
                 <Testimonials />
               </>
             } />
-            <Route path="/blogPage3" element={<BlogPage3 />} />
-            <Route path="/blogPage1" element={<BlogPage1 />} />
-            <Route path="/blogPage2" element={<BlogPage2 />} />
             <Route path="/news1" element={<NEWS1 />} />
             <Route path="/news2" element={<NEWS2 />} />
             <Route path="/news3" element={<NEWS3 />} />
