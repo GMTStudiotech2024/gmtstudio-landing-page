@@ -28,6 +28,7 @@ const CookieNotifier: React.FC = () => {
     setVisible(false);
   };
 
+
   if (!visible) return null;
 
   return (
@@ -93,6 +94,7 @@ const CookieNotifier: React.FC = () => {
             onClick={() => setVisible(false)}
           >
             Take A Bite of the Cookie 🍪
+            
           </button>
           <button
             className="mt-2 w-full py-2 rounded-full shadow-md text-white bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800"
