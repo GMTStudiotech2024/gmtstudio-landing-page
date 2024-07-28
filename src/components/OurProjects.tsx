@@ -6,8 +6,8 @@ import projectImage1 from '../assets/images/MazsAiPic.png';
 import projectImage2 from '../assets/images/blog5.png';
 import projectImage3 from '../assets/images/Story.jpg';
 import { motion, AnimatePresence } from 'framer-motion';
-import npc from '../assets/images/npc.png';
-
+import game_ohmypc from '../assets/images/Game_ohmypc.jpg';
+import game_dungeon from '../assets/images/Game_dungeon.jpg';
 const projects = [
   {
     title: 'GMTStudio AI WorkSpace',
@@ -42,7 +42,17 @@ const projects = [
   {
     title: 'Game - Oh My pc',
     description: 'A game that simulate a person who has a bad pc but want to be a youtuber or developer, which he has to make content that is viral to get money ',
-    image: npc,
+    image: game_ohmypc,
+    link: '/',
+    icon: faCompass,
+    isInternal: true,
+    color: 'from-gray-200 to-gray-400 dark:from-gray-700 dark:to-gray-900',
+    category: 'Game',
+  },
+  {
+    title: 'Game - (not decided yet)',
+    description: 'A game that simulate a person who has a bad pc but want to be a youtuber or developer, which he has to make content that is viral to get money ',
+    image: game_dungeon,
     link: '/',
     icon: faCompass,
     isInternal: true,
@@ -119,7 +129,7 @@ const OurProjects: React.FC = () => {
                       src={project.image}
                       alt={project.title}
                       loading="lazy"
-                      className="h-48 w-full object-cover object-top transition-transform duration-500 ease-in-out transform group-hover:scale-110"
+                      className="h-48 w-full object-cover object-center transition-transform duration-500 ease-in-out transform group-hover:scale-110"
                     />
                   </div>
                   <div className="relative mt-6">
