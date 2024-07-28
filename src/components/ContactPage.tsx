@@ -58,7 +58,7 @@ const ContactPage: React.FC = () => {
   ];
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-900 min-h-screen py-12">
+    <div className="min-h-screen py-12">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 space-y-8">
           <h1 className="text-4xl font-extrabold text-center text-gray-800 dark:text-gray-200">Get in Touch</h1>
