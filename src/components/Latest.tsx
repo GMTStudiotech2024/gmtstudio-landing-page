@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSearch, FaCalendarAlt, FaUser, FaTags } from 'react-icons/fa';
+import { FaSearch, FaCalendarAlt, FaUser, FaTags, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import blogImage1 from '../assets/images/MazsAiPic.png';
 import blogImage2 from '../assets/images/blog2.png';
 import blogImage3 from '../assets/images/Story.jpg';
@@ -115,7 +115,8 @@ const Latest: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 6;
+  const [postsPerPage, setPostsPerPage] = useState(6);
+  const [isGridView, setIsGridView] = useState(true);
 
   const categories = ['All', ...Array.from(new Set(blogPosts.map(post => post.category)))];
 
@@ -136,6 +137,11 @@ const Latest: React.FC = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory, searchTerm]);
+
+  const handlePostsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setPostsPerPage(Number(e.target.value));
+    setCurrentPage(1);
+  };
 
   return (
     <section id="blog" className="py-16 bg-gradient-to-b from-gray-200 to-gray-200 dark:from-gray-900 dark:to-black min-h-screen">
@@ -167,15 +173,23 @@ const Latest: React.FC = () => {
               </motion.button>
             ))}
           </div>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search posts..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 rounded-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <div className="flex items-center">
+            <div className="relative mr-4">
+              <input
+                type="text"
+                placeholder="Search posts..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 rounded-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
+            <button
+              onClick={() => setIsGridView(!isGridView)}
+              className="p-2 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            >
+              {isGridView ? 'List View' : 'Grid View'}
+            </button>
           </div>
         </div>
 
@@ -185,7 +199,7 @@ const Latest: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
+            className={isGridView ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10" : "space-y-8"}
           >
             {currentPosts.map((post, index) => (
               <motion.div 
@@ -193,9 +207,9 @@ const Latest: React.FC = () => {
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="relative flex w-full flex-col rounded-xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105"
+                className={`relative flex ${isGridView ? 'flex-col' : 'flex-row'} rounded-xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105`}
               >
-                <div className="relative mx-4 -mt-6 h-56 overflow-hidden rounded-xl">
+                <div className={`relative ${isGridView ? 'mx-4 -mt-6 h-56' : 'w-1/3 h-full'} overflow-hidden rounded-xl`}>
                   <img 
                     src={post.image} 
                     alt={post.title} 
@@ -205,7 +219,7 @@ const Latest: React.FC = () => {
                     <span className="text-white text-lg font-bold">{post.category}</span>
                   </div>
                 </div>
-                <div className="p-6">
+                <div className={`${isGridView ? 'p-6' : 'p-6 w-2/3'}`}>
                   <div className="flex items-center mb-2 text-sm text-gray-500 dark:text-gray-400">
                     <FaCalendarAlt className="mr-2" />
                     <span>{post.date}</span>
@@ -237,20 +251,33 @@ const Latest: React.FC = () => {
         </AnimatePresence>
 
         {filteredPosts.length > postsPerPage && (
-          <div className="mt-8 flex justify-center">
-            {Array.from({ length: Math.ceil(filteredPosts.length / postsPerPage) }, (_, i) => (
-              <button
-                key={i}
-                onClick={() => paginate(i + 1)}
-                className={`mx-1 px-3 py-1 rounded ${
-                  currentPage === i + 1
-                    ? 'bg-red-500 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
+          <div className="mt-8 flex justify-between items-center">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+            >
+              <FaChevronLeft />
+            </button>
+            <div className="flex items-center">
+              <span className="mr-4">Posts per page:</span>
+              <select
+                value={postsPerPage}
+                onChange={handlePostsPerPageChange}
+                className="p-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
-                {i + 1}
-              </button>
-            ))}
+                <option value={6}>6</option>
+                <option value={12}>12</option>
+                <option value={24}>24</option>
+              </select>
+            </div>
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={indexOfLastPost >= filteredPosts.length}
+              className="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+            >
+              <FaChevronRight />
+            </button>
           </div>
         )}
       </div>

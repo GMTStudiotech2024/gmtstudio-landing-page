@@ -73,7 +73,7 @@ const Navbar: React.FC = () => {
           transition={{ duration: 0.5 }}
           className="text-2xl font-extrabold bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-cyan-600 dark:to-blue-600"
         >
-          GMTStudio
+          <a href="/">GMTStudio</a>
         </motion.div>
 
         <div className="hidden lg:flex space-x-6 items-center text-white dark:text-gray-200">

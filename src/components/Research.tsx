@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { FaChevronRight, FaRocket, FaCodeBranch, FaMap, FaSearch, FaUsers,  FaMicrochip,  } from 'react-icons/fa';
+import { FaChevronRight, FaRocket,  FaSearch, FaUsers, FaMicrochip, FaBrain, FaGlobe } from 'react-icons/fa';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const ResearchCard = ({
@@ -25,20 +25,21 @@ const ResearchCard = ({
 
   return (
     <motion.div
-      className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105"
-      whileHover={{ y: shouldReduceMotion ? 0 : -5 }}
+      className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl shadow-xl overflow-hidden transform transition duration-300 hover:scale-105 border-2 border-blue-500 hover:border-purple-500"
+      whileHover={{ y: shouldReduceMotion ? 0 : -10, boxShadow: "0 10px 30px -10px rgba(59, 130, 246, 0.5)" }}
       layout
     >
-      <div className="p-6">
-        <Icon className="text-5xl text-indigo-600 dark:text-indigo-400 mb-4" />
-        <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">{title}</h3>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">{description}</p>
+      <div className="p-8">
+        <Icon className="text-7xl text-blue-400 mb-6 transform transition-transform duration-300 hover:rotate-12" />
+        <h3 className="text-3xl font-bold text-white mb-4">{title}</h3>
+        <p className="text-gray-300 mb-6 text-lg">{description}</p>
         <motion.button
-          className="flex items-center text-indigo-600 dark:text-indigo-400 font-semibold"
+          className="flex items-center text-blue-400 font-semibold text-lg group"
           onClick={toggleExpand}
-          whileHover={{ x: shouldReduceMotion ? 0 : 5 }}
+          whileHover={{ x: shouldReduceMotion ? 0 : 10 }}
         >
-          {isExpanded ? "Show Less" : "Learn More"} <FaChevronRight className="ml-2" />
+          {isExpanded ? "Show Less" : "Learn More"} 
+          <FaChevronRight className="ml-2 transform transition-transform duration-300 group-hover:translate-x-2" />
         </motion.button>
       </div>
       <AnimatePresence>
@@ -47,19 +48,19 @@ const ResearchCard = ({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.3 }}
-            className="px-6 pb-6"
+            transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: "easeInOut" }}
+            className="px-8 pb-8"
           >
-            <h4 className="font-semibold mb-2">Recent Publications:</h4>
-            <ul className="list-disc pl-5 mb-4">
+            <h4 className="font-semibold mb-4 text-blue-300 text-xl">Recent Publications:</h4>
+            <ul className="list-disc pl-5 mb-6 space-y-2">
               {publications.map((pub, index) => (
-                <li key={index} className="text-sm text-gray-600 dark:text-gray-400">{pub}</li>
+                <li key={index} className="text-base text-gray-400 hover:text-blue-300 transition-colors duration-200">{pub}</li>
               ))}
             </ul>
-            <h4 className="font-semibold mb-2">Key Collaborators:</h4>
-            <ul className="list-disc pl-5">
+            <h4 className="font-semibold mb-4 text-blue-300 text-xl">Key Collaborators:</h4>
+            <ul className="list-disc pl-5 space-y-2">
               {collaborators.map((collab, index) => (
-                <li key={index} className="text-sm text-gray-600 dark:text-gray-400">{collab}</li>
+                <li key={index} className="text-base text-gray-400 hover:text-blue-300 transition-colors duration-200">{collab}</li>
               ))}
             </ul>
           </motion.div>
@@ -70,18 +71,24 @@ const ResearchCard = ({
 };
 
 const ResearchProcess = ({ icon: Icon, title, description }: { icon: React.ComponentType<{ className: string }>, title: string, description: string }) => (
-  <div className="flex flex-col items-center text-center w-48">
-    <Icon className="text-4xl text-indigo-600 dark:text-indigo-400 mb-4" />
-    <h3 className="text-xl font-semibold mb-2">{title}</h3>
-    <p className="text-gray-700 dark:text-gray-300">{description}</p>
-  </div>
+  <motion.div 
+    className="flex flex-col items-center text-center w-64 p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-lg border border-blue-500 hover:border-purple-500 transition-all duration-300"
+    whileHover={{ scale: 1.05, boxShadow: "0 8px 30px -10px rgba(59, 130, 246, 0.5)" }}
+  >
+    <Icon className="text-6xl text-blue-400 mb-6 transform transition-transform duration-300 hover:rotate-12" />
+    <h3 className="text-2xl font-semibold mb-4 text-white">{title}</h3>
+    <p className="text-gray-300 text-lg">{description}</p>
+  </motion.div>
 );
 
 const StatCard = ({ value, label }: { value: string, label: string }) => (
-  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center">
-    <h3 className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">{value}</h3>
-    <p className="text-gray-700 dark:text-gray-300">{label}</p>
-  </div>
+  <motion.div 
+    className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-lg p-8 text-center border-2 border-blue-500 hover:border-purple-500 transition-all duration-300"
+    whileHover={{ scale: 1.05, boxShadow: "0 8px 30px -10px rgba(59, 130, 246, 0.5)" }}
+  >
+    <h3 className="text-6xl font-bold text-blue-400 mb-4">{value}</h3>
+    <p className="text-gray-300 text-xl">{label}</p>
+  </motion.div>
 );
 
 const fundingData = [
@@ -93,18 +100,21 @@ const fundingData = [
 ];
 
 const FundingChart = () => (
-  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-    <h3 className="text-2xl font-bold mb-4 text-center">GMTStudio Product Growth</h3>
-    <ResponsiveContainer width="100%" height={300}>
+  <motion.div 
+    className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-lg p-8 border-2 border-blue-500 hover:border-purple-500 transition-all duration-300"
+    whileHover={{ scale: 1.02, boxShadow: "0 8px 30px -10px rgba(59, 130, 246, 0.5)" }}
+  >
+    <h3 className="text-3xl font-bold mb-6 text-center text-blue-400">GMTStudio Product Growth</h3>
+    <ResponsiveContainer width="100%" height={400}>
       <LineChart data={fundingData}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="year" />
-        <YAxis />
-        <Tooltip />
-        <Line type="monotone" dataKey="amount" stroke="#4f46e5" strokeWidth={2} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+        <XAxis dataKey="year" stroke="#9CA3AF" />
+        <YAxis stroke="#9CA3AF" />
+        <Tooltip contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '8px' }} />
+        <Line type="monotone" dataKey="amount" stroke="#3B82F6" strokeWidth={4} dot={{ fill: '#3B82F6', strokeWidth: 2, r: 6 }} />
       </LineChart>
     </ResponsiveContainer>
-  </div>
+  </motion.div>
 );
 
 const Research = () => {
@@ -114,50 +124,50 @@ const Research = () => {
 
   const researchAreas = [
     {
-      title: "GMTStudio Landing page ",
-      description: "We choose to use React JS becuase it is harder but better than HTML for developing web applications",
+      title: "GMTStudio Landing Page",
+      description: "We use React JS for developing web applications, providing a robust and scalable solution.",
       Icon: FaRocket,
       publications: [
         "Our project launch pad",
-        "introduce ourself",
-        "enhance your experience"
+        "Introducing ourselves",
+        "Enhancing user experience"
       ],
       collaborators: [
         "GMTStudio AI Studio",
-        "Every AI on Earth, to enhance our Code",
+        "Global AI Community",
         "Vercel"
       ],
       category: 'Web Development'
     },
     {
-      title: "GMTStudio AI studio",
-      description: "We try to use Current popular AI to Create an AI, helping us to develop a new type of Model",
-      Icon: FaCodeBranch,
+      title: "GMTStudio AI Studio",
+      description: "Leveraging current AI technologies to develop innovative models and solutions.",
+      Icon: FaBrain,
       publications: [
-        "Enhance the AI by using AI",
-        "Create the nearly stupid but very stupid AI",
+        "Enhancing AI with AI",
+        "Creating advanced AI models",
         "Vercel"
       ],
       collaborators: [
-        "ChatGPT from OPENAI",
-        "Claude 3.5 sonnet from Anthropic",
-        "Mazs AI from GMTStudio"
+        "OpenAI's ChatGPT",
+        "Anthropic's Claude 3.5",
+        "GMTStudio's Mazs AI"
       ],
-      category: 'Web Application'
+      category: 'AI Development'
     },
     {
       title: "Theta - Social Media Platform",
-      description: "A New type of experience of Social Media ",
-      Icon: FaMap ,
+      description: "A revolutionary social media experience designed with cutting-edge technology.",
+      Icon: FaGlobe,
       publications: [
         "Vercel",
         "AppWrite",
         "AI"
       ],
       collaborators: [
-        "Artificial intelligence",
-        "My hand",
-        "User"
+        "Artificial Intelligence",
+        "Development Team",
+        "User Community"
       ],
       category: 'Web Application'
     },
@@ -184,33 +194,33 @@ const Research = () => {
   }, []);
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 text-gray-900 dark:text-gray-100 min-h-screen py-16 px-4 sm:px-6 lg:px-8">
+    <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 text-white min-h-screen py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-20"
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.5 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.8, ease: "easeOut" }}
         >
-          <h1 className="text-5xl sm:text-6xl font-extrabold mb-6">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+          <h1 className="text-7xl sm:text-8xl font-extrabold mb-8">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
               Company Info
             </span>
           </h1>
-          <p className="text-xl sm:text-2xl mb-10 max-w-3xl mx-auto">
-            Exploring the frontiers of technology to shape the future and drive positive change in our interconnected world.
+          <p className="text-3xl sm:text-4xl mb-12 max-w-4xl mx-auto text-gray-300 leading-relaxed">
+            Pioneering the future of technology to create a better, more connected world.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="flex flex-col sm:flex-row justify-center space-y-6 sm:space-y-0 sm:space-x-6">
             <motion.button
-              className="px-8 py-4 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition duration-200 shadow-md"
-              whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
+              className="px-10 py-5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full font-bold text-xl hover:from-blue-600 hover:to-purple-700 transition duration-300 shadow-lg"
+              whileHover={{ scale: shouldReduceMotion ? 1 : 1.05, boxShadow: "0 10px 30px -10px rgba(59, 130, 246, 0.7)" }}
               whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
             >
               Explore Our Work
             </motion.button>
             <motion.button
-              className="px-8 py-4 bg-white text-indigo-600 rounded-full font-bold hover:bg-gray-100 transition duration-200 shadow-md"
-              whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
+              className="px-10 py-5 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-full font-bold text-xl hover:from-purple-600 hover:to-pink-700 transition duration-300 shadow-lg"
+              whileHover={{ scale: shouldReduceMotion ? 1 : 1.05, boxShadow: "0 10px 30px -10px rgba(168, 85, 247, 0.7)" }}
               whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
             >
               Join Our Team
@@ -218,30 +228,36 @@ const Research = () => {
           </div>
         </motion.div>
 
-        <div className="mb-8 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
-          <div className="flex flex-wrap justify-center space-x-2 space-y-2">
-            {['all', 'Web Development', 'Web Application',].map((tab) => (
+        <div className="mb-12 flex flex-col sm:flex-row justify-center items-center space-y-6 sm:space-y-0 sm:space-x-6">
+          <div className="flex flex-wrap justify-center gap-4">
+            {['all', 'Web Development', 'AI Development', 'Web Application'].map((tab) => (
               <motion.button
                 key={tab}
-                className={`px-4 py-2 rounded-full ${activeTab === tab ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-600'}`}
+                className={`px-6 py-3 rounded-full text-lg font-semibold ${activeTab === tab ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' : 'bg-gray-800 text-blue-400'}`}
                 onClick={() => setActiveTab(tab)}
-                whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
+                whileHover={{ scale: shouldReduceMotion ? 1 : 1.05, boxShadow: "0 5px 15px -5px rgba(59, 130, 246, 0.5)" }}
                 whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </motion.button>
             ))}
           </div>
-          <input
-            type="text"
-            placeholder="Search research areas..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="relative"
+          >
+            <input
+              type="text"
+              placeholder="Search research areas..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-6 py-3 rounded-full border-2 border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white text-lg w-80"
+            />
+            <FaSearch className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          </motion.div>
         </div>
 
-        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-20">
           <AnimatePresence>
             {filteredResearchAreas.map((area, index) => (
               <motion.div
@@ -258,18 +274,18 @@ const Research = () => {
         </motion.div>
 
         <motion.div
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-16"
+          className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl shadow-xl p-12 mb-20 border-2 border-blue-500"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.5, delay: 0.2 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.8, delay: 0.2 }}
         >
-<h2 className="text-3xl font-bold mb-6 text-center">Our Research Process</h2>
-          <div className="flex flex-wrap justify-center gap-8">
+          <h2 className="text-5xl font-bold mb-10 text-center text-blue-400">Our Research Process</h2>
+          <div className="flex flex-wrap justify-center gap-12">
             {[
-              { icon: FaSearch, title: "New Project Idea", description: "We explore new ideas and challenges" },
-              { icon: FaMicrochip, title: "DataBase Develop", description: "AppWrite is a great thing to use" },
-              { icon: FaRocket, title: "New and Powerful", description: "We build new and power application" },
-              { icon: FaUsers, title: "Collaborate", description: "If you want to, just Email us" },
+              { icon: FaSearch, title: "New Project Idea", description: "Exploring innovative ideas and challenges." },
+              { icon: FaMicrochip, title: "Database Development", description: "Utilizing AppWrite for robust database solutions." },
+              { icon: FaRocket, title: "Powerful Applications", description: "Building cutting-edge applications." },
+              { icon: FaUsers, title: "Collaboration", description: "Join us in our mission to innovate." },
             ].map((step, index) => (
               <ResearchProcess key={index} {...step} />
             ))}
@@ -282,37 +298,37 @@ const Research = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.5, delay: 0.4 }}
         >
-          <h2 className="text-3xl font-bold mb-6 text-center">Research Impact</h2>
+          <h2 className="text-4xl font-bold mb-6 text-center text-blue-400">Research Impact</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-            <StatCard value="3" label="Published Application" />
-            <StatCard value="6+" label="current Development" />
-            <StatCard value="16+" label="Team member age" />
-            <StatCard value="7" label="Team member count" />
+            <StatCard value="3" label="Published Applications" />
+            <StatCard value="6+" label="Current Developments" />
+            <StatCard value="16+" label="Team Member Age" />
+            <StatCard value="7" label="Team Member Count" />
           </div>
           <FundingChart />
         </motion.div>
 
         <motion.div
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-16"
+          className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-lg p-8 mb-16 border border-blue-500"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.5, delay: 0.6 }}
         >
-          <h2 className="text-3xl font-bold mb-6 text-center">Join Our Team</h2>
-          <p className="text-center mb-8">
+          <h2 className="text-4xl font-bold mb-6 text-center text-blue-400">Join Our Team</h2>
+          <p className="text-center mb-8 text-gray-300">
             We're always looking for brilliant minds to join our team. 
             If you're passionate about pushing the boundaries of technology and making a real impact, we want to hear from you!
           </p>
           <div className="flex justify-center space-x-4">
             <motion.button
-              className="px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition duration-200 shadow-md"
+              className="px-6 py-3 bg-blue-500 text-white rounded-full font-bold hover:bg-blue-600 transition duration-200 shadow-lg"
               whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
               whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
             >
               View Open Positions
             </motion.button>
             <motion.button
-              className="px-6 py-3 bg-purple-600 text-white rounded-full font-bold hover:bg-purple-700 transition duration-200 shadow-md"
+              className="px-6 py-3 bg-purple-500 text-white rounded-full font-bold hover:bg-purple-600 transition duration-200 shadow-md"
               whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
               whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
             >
@@ -329,7 +345,7 @@ const Research = () => {
         >
           <h2 className="text-3xl font-bold mb-6">Ready to work with us?</h2>
           <motion.button
-            className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full font-bold hover:from-indigo-700 hover:to-purple-700 transition duration-200 shadow-md"
+            className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full font-bold hover:from-blue-600 hover:to-purple-600 transition duration-200 shadow-md"
             whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
             whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
           >

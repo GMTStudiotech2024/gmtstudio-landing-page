@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CalendarIcon, AcademicCapIcon, LightBulbIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon, AcademicCapIcon, LightBulbIcon, ChevronDownIcon, MapPinIcon, ClockIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 
 const eventsData = [
   {
@@ -12,6 +12,7 @@ const eventsData = [
     textColor: 'text-purple-600 dark:text-purple-300',
     location: 'Online Event',
     time: '2:00 PM EST',
+    attendees: 5000,
   },
   {
     title: 'Yearly Developer Event',
@@ -22,6 +23,7 @@ const eventsData = [
     textColor: 'text-green-600 dark:text-green-300',
     location: 'Taipei, Taiwan',
     time: '12:00 AM EST',
+    attendees: 1000,
   },
   {
     title: 'Application Event',
@@ -32,6 +34,7 @@ const eventsData = [
     textColor: 'text-blue-600 dark:text-blue-300',
     location: 'To be announced',
     time: 'TBA',
+    attendees: 'TBA',
   },
 ];
 
@@ -92,8 +95,18 @@ const UpcomingEvents: React.FC = () => {
                       transition={{ duration: 0.3 }}
                       className="mt-4 pt-4 border-t border-current"
                     >
-                      <p className={`${event.textColor} font-semibold`}>Location: {event.location}</p>
-                      <p className={`${event.textColor} font-semibold`}>Time: {event.time}</p>
+                      <div className="flex items-center mb-2">
+                        <MapPinIcon className={`h-5 w-5 ${event.textColor} mr-2`} />
+                        <p className={`${event.textColor} font-semibold`}>{event.location}</p>
+                      </div>
+                      <div className="flex items-center mb-2">
+                        <ClockIcon className={`h-5 w-5 ${event.textColor} mr-2`} />
+                        <p className={`${event.textColor} font-semibold`}>{event.time}</p>
+                      </div>
+                      <div className="flex items-center">
+                        <UserGroupIcon className={`h-5 w-5 ${event.textColor} mr-2`} />
+                        <p className={`${event.textColor} font-semibold`}>Expected Attendees: {event.attendees}</p>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>

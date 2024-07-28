@@ -45,6 +45,7 @@
   background-color: rgba(255, 255, 255, 1);
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
   transition: all 150ms ease;
+  cursor:none;
 }
 
 .custom-cursor.cursor-button {
