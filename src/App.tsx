@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -34,6 +34,7 @@ import NEWS7 from './components/News/NEWS7';
 import NEWS8 from './components/News/NEWS8';
 import NEWS9 from './components/News/NEWS9';
 import NEWS10 from './components/News/NEWS10';
+import NEWS11 from './components/News/NEWS11';
 import Dashboard from './components/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
 import ChatWidget from './components/ChatWidget';
@@ -41,6 +42,7 @@ import ChatWidget from './components/ChatWidget';
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -49,6 +51,8 @@ const App: React.FC = () => {
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
   };
+
+
 
   return (
     <Router>
@@ -60,7 +64,9 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={
               <>
-                <Hero />
+                <div ref={heroRef}>
+                  <Hero />
+                </div>
                 <Blog />
                 <Feature />
                 <OurProjects />
@@ -81,6 +87,7 @@ const App: React.FC = () => {
             <Route path="/news8" element={<NEWS8 />} />
             <Route path="/news9" element={<NEWS9 />} />
             <Route path="/news10" element={<NEWS10 />} />
+            <Route path="/news11" element={<NEWS11 />} />
             <Route path="/research" element={<Research />} />
             <Route path="/learning" element={<Learning />} />
             <Route path="*" element={<Error />} />
