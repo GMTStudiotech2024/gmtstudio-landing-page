@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import blogImage2 from '../assets/GMTStudio_p.png';
 
-const NEWS9 = () => {
+const NEWS11 = () => {
   const navigate = useNavigate();
   const [likes, setLikes] = useState(0);
 
@@ -88,4 +88,4 @@ const NEWS9 = () => {
   );
 }
 
-export default NEWS9;
+export default NEWS11;
