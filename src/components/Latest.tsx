@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSearch, FaCalendarAlt, FaUser, FaTags, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaSearch, FaCalendarAlt, FaUser, FaTags, FaChevronLeft, FaChevronRight, FaThLarge, FaList } from 'react-icons/fa';
 import blogImage1 from '../assets/images/MazsAiPic.png';
 import blogImage2 from '../assets/images/blog2.png';
 import blogImage3 from '../assets/images/Story.jpg';
@@ -144,15 +144,15 @@ const Latest: React.FC = () => {
   };
 
   return (
-    <section id="blog" className="py-16 bg-gradient-to-b from-gray-200 to-gray-200 dark:from-gray-900 dark:to-black min-h-screen">
+    <section id="blog" className="py-16 bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-black min-h-screen">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2 
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-5xl font-bold text-black dark:text-white mb-12 text-center"
+          className="text-5xl font-bold text-gray-900 dark:text-white mb-12 text-center"
         >
-          Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Latest News</span>
+          Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">Latest News</span>
         </motion.h2>
         
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-center">
@@ -165,8 +165,8 @@ const Latest: React.FC = () => {
                 whileTap={{ scale: 0.95 }}
                 className={`mx-2 my-1 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   selectedCategory === category
-                    ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                 }`}
               >
                 {category}
@@ -180,15 +180,15 @@ const Latest: React.FC = () => {
                 placeholder="Search posts..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 rounded-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="pl-10 pr-4 py-2 rounded-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-md"
               />
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
             <button
               onClick={() => setIsGridView(!isGridView)}
-              className="p-2 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className="p-2 bg-white dark:bg-gray-700 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors shadow-md"
             >
-              {isGridView ? 'List View' : 'Grid View'}
+              {isGridView ? <FaList className="text-gray-600 dark:text-gray-300" /> : <FaThLarge className="text-gray-600 dark:text-gray-300" />}
             </button>
           </div>
         </div>
@@ -209,7 +209,7 @@ const Latest: React.FC = () => {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className={`relative flex ${isGridView ? 'flex-col' : 'flex-row'} rounded-xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105`}
               >
-                <div className={`relative ${isGridView ? 'mx-4 -mt-6 h-56' : 'w-1/3 h-full'} overflow-hidden rounded-xl`}>
+                <div className={`relative ${isGridView ? 'h-56' : 'w-1/3 h-full'} overflow-hidden rounded-t-xl ${isGridView ? '' : 'rounded-l-xl rounded-r-none'}`}>
                   <img 
                     src={post.image} 
                     alt={post.title} 
@@ -235,7 +235,7 @@ const Latest: React.FC = () => {
                   <div className="flex justify-between items-center">
                     <a 
                       href={post.link}
-                      className="inline-block rounded-lg bg-gradient-to-r from-red-500 to-orange-500 py-2 px-4 text-center text-sm font-bold uppercase text-white transition-all hover:shadow-lg focus:shadow-none hover:from-orange-500 hover:to-red-500"
+                      className="inline-block rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 py-2 px-4 text-center text-sm font-bold uppercase text-white transition-all hover:shadow-lg focus:shadow-none hover:from-pink-600 hover:to-purple-600"
                     >
                       Read More
                     </a>
@@ -255,16 +255,16 @@ const Latest: React.FC = () => {
             <button
               onClick={() => paginate(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+              className="px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors shadow-md"
             >
               <FaChevronLeft />
             </button>
             <div className="flex items-center">
-              <span className="mr-4">Posts per page:</span>
+              <span className="mr-4 text-gray-700 dark:text-gray-300">Posts per page:</span>
               <select
                 value={postsPerPage}
                 onChange={handlePostsPerPageChange}
-                className="p-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="p-2 rounded-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-md"
               >
                 <option value={6}>6</option>
                 <option value={12}>12</option>
@@ -274,7 +274,7 @@ const Latest: React.FC = () => {
             <button
               onClick={() => paginate(currentPage + 1)}
               disabled={indexOfLastPost >= filteredPosts.length}
-              className="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+              className="px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors shadow-md"
             >
               <FaChevronRight />
             </button>

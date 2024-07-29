@@ -34,6 +34,7 @@ import NEWS10 from './components/News/NEWS10';
 import NEWS11 from './components/News/NEWS11';
 import Dashboard from './components/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
+import Products from './components/Products';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -82,6 +83,7 @@ const App: React.FC = () => {
             <Route path="/contact" element={<Contact />} />
             <Route path="/signup" element={<SignUpLoginPage setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/latest" element={<Latest />} />
+            <Route path="/products" element={<Products />} />
             <Route
               path="/dashboard"
               element={

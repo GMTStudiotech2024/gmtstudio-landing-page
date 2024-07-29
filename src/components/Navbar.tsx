@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { FaBars, FaTimes, FaUser, FaChevronDown, FaHome, FaFlask, FaBox, FaEnvelope } from 'react-icons/fa';
+import { FaBars, FaTimes, FaUser, FaHome, FaFlask, FaBox, FaEnvelope } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
 import { account } from '../appwriteConfig';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [user, setUser] = useState<any>(null);
@@ -34,18 +33,11 @@ const Navbar: React.FC = () => {
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
-    setIsProductsOpen(false);
-    setIsProfileOpen(false);
-  };
-
-  const toggleProductsMenu = () => {
-    setIsProductsOpen(!isProductsOpen);
     setIsProfileOpen(false);
   };
 
   const toggleProfileMenu = () => {
     setIsProfileOpen(!isProfileOpen);
-    setIsProductsOpen(false);
   };
 
   const handleLogout = async () => {
@@ -78,18 +70,8 @@ const Navbar: React.FC = () => {
 
         <div className="hidden lg:flex space-x-6 items-center text-white dark:text-gray-200">
           <NavLink href="/" label="Home" icon={<FaHome />} />
-          <NavLink href="/research" label="Research" icon={<FaFlask />} />
-          <DropdownMenu 
-            label="Products"
-            icon={<FaBox />}
-            isOpen={isProductsOpen}
-            toggleMenu={toggleProductsMenu}
-            items={[
-              { href: "https://gmt-studio-ai-workspace.vercel.app/", label: "GMTStudio AI WorkSpace", icon: <FaBox /> },
-              { href: "https://theta-plum.vercel.app/", label: "Theta Social Media Platform", icon: <FaBox /> },
-            ]}
-          />
-          <NavLink href="/contact" label="Contact" icon={<FaEnvelope />} />
+          <NavLink href="/Latest" label="Latest News" icon={<FaFlask />} />
+          <NavLink href="/Products" label="Products" icon={<FaBox />} />
           <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} user={user} />
           <ThemeToggle />
         </div>
@@ -113,17 +95,8 @@ const Navbar: React.FC = () => {
             className="lg:hidden mt-4 bg-white dark:bg-gray-900 shadow-md rounded-lg p-4 space-y-2"
           >
             <NavLink href="/" label="Home" icon={<FaHome />} />
-            <NavLink href="/research" label="Research" icon={<FaFlask />} />
-            <DropdownMenu 
-              label="Products"
-              icon={<FaBox />}
-              isOpen={isProductsOpen}
-              toggleMenu={toggleProductsMenu}
-              items={[
-                { href: "https://gmt-studio-ai-workspace.vercel.app/", label: "GMTStudio AI WorkSpace", icon: <FaBox /> },
-                { href: "https://theta-plum.vercel.app/", label: "Theta Social Media Platform", icon: <FaBox /> },
-              ]}
-            />
+            <NavLink href="/Latest" label="Latest News" icon={<FaFlask />} />
+            <NavLink href="/Products" label="Products" icon={<FaBox />} />
             <NavLink href="/contact" label="Contact" icon={<FaEnvelope />} />
           </motion.div>
         )}
@@ -136,38 +109,6 @@ const Navbar: React.FC = () => {
 
 const NavLink: React.FC<{ href: string; label: string; icon: React.ReactNode }> = ({ href, label, icon }) => (
   <a href={href} className="flex px-3 py-2 text-blue-300 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 items-center">
-    {icon} <span className="ml-2">{label}</span>
-  </a>
-);
-
-const DropdownMenu: React.FC<{ label: string; icon: React.ReactNode; isOpen: boolean; toggleMenu: () => void; items: { href: string; label: string; icon: React.ReactNode }[] }> = ({ label, icon, isOpen, toggleMenu, items }) => (
-  <div className="relative">
-    <button onClick={toggleMenu} className="flex items-center px-3 py-2 text-blue-300 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
-      {icon} <span className="ml-2">{label}</span> <FaChevronDown className="ml-1" />
-    </button>
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          variants={{
-            hidden: { opacity: 0, y: -20 },
-            visible: { opacity: 1, y: 0 },
-          }}
-          className="absolute left-0 mt-2 w-56 bg-gray-200 dark:bg-gray-900 shadow-lg rounded-lg overflow-hidden"
-        >
-          {items.map(item => (
-            <ProductLink key={item.href} href={item.href} label={item.label} icon={item.icon} />
-          ))}
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </div>
-);
-
-const ProductLink: React.FC<{ href: string; label: string; icon: React.ReactNode }> = ({ href, label, icon }) => (
-  <a href={href} className="flex px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 items-center">
     {icon} <span className="ml-2">{label}</span>
   </a>
 );
@@ -199,8 +140,8 @@ const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () 
         }}
         className="absolute right-4 mt-4 bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4 space-y-2"
       >
-        <a href="/Latest" className="flex px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 items-center">
-          <FaUser className="mr-2" /> Latest Update
+        <a href="/Research" className="flex px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 items-center">
+          <FaUser className="mr-2" /> Research
         </a>
         <a href="/Learning" className="flex px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 items-center">
           <FaUser className="mr-2" /> Project Learning
