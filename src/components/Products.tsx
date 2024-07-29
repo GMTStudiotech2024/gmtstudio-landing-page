@@ -38,7 +38,7 @@ const products = [
   },
   {
     name: "Game - Oh My pc",
-    description: "A game that simulate a person who has a bad pc but want to be a youtuber or developer, which he has to make content that is viral to get money",
+    description: "A game that simulates a person who has a bad pc but wants to be a YouTuber or developer, who has to make viral content to earn money.",
     image: game_ohmypc,
     icon: FaCompass,
     category: "Game",
@@ -47,7 +47,7 @@ const products = [
   },
   {
     name: "Game - (not decided yet)",
-    description: "A game that simulate a person who has a bad pc but want to be a youtuber or developer, which he has to make content that is viral to get money",
+    description: "An exciting new game concept currently in the early stages of development.",
     image: game_dungeon,
     icon: FaCompass,
     category: "Game",
@@ -61,6 +61,7 @@ const Products: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isGridView, setIsGridView] = useState(true);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
+  const [sortBy, setSortBy] = useState('name');
 
   const categories = ['All', ...Array.from(new Set(products.map(product => product.category)))];
 
@@ -69,7 +70,8 @@ const Products: React.FC = () => {
     .filter(product => 
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const getStatusIcon = (status: string) => {
     switch (status) {

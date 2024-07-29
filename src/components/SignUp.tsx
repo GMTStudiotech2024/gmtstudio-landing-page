@@ -143,7 +143,7 @@ const SignUpLoginPage: React.FC<SignUpLoginPageProps> = ({ setIsAuthenticated })
               </label>
             </div>
             <div className="text-sm">
-              <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSctMdJctRfq2Q1yfb4F8x_szlvXInk3O6eu0WFzjYFr3hmfSQ/viewform" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
                 Forgot your password?
               </a>
             </div>
@@ -160,7 +160,7 @@ const SignUpLoginPage: React.FC<SignUpLoginPageProps> = ({ setIsAuthenticated })
         </form>
         <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
           Need beta access?{' '}
-          <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSctMdJctRfq2Q1yfb4F8x_szlvXInk3O6eu0WFzjYFr3hmfSQ/viewform" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
             Request an invite
           </a>
         </p>
