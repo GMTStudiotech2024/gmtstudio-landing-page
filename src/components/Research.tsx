@@ -333,7 +333,7 @@ const Research = () => {
             whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
             whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
           >
-            Get in Touch
+            <a href='/aaa'> Get in Touch</a>
           </motion.button>
         </motion.div>
       </div>
