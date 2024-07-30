@@ -35,7 +35,7 @@ import NEWS11 from './components/News/NEWS11';
 import Dashboard from './components/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
 import Products from './components/Products';
-
+import Help from './components/Help';
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -84,6 +84,7 @@ const App: React.FC = () => {
             <Route path="/signup" element={<SignUpLoginPage setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/latest" element={<Latest />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/help" element={<Help />} />
             <Route
               path="/dashboard"
               element={

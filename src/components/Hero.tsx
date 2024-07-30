@@ -58,7 +58,7 @@ const Hero: React.FC = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
           >
-            Welcome to <span className="text-emerald-400 hover:text-emerald-300 transition-colors duration-300">GMTStudio</span>
+          <span className="text-emerald-400 hover:text-emerald-300 transition-colors duration-300">GMTStudio</span>
           </motion.h1>
           <motion.p
             className="text-xl sm:text-2xl md:text-3xl text-gray-300 mb-6 sm:mb-10"
@@ -91,6 +91,9 @@ const Hero: React.FC = () => {
               </motion.div>
             </AnimatePresence>
           </motion.div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 flex justify-center mb-4">
+          <ChevronDown className="text-white animate-bounce" size={32} />
         </div>
       </motion.section>
       <motion.div
