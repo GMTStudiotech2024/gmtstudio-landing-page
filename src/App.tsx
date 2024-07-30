@@ -62,8 +62,6 @@ const App: React.FC = () => {
                 <Blog />
                 <Feature />
                 <OurProjects />
-                <AboutUs />
-                <Testimonials />
               </>
             } />
             <Route path="/news1" element={<NEWS1 />} />

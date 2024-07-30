@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSearch, FaRocket, FaFlask, FaClock, FaRobot, FaLock, FaList, FaThLarge, FaDownload, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaSearch, FaRocket, FaFlask, FaClock, FaRobot, FaLock, FaList, FaThLarge, FaExternalLinkAlt } from 'react-icons/fa';
 
 interface ResearchPaper {
   id: number;
@@ -97,7 +97,7 @@ const Research: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 pt-20">
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 pt-20">
       <div className="container mx-auto px-4 py-12">
         <motion.h1 
           className="text-4xl font-bold mb-8 text-center"
@@ -162,7 +162,7 @@ const Research: React.FC = () => {
             {filteredPapers.map((paper) => (
               <motion.div
                 key={paper.id}
-                className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
@@ -186,8 +186,8 @@ const Research: React.FC = () => {
                   )}
                   <div className="flex space-x-2">
                     {paper.pdfLink && (
-                      <a href={paper.pdfLink} download className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200 transition-colors">
-                        <FaDownload title="Download PDF" />
+                      <a href={paper.pdfLink} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200 transition-colors">
+                        <FaExternalLinkAlt title="View PDF" />
                       </a>
                     )}
                     <button className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-200 transition-colors">
