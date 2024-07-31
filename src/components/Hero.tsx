@@ -1,20 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Star, Zap, Shield } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ChevronDown, Globe2, Play, Pause } from 'lucide-react';
 
 const Hero: React.FC = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const [activeFeature, setActiveFeature] = useState(0);
-
-  useEffect(() => {
-    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    setIsDarkMode(darkModeMediaQuery.matches);
-    const handleChange = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
-    darkModeMediaQuery.addEventListener('change', handleChange);
-    return () => darkModeMediaQuery.removeEventListener('change', handleChange);
-  }, []);
+  const [isFloating, setIsFloating] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,43 +16,45 @@ const Hero: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveFeature((prev) => (prev + 1) % features.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const features = [
-    { icon: <Star className="w-6 h-6 text-yellow-400" />, text: "Premium Quality", description: "Our products are crafted with utmost care and precision." },
-    { icon: <Zap className="w-6 h-6 text-blue-400" />, text: "Lightning Fast", description: "Experience blazing fast performance with our optimized solutions." },
-    { icon: <Shield className="w-6 h-6 text-green-400" />, text: "Secure & Reliable", description: "Your data's safety is our top priority. Trust in our robust security measures." },
-  ];
-
   return (
     <>
       <motion.section
         id="hero"
-        className={`min-h-screen flex items-center justify-center sm:justify-end pt-10 px-4 sm:pr-10 text-center sm:text-right relative bg-cover bg-center transition-all duration-500 ${isDarkMode ? 'dark-mode-wallpaper' : 'light-mode-wallpaper'}`}
-        aria-label="Hero section with dynamic background"
-        style={{
-          backgroundPositionY: `${scrollY * 0.3}px`,
-        }}
+        className="min-h-screen flex flex-col items-center justify-center text-center relative bg-black overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
-        <div className="relative z-10 p-4 sm:p-8 max-w-4xl backdrop-blur-sm bg-black bg-opacity-30 rounded-lg">
-          <motion.h1
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-4 sm:mb-6"
+        <motion.div
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: `url('/path/to/your/infinity-background.jpg')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+          animate={isFloating ? {
+            y: [0, -20, 0],
+            x: [0, 20, 0],
+          } : {}}
+          transition={isFloating ? {
+            y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+            x: { duration: 8, repeat: Infinity, ease: "easeInOut" },
+          } : {}}
+        />
+        <div className="relative z-10 p-6 sm:p-8 max-w-4xl w-full">
+          <motion.div
+            className="flex flex-col items-center mb-6 sm:mb-10"
             initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
           >
-          <span className="text-emerald-400 hover:text-emerald-300 transition-colors duration-300">GMTStudio</span>
-          </motion.h1>
+            <Globe2 className="text-white w-14 h-14 mb-4" />
+            <h1 className="text-9xl sm:text-9xl md:text-6xl lg:text-7xl font-extrabold text-white">
+              GMTStudio
+            </h1>
+          </motion.div>
           <motion.p
-            className="text-xl sm:text-2xl md:text-3xl text-gray-300 mb-6 sm:mb-10"
+            className="text-2xl sm:text-2xl md:text-2xl text-white mb-6 sm:mb-10"
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -69,35 +62,25 @@ const Hero: React.FC = () => {
             Enhanced tools and applications to make your life easier.
           </motion.p>
           <motion.div
-            className="flex flex-col items-center sm:items-end gap-4 mb-8"
+            className="flex flex-col items-center gap-4 mb-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeFeature}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-                className="bg-gray-800 bg-opacity-70 rounded-lg p-4 w-full sm:w-auto"
-              >
-                <div className="flex items-center justify-center sm:justify-start mb-2">
-                  {features[activeFeature].icon}
-                  <span className="ml-2 text-white font-semibold">{features[activeFeature].text}</span>
-                </div>
-                <p className="text-gray-300 text-sm">{features[activeFeature].description}</p>
-              </motion.div>
-            </AnimatePresence>
+            <ChevronDown className="text-white animate-bounce" size={32} />
           </motion.div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 flex justify-center mb-4">
-          <ChevronDown className="text-white animate-bounce" size={32} />
-        </div>
+        <motion.button
+          className="absolute bottom-4 right-4 bg-white/20 p-2 rounded-full cursor-pointer"
+          onClick={() => setIsFloating(!isFloating)}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          {isFloating ? <Pause size={24} className="text-white" /> : <Play size={24} className="text-white" />}
+        </motion.button>
       </motion.section>
       <motion.div
-        className={`fixed bottom-8 right-8 bg-indigo-600 p-3 rounded-full cursor-pointer ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+        className={`fixed bottom-8 right-8 bg-indigo-600 p-3 rounded-full cursor-none ${isVisible ? 'opacity-100' : 'opacity-0'}`}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
