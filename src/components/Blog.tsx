@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaChevronDown, FaSearch, FaTags, FaCalendarAlt, FaUser, FaEye, FaShare } from 'react-icons/fa';
+import { FaChevronDown, FaSearch, FaTags, FaCalendarAlt, FaUser, FaEye, FaShare, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import blogImage1 from '../assets/images/MazsAiPic.png';
 import DEV from '../assets/images/1.png'
 import Beta from '../assets/images/cool_design.png'
+
 const blogPosts = [
   { 
     image: Beta, 
@@ -47,6 +48,7 @@ const Blog: React.FC = () => {
   const [filteredPosts, setFilteredPosts] = useState(blogPosts);
   const [sortBy, setSortBy] = useState('date');
   const categories = ['All', ...Array.from(new Set(blogPosts.map(post => post.category)))];
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     let filtered = blogPosts.filter(post => 
@@ -56,7 +58,6 @@ const Blog: React.FC = () => {
        post.author.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
-    // Sort the filtered posts
     filtered.sort((a, b) => {
       if (sortBy === 'date') {
         return new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -68,6 +69,14 @@ const Blog: React.FC = () => {
 
     setFilteredPosts(filtered);
   }, [selectedCategory, searchTerm, sortBy]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prevSlide) => (prevSlide + 1) % filteredPosts.length);
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(timer);
+  }, [filteredPosts.length]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -84,6 +93,14 @@ const Blog: React.FC = () => {
       opacity: 1,
       transition: { type: 'spring', stiffness: 100 }
     }
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % filteredPosts.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + filteredPosts.length) % filteredPosts.length);
   };
 
   return (
@@ -141,7 +158,7 @@ const Blog: React.FC = () => {
 
         <AnimatePresence>
           <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
+            className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-10"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -198,6 +215,78 @@ const Blog: React.FC = () => {
               </motion.div>
             ))}
           </motion.div>
+
+          {/* Mobile Slider */}
+          <div className="md:hidden relative">
+            <motion.div
+              className="overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="flex transition-transform ease-in-out duration-300"
+                initial={false}
+                animate={{ x: `-${currentSlide * 100}%` }}
+              >
+                {filteredPosts.map((post, index) => (
+                  <div key={index} className="w-full flex-shrink-0">
+                    <div className="relative flex w-full flex-col rounded-xl bg-gray-400 bg-clip-border text-gray-900 shadow-lg dark:bg-gray-900 dark:text-white">
+                      <div className="relative mx-4 -mt-6 h-56 overflow-hidden rounded-xl bg-gradient-to-r from-red-500 to-orange-500">
+                        <img 
+                          src={post.image} 
+                          alt={post.title} 
+                          className="w-full h-full object-cover transition-transform duration-300 ease-in-out transform hover:scale-110"
+                        />
+                        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                          <span className="text-white text-lg font-bold">{post.category}</span>
+                        </div>
+                      </div>
+                      <div className="p-8">
+                        <div className="flex justify-between items-center mb-2">
+                          <p className="text-gray-400 text-sm flex items-center">
+                            <FaCalendarAlt className="mr-2" /> {post.date}
+                          </p>
+                          <p className="text-gray-400 text-sm flex items-center">
+                            <FaEye className="mr-2" /> {post.views} views
+                          </p>
+                        </div>
+                        <h5 className="mb-2 text-2xl font-semibold leading-snug tracking-normal text-white">
+                          {post.title}
+                        </h5>
+                        <p className="mb-4 text-gray-200 dark:text-gray-200">
+                          {post.excerpt}
+                        </p>
+                        <div className="flex justify-between items-center">
+                          <p className="text-gray-400 text-sm flex items-center">
+                            <FaUser className="mr-2" /> {post.author}
+                          </p>
+                          <p className="text-gray-400 text-sm">{post.readTime}</p>
+                        </div>
+                        <div className="mt-4 flex justify-between items-center">
+                          <Link 
+                            to={post.link}
+                            className="inline-block rounded-lg bg-gradient-to-r from-red-500 to-orange-500 py-3 px-6 text-center text-base font-bold uppercase text-white transition-all hover:shadow-lg focus:shadow-none hover:from-orange-500 hover:to-red-500"
+                          >
+                            Read More
+                          </Link>
+                          <button className="text-gray-400 hover:text-white transition-colors duration-200">
+                            <FaShare />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            </motion.div>
+            <button onClick={prevSlide} className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
+              <FaChevronLeft />
+            </button>
+            <button onClick={nextSlide} className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
+              <FaChevronRight />
+            </button>
+          </div>
         </AnimatePresence>
         
         <motion.div 
