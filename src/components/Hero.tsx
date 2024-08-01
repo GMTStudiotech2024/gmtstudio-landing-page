@@ -82,14 +82,14 @@ const Hero: React.FC = () => {
             transition={{ duration: 0.8 }}
           >
             <Globe2 className={`w-14 h-14 mb-4 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
-            <h1 className={`text-7xl sm:text-6xl md:text-7xl font-extrabold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+            <h1 className={`text-7xl sm:text-6xl md:text-7xl font-extrabold ${isDarkMode ? 'text-white' : 'text-white'}`}>
               GMTStudio
             </h1>
           </motion.div>
           <AnimatePresence mode="wait">
             <motion.p
               key={currentSlide}
-              className={`text-lg sm:text-2xl md:text-3xl mb-6 sm:mb-10 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}
+              className={`text-lg sm:text-2xl md:text-3xl mb-6 sm:mb-10 ${isDarkMode ? 'text-gray-300' : 'text-gray-300'}`}
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
