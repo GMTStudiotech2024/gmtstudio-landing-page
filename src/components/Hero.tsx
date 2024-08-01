@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Globe2, Play, Pause, Sun, Moon } from 'lucide-react';
+import { ChevronDown, Globe2, Play, Pause, Sun, Moon } from 'lucide-react';    
 
 const Hero: React.FC = () => {
   const [scrollY, setScrollY] = useState(0);
