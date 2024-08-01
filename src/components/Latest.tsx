@@ -144,15 +144,33 @@ const Latest: React.FC = () => {
   };
 
   return (
-    <section id="blog" className="py-16 bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-black min-h-screen">
+    <section id="blog" className="pt-20 bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-black min-h-screen">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-16 text-center">
+          <motion.h1 
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-6xl font-bold text-gray-900 dark:text-white mb-4"
+          >
+            Latest <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">News</span>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-xl text-gray-600 dark:text-gray-300"
+          >
+            Stay updated with the latest developments and insights from GMTStudio
+          </motion.p>
+        </div>
+        
         <motion.h2 
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-5xl font-bold text-gray-900 dark:text-white mb-12 text-center"
+          className="text-4xl font-bold text-gray-900 dark:text-white mb-12 text-center"
         >
-          Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">Latest News</span>
         </motion.h2>
         
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-center">
