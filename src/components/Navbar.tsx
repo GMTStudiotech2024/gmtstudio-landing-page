@@ -16,7 +16,7 @@ const Navbar: React.FC = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [notifications, setNotifications] = useState([
     { id: 1, message: "New feature released!", read: false, timestamp: new Date().toISOString() },
-    { id: 2, message: "Your project has been updated.", read: false, timestamp: new Date(Date.now() - 86400000).toISOString() },
+    { id: 2, message: "New product released.", read: false, timestamp: new Date(Date.now() - 86400000).toISOString() },
     { id: 3, message: "Welcome to GMTStudio!", read: true, timestamp: new Date(Date.now() - 172800000).toISOString() },
   ]);
   const location = useLocation();

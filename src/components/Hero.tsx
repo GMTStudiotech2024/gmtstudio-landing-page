@@ -1,26 +1,65 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { ChevronDown, Globe2, Play, Pause } from 'lucide-react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, Globe2, Play, Pause, Sun, Moon } from 'lucide-react';
 
 const Hero: React.FC = () => {
   const [scrollY, setScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [isFloating, setIsFloating] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(() => 
+    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const slides = [
+    "Enhanced tools and applications to power up your efficiency.",
+    "The tech company that builds the future.",
+    "Great, Marvelous, and Terrific."
+  ];
+
+  const handleScroll = useCallback(() => {
+    const currentScrollY = window.scrollY;
+    setScrollY(currentScrollY);
+    setIsVisible(currentScrollY > 100);
+  }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-      setIsVisible(window.scrollY > 100);
-    };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [slides.length]);
+
+  const toggleDarkMode = useCallback(() => {
+    setIsDarkMode((prevMode) => {
+      const newMode = !prevMode;
+      document.documentElement.classList.toggle('dark', newMode);
+      return newMode;
+    });
   }, []);
+
+  const backgroundVariants = {
+    floating: {
+      y: [0, -20, 0],
+      x: [0, 20, 0],
+      transition: {
+        y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+        x: { duration: 8, repeat: Infinity, ease: "easeInOut" },
+      }
+    },
+    static: { y: 0, x: 0 }
+  };
 
   return (
     <>
       <motion.section
         id="hero"
-        className="min-h-screen flex flex-col items-center justify-center text-center relative bg-black overflow-hidden"
+        className={`min-h-screen flex flex-col items-center justify-center text-center relative overflow-hidden ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
@@ -28,18 +67,12 @@ const Hero: React.FC = () => {
         <motion.div
           className="absolute inset-0 z-0"
           style={{
-            backgroundImage: `url('/path/to/your/infinity-background.jpg')`,
+            backgroundImage: `url('/path/to/your/optimized-infinity-background.webp')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
-          animate={isFloating ? {
-            y: [0, -20, 0],
-            x: [0, 20, 0],
-          } : {}}
-          transition={isFloating ? {
-            y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
-            x: { duration: 8, repeat: Infinity, ease: "easeInOut" },
-          } : {}}
+          variants={backgroundVariants}
+          animate={isFloating ? "floating" : "static"}
         />
         <div className="relative z-10 p-6 sm:p-8 max-w-4xl w-full">
           <motion.div
@@ -48,39 +81,51 @@ const Hero: React.FC = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
           >
-            <Globe2 className="text-white w-14 h-14 mb-4" />
-            <h1 className="text-9xl sm:text-9xl md:text-6xl lg:text-7xl font-extrabold text-white">
+            <Globe2 className={`w-14 h-14 mb-4 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+            <h1 className={`text-7xl sm:text-6xl md:text-7xl font-extrabold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               GMTStudio
             </h1>
           </motion.div>
-          <motion.p
-            className="text-2xl sm:text-2xl md:text-2xl text-white mb-6 sm:mb-10"
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            Enhanced tools and applications to make your life easier.
-          </motion.p>
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={currentSlide}
+              className={`text-lg sm:text-2xl md:text-3xl mb-6 sm:mb-10 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              {slides[currentSlide]}
+            </motion.p>
+          </AnimatePresence>
           <motion.div
-            className="flex flex-col items-center gap-4 mb-8"
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <ChevronDown className="text-white animate-bounce" size={32} />
+            {/* Add your CTA buttons or additional content here */}
           </motion.div>
         </div>
         <motion.button
-          className="absolute bottom-4 right-4 bg-white/20 p-2 rounded-full cursor-pointer"
+          className={`absolute bottom-4 right-4 p-2 rounded-full cursor-pointer ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white/20 hover:bg-white/30'}`}
           onClick={() => setIsFloating(!isFloating)}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
-          {isFloating ? <Pause size={24} className="text-white" /> : <Play size={24} className="text-white" />}
+          {isFloating ? <Pause size={24} className={isDarkMode ? 'text-white' : 'text-gray-900'} /> : <Play size={24} className={isDarkMode ? 'text-white' : 'text-gray-900'} />}
+        </motion.button>
+        <motion.button
+          className={`absolute top-4 right-4 p-2 rounded-full cursor-pointer ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white/20 hover:bg-white/30'}`}
+          onClick={toggleDarkMode}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          {isDarkMode ? <Sun size={24} className="text-yellow-400" /> : <Moon size={24} className="text-gray-900" />}
         </motion.button>
       </motion.section>
       <motion.div
-        className={`fixed bottom-8 right-8 bg-indigo-600 p-3 rounded-full cursor-none ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+        className={`fixed bottom-8 right-8 bg-indigo-600 p-3 rounded-full cursor-pointer ${isVisible ? 'opacity-100' : 'opacity-0'}`}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
