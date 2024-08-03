@@ -55,6 +55,13 @@ const Hero: React.FC = () => {
     static: { y: 0, x: 0 }
   };
 
+  const scrollToNextSection = () => {
+    const nextSection = document.getElementById('blog');
+    if (nextSection) {
+      nextSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <>
       <motion.section
@@ -89,7 +96,7 @@ const Hero: React.FC = () => {
           <AnimatePresence mode="wait">
             <motion.p
               key={currentSlide}
-              className={`text-lg sm:text-2xl md:text-3xl mb-6 sm:mb-10 ${isDarkMode ? 'text-gray-300' : 'text-gray-300'}`}
+              className={`text-lg sm:text-3xl md:text-4xl mb-6 sm:mb-10 ${isDarkMode ? 'text-gray-300' : 'text-gray-300'}`}
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
@@ -104,7 +111,14 @@ const Hero: React.FC = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            {/* Add your CTA buttons or additional content here */}
+            <motion.button 
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300"
+              onClick={scrollToNextSection}
+              whileHover={{ scale: 1.1, boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.3)" }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Get Started
+            </motion.button>
           </motion.div>
         </div>
         <motion.button
