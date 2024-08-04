@@ -12,7 +12,7 @@ import {
   Terminal,
 } from 'lucide-react';
 import 'tailwindcss/tailwind.css';
-
+import CodeEditor from './CodeEditor';
 interface Notification {
   id: number;
   message: string;
@@ -39,6 +39,7 @@ const Dashboard: React.FC = () => {
   const [pomodoroTime, setPomodoroTime] = useState<number>(1500);
   const [pomodoroTimer, setPomodoroTimer] = useState<NodeJS.Timeout | null>(null);
   const [terminalOutput, setTerminalOutput] = useState<string[]>([]);
+  const [codeEditorOpen, setCodeEditorOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -118,7 +119,11 @@ const Dashboard: React.FC = () => {
     setOpenApp('Pomodoro');
     expandTopBar();
   }, []);
-
+const openCodeEditor = useCallback(() => {
+  setActiveSection('codeEditor');
+  setOpenApp('Code Editor');
+  expandTopBar();
+}, []);
   const openMazsAi = useCallback(() => {
     window.location.href = 'https://gmt-studio-ai-workspace.vercel.app/';
   }, []);
