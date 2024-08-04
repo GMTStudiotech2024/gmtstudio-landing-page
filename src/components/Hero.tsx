@@ -94,7 +94,7 @@ const Hero: React.FC = () => {
             transition={{ duration: 0.8 }}
           >
             <Globe2 className={`w-14 h-14 mb-4 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
-            <h1 className={`text-7xl sm:text-6xl md:text-7xl font-extrabold ${isDarkMode ? 'text-white' : 'text-white'}`}>
+            <h1 className={`text-6xl sm:text-6xl md:text-7xl font-extrabold ${isDarkMode ? 'text-white' : 'text-white'}`}>
               {"GMTStudio".split('').map((letter, index) => (
                 <motion.span
                   key={index}
