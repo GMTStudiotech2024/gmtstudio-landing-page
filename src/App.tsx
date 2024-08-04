@@ -34,6 +34,7 @@ import Dashboard from './components/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
 import Products from './components/Products';
 import Help from './components/Help';
+import LaunchGMTStudio from './components/LaunchGMTStudio';
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -57,6 +58,7 @@ const App: React.FC = () => {
                 <div ref={heroRef}>
                   <Hero />
                 </div>
+                <LaunchGMTStudio />
                 <Blog />
                 <Feature />
                 <OurProjects />

@@ -1,29 +1,32 @@
 import React, { useState, FormEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, User, AlertCircle, CheckCircle, Loader } from 'lucide-react';
 
 interface AuthorizedUser {
   userId: string;
+  username: string;
   passcode: string;
 }
 
 const authorizedUsers: AuthorizedUser[] = [
-  { userId: 'Alston@20070119', passcode: 'GMT001A' },
-  { userId: 'Lucas@Yeh', passcode: 'GMT002A' },
-  { userId: 'Willy@lin', passcode: 'GMT003A' },
-  { userId: 'jerry20070513@gmail.com', passcode: 'GMT004A' },
-  { userId: 'Waiting@666', passcode: 'GMT005A' }
+  { userId: 'Alston@20070119', username: 'Alston', passcode: 'GMT001A' },
+  { userId: 'Lucas@Yeh', username: 'Lucas', passcode: 'GMT002A' },
+  { userId: 'Willy@lin', username: 'Willy', passcode: 'GMT003A' },
+  { userId: 'jerry20070513@gmail.com', username: 'Jerry', passcode: 'GMT004A' },
+  { userId: 'Waiting@666', username: 'Waiting', passcode: 'GMT005A' }
 ];
 
-interface SignUpLoginPageProps {
+interface LoginPageProps {
   setIsAuthenticated: (authenticated: boolean) => void;
 }
 
-const SignUpLoginPage: React.FC<SignUpLoginPageProps> = ({ setIsAuthenticated }) => {
+const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -41,9 +44,10 @@ const SignUpLoginPage: React.FC<SignUpLoginPageProps> = ({ setIsAuthenticated })
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setSuccess(null);
 
     try {
-      const user = authorizedUsers.find(u => u.userId === email && u.passcode === password);
+      const user = authorizedUsers.find(u => u.userId === email && u.username === username && u.passcode === password);
       if (user) {
         if (rememberMe) {
           localStorage.setItem('rememberedEmail', email);
@@ -51,7 +55,8 @@ const SignUpLoginPage: React.FC<SignUpLoginPageProps> = ({ setIsAuthenticated })
           localStorage.removeItem('rememberedEmail');
         }
         setIsAuthenticated(true);
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        setSuccess('Login successful! Redirecting...');
+        await new Promise(resolve => setTimeout(resolve, 1500));
         navigate('/dashboard');
       } else {
         throw new Error('Invalid credentials');
@@ -66,65 +71,102 @@ const SignUpLoginPage: React.FC<SignUpLoginPageProps> = ({ setIsAuthenticated })
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-200 dark:from-gray-900 dark:to-gray-800 p-4">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md"
+        className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md backdrop-blur-sm bg-opacity-80 dark:bg-opacity-60"
+        style={{
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1), 0 5px 10px rgba(0, 0, 0, 0.05)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+        }}
       >
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800 dark:text-white">
-          GMTStudio Beta
-        </h2>
+        <motion.h2 
+          className="text-4xl font-bold mb-8 text-center text-gray-800 dark:text-white"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          Welcome Back
+        </motion.h2>
         <AnimatePresence>
           {error && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="mb-4 p-3 bg-red-100 text-red-700 rounded"
+              className="mb-6 p-4 bg-red-100 text-red-700 rounded-lg flex items-center"
             >
-              {error}
+              <AlertCircle className="mr-3 flex-shrink-0" size={20} />
+              <span className="text-sm font-medium">{error}</span>
+            </motion.div>
+          )}
+          {success && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="mb-6 p-4 bg-green-100 text-green-700 rounded-lg flex items-center"
+            >
+              <CheckCircle className="mr-3 flex-shrink-0" size={20} />
+              <span className="text-sm font-medium">{success}</span>
             </motion.div>
           )}
         </AnimatePresence>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="relative">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Email
             </label>
             <div className="relative">
               <input
                 type="email"
                 id="email"
-                className="pl-10 pr-3 py-2 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="pl-12 pr-4 py-3 w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             </div>
           </div>
           <div className="relative">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Username
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                id="username"
+                className="pl-12 pr-4 py-3 w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+              <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            </div>
+          </div>
+          <div className="relative">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Password
             </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 id="password"
-                className="pl-10 pr-10 py-2 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="pl-12 pr-12 py-3 w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors duration-200"
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
           </div>
@@ -134,33 +176,40 @@ const SignUpLoginPage: React.FC<SignUpLoginPageProps> = ({ setIsAuthenticated })
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded transition-colors duration-200"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+              <label htmlFor="remember-me" className="ml-3 block text-sm text-gray-700 dark:text-gray-300">
                 Remember me
               </label>
             </div>
             <div className="text-sm">
-              <a href="https://docs.google.com/forms/d/e/1FAIpQLSctMdJctRfq2Q1yfb4F8x_szlvXInk3O6eu0WFzjYFr3hmfSQ/viewform" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
-                Forgot your password?
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSctMdJctRfq2Q1yfb4F8x_szlvXInk3O6eu0WFzjYFr3hmfSQ/viewform" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors duration-200">
+                Forgot password?
               </a>
             </div>
           </div>
           <motion.button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
             disabled={isLoading}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
-            {isLoading ? 'Logging in...' : 'Log In'}
+            {isLoading ? (
+              <>
+                <Loader className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+                Processing...
+              </>
+            ) : (
+              'Log In'
+            )}
           </motion.button>
         </form>
-        <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
           Need beta access?{' '}
-          <a href="https://docs.google.com/forms/d/e/1FAIpQLSctMdJctRfq2Q1yfb4F8x_szlvXInk3O6eu0WFzjYFr3hmfSQ/viewform" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSctMdJctRfq2Q1yfb4F8x_szlvXInk3O6eu0WFzjYFr3hmfSQ/viewform" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors duration-200">
             Request an invite
           </a>
         </p>
@@ -169,4 +218,4 @@ const SignUpLoginPage: React.FC<SignUpLoginPageProps> = ({ setIsAuthenticated })
   );
 };
 
-export default SignUpLoginPage;
+export default LoginPage;

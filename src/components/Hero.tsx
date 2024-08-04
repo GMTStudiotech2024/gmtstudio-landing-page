@@ -62,6 +62,11 @@ const Hero: React.FC = () => {
     }
   };
 
+  const letterVariants = {
+    initial: { y: 0 },
+    hover: { y: -10 },
+  };
+
   return (
     <>
       <motion.section
@@ -90,7 +95,17 @@ const Hero: React.FC = () => {
           >
             <Globe2 className={`w-14 h-14 mb-4 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
             <h1 className={`text-7xl sm:text-6xl md:text-7xl font-extrabold ${isDarkMode ? 'text-white' : 'text-white'}`}>
-              GMTStudio
+              {"GMTStudio".split('').map((letter, index) => (
+                <motion.span
+                  key={index}
+                  variants={letterVariants}
+                  initial="initial"
+                  whileHover="hover"
+                  style={{ display: 'inline-block' }}
+                >
+                  {letter}
+                </motion.span>
+              ))}
             </h1>
           </motion.div>
           <AnimatePresence mode="wait">
@@ -114,7 +129,7 @@ const Hero: React.FC = () => {
           </motion.div>
         </div>
         <motion.button
-          className={`absolute bottom-4 right-4 p-2 rounded-full cursor-pointer ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white/20 hover:bg-white/30'}`}
+          className={`absolute bottom-4 right-4 p-2 rounded-full ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white/20 hover:bg-white/30'}`}
           onClick={() => setIsFloating(!isFloating)}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -122,7 +137,7 @@ const Hero: React.FC = () => {
           {isFloating ? <Pause size={24} className={isDarkMode ? 'text-white' : 'text-gray-900'} /> : <Play size={24} className={isDarkMode ? 'text-white' : 'text-gray-900'} />}
         </motion.button>
         <motion.button
-          className={`absolute top-4 right-4 p-2 rounded-full cursor-pointer ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white/20 hover:bg-white/30'}`}
+          className={`absolute top-4 right-4 p-2 rounded-full ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white/20 hover:bg-white/30'}`}
           onClick={toggleDarkMode}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -131,7 +146,7 @@ const Hero: React.FC = () => {
         </motion.button>
       </motion.section>
       <motion.div
-        className={`fixed bottom-8 right-8 bg-indigo-600 p-3 rounded-full cursor-pointer ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+        className={`fixed bottom-8 right-8 bg-indigo-600 p-3 rounded-full ${isVisible ? 'opacity-100' : 'opacity-0'}`}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}

@@ -112,7 +112,7 @@ const Blog: React.FC = () => {
           transition={{ duration: 0.5 }}
           className="text-5xl font-bold text-black dark:text-white mb-12 text-center"
         >
-          Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Latest News</span>
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Latest News</span>
         </motion.h2>
         
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
