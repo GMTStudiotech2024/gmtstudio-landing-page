@@ -111,14 +111,6 @@ const Hero: React.FC = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <motion.button 
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300"
-              onClick={scrollToNextSection}
-              whileHover={{ scale: 1.1, boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.3)" }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Get Started
-            </motion.button>
           </motion.div>
         </div>
         <motion.button
