@@ -14,7 +14,7 @@ const LaunchGMTStudio: React.FC = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 md:mb-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent text-center md:text-left">
-            Experience the Future with GMTStudio Beta
+            Experience the power of GMTStudio AI
           </h1>
         </motion.div>
 
@@ -37,7 +37,7 @@ const LaunchGMTStudio: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <motion.a href="/dashboard">Launch GMTStudio Beta</motion.a>
+                <motion.a href="/dashboard">Launch Mazs AI</motion.a>
                 <ChevronRightIcon className="w-6 h-6 sm:w-7 sm:h-7 ml-2 sm:ml-3" />
               </motion.button>
             </div>
