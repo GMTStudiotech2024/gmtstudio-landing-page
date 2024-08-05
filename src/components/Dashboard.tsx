@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Users,
   Bell,
   Home,
   Folder,
@@ -12,7 +11,7 @@ import {
   Terminal,
 } from 'lucide-react';
 import 'tailwindcss/tailwind.css';
-import CodeEditor from './CodeEditor';
+
 interface Notification {
   id: number;
   message: string;
@@ -39,7 +38,7 @@ const Dashboard: React.FC = () => {
   const [pomodoroTime, setPomodoroTime] = useState<number>(1500);
   const [pomodoroTimer, setPomodoroTimer] = useState<NodeJS.Timeout | null>(null);
   const [terminalOutput, setTerminalOutput] = useState<string[]>([]);
-  const [codeEditorOpen, setCodeEditorOpen] = useState<boolean>(false);
+
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);

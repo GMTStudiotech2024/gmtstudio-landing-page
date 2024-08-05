@@ -15,7 +15,7 @@ import { Analytics } from '@vercel/analytics/react';
 import './components/st.css';
 import CustomCursor from './components/CustomCursor';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-import CookieNotifier from './components/CookieNotifier';
+
 import Contact from './components/ContactPage';
 import SignUpLoginPage from './components/SignUp';
 import Latest from './components/Latest';
@@ -96,7 +96,6 @@ const App: React.FC = () => {
         <Footer />
         <Analytics />
         <SpeedInsights />
-        <CookieNotifier />
       </div>
     </Router>
   );
