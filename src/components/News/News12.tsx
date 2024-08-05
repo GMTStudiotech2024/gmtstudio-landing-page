@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import blogImage from '../assets/mazs_ai_network.png';
+import blogImage from '../assets/GMTStudio_p.png'
 
 const NEWS12 = () => {
   const navigate = useNavigate();

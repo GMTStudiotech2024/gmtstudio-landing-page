@@ -5,9 +5,6 @@ import { FaChevronDown, FaSearch, FaTags, FaCalendarAlt, FaUser, FaEye, FaShare,
 import blogImage1 from '../assets/images/MazsAiPic.png';
 import DEV from '../assets/images/1.png'
 import Beta from '../assets/images/cool_design.png'
-import News12 from '../components/News/News12';
-import News11 from '../components/News/News11';
-import News10 from '../components/News/News10';
 
 const blogPosts = [
   { 
@@ -16,7 +13,7 @@ const blogPosts = [
     excerpt: "Comprehensive analysis of a neural network-powered chatbot, exploring architecture, training, limitations, and future enhancements in conversational AI", 
     author: "Alston Chang", 
     date: "August 5, 2024",
-    link: "/NEWS12",
+    link: "/news12",
     category: "AI",
     views: 30,
     readTime: "1 min "
@@ -27,7 +24,7 @@ const blogPosts = [
     excerpt: "Beta version of website from GMTStudio", 
     author: "Alston Chang", 
     date: "July 27, 2024",
-    link: "/NEWS11",
+    link: "/news11",
     category: "Development Log",
     views: 10,
     readTime: "1 min "
@@ -38,7 +35,7 @@ const blogPosts = [
     excerpt: "We added some new feature to our official website, let's hop into the introduction of the new feature!", 
     author: "Alston Chang", 
     date: "July 24, 2024",
-    link: "/NEWS10",
+    link: "/news10",
     category: "Development Log",
     views: 20,
     readTime: "3 min"
