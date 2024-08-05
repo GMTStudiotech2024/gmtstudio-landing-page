@@ -11,6 +11,15 @@ import Beta from '../assets/images/cool_design.png'
 
 const blogPosts = [
   {
+    image: blogImage1,
+    title: "Mazs AI: A Technical Deep Dive",
+    excerpt: "Comprehensive analysis of a neural network-powered chatbot, exploring architecture, training, limitations, and future enhancements in conversational AI.",
+    author: "Dr. Alan Turing",
+    date: "August 5, 2024",
+    link: "/NEWS12",
+    category: "AI Development"
+  },
+  {
     image: Beta,
     title: "GMTStudio Beta",
     excerpt: "Beta version of website from GMTStudio",
