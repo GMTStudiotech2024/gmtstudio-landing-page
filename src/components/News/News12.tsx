@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import blogImage from '../assets/mazs_ai_network.png'; // Assuming you have an image for Mazs AI
+import blogImage from '../assets/mazs_ai_network.png';
 
 const NEWS12 = () => {
   const navigate = useNavigate();
@@ -28,25 +28,41 @@ const NEWS12 = () => {
             <div className="flex items-center text-gray-600 dark:text-gray-400 mb-6">
               <img src="/api/placeholder/48/48" alt="Author" className="w-12 h-12 rounded-full mr-4" />
               <div>
-                <p className="font-semibold">Dr. Alan Turing</p>
+                <p className="font-semibold">Alston Chang</p>
                 <p className="text-sm">AI Research Scientist</p>
-                <p className="text-sm">August 15, 2024 • 20 min read</p>
+                <p className="text-sm">August 5, 2024 • 30 min read</p>
               </div>
             </div>
             <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200">
-              <p className="lead text-xl mb-6">This technical analysis explores the architecture, training process, and potential enhancements of Mazs AI, a neural network-powered chatbot designed for intent classification and response generation.</p>
+              <p className="lead text-xl mb-6">This thesis presents a comprehensive technical analysis of Mazs AI, a rudimentary chatbot powered by a three-layer neural network for intent classification. We explore the architecture, training process, and performance evaluation, while proposing enhancements to achieve a more robust and versatile conversational agent.</p>
               
-              <h2 className="text-2xl font-bold mt-8 mb-4">Key Technical Aspects</h2>
+              <h2 className="text-2xl font-bold mt-8 mb-4">1. Introduction</h2>
+              <p>Mazs AI is a rudimentary chatbot utilizing a neural network to understand user intent and generate appropriate responses. This technical deep dive explores its underlying mechanisms, providing a detailed understanding of its architecture, training process, limitations, and potential for future enhancements.</p>
+
+              <h2 className="text-2xl font-bold mt-8 mb-4">2. Chatbot Architecture and Neural Network Design</h2>
               <ul className="list-disc pl-6 mb-6">
-                <li>Three-layer feedforward neural network architecture</li>
-                <li>Binary keyword vector input representation</li>
-                <li>ReLU activation in hidden layer, Softmax in output layer</li>
-                <li>AdamW optimizer with learning rate decay</li>
-                <li>Dropout and L2 regularization for preventing overfitting</li>
+                <li>Three-layer feedforward neural network for intent classification</li>
+                <li>Input Layer: 10 neurons, binary vector encoding</li>
+                <li>Hidden Layer: 10 neurons, ReLU activation</li>
+                <li>Output Layer: 10 neurons, Softmax activation</li>
               </ul>
 
-              <h2 className="text-2xl font-bold mt-8 mb-4">Limitations and Future Enhancements</h2>
-              <p>While Mazs AI demonstrates the potential of neural network-powered chatbots, it has several limitations:</p>
+              <h2 className="text-2xl font-bold mt-8 mb-4">3. Parameter Selection and Optimization</h2>
+              <ul className="list-disc pl-6 mb-6">
+                <li>Learning Rate: 0.001 with decay factor 0.99 per epoch</li>
+                <li>Dropout Rate: 0.3</li>
+                <li>Batch Size: 64</li>
+                <li>Optimizer: AdamW</li>
+                <li>L2 Regularization Rate: 0.01</li>
+              </ul>
+
+              <h2 className="text-2xl font-bold mt-8 mb-4">4. Training Data and Process</h2>
+              <p>Mazs AI is trained on a limited dataset of user input examples and corresponding target output vectors. The training process involves forward and backward propagation over 1000 epochs.</p>
+
+              <h2 className="text-2xl font-bold mt-8 mb-4">5. Inference and Response Generation</h2>
+              <p>During inference, user input is processed into a binary vector, fed into the neural network, and the highest probability intent is selected for response generation.</p>
+
+              <h2 className="text-2xl font-bold mt-8 mb-4">6. Limitations of Mazs AI</h2>
               <ul className="list-disc pl-6 mb-6">
                 <li>Limited training data affecting generalization</li>
                 <li>Lack of advanced NLP techniques for contextual understanding</li>
@@ -54,12 +70,26 @@ const NEWS12 = () => {
                 <li>Absence of external API integration</li>
               </ul>
 
-              <p>Proposed enhancements include:</p>
+              <h2 className="text-2xl font-bold mt-8 mb-4">7. Future Enhancements</h2>
               <ul className="list-disc pl-6 mb-6">
-                <li>Expanding the training dataset</li>
-                <li>Implementing advanced NLP techniques (word embeddings, etc.)</li>
-                <li>Integrating a sophisticated dialogue management system</li>
-                <li>Connecting to external APIs for real-time information</li>
+                <li>Expand training data for improved generalization</li>
+                <li>Implement NLP techniques (tokenization, word embeddings)</li>
+                <li>Integrate sophisticated dialogue management system</li>
+                <li>Connect to external APIs for real-time information</li>
+              </ul>
+
+              <h2 className="text-2xl font-bold mt-8 mb-4">8. Evaluation and Metrics</h2>
+              <p>Performance metrics include accuracy, precision, recall, F1-score, and user satisfaction surveys.</p>
+
+              <h2 className="text-2xl font-bold mt-8 mb-4">9. Conclusion</h2>
+              <p>Mazs AI serves as a valuable foundation for exploring neural network-powered chatbots. By addressing current limitations and implementing proposed enhancements, it can evolve into a more robust and versatile conversational agent.</p>
+
+              <h2 className="text-2xl font-bold mt-8 mb-4">10. Future Research Directions</h2>
+              <ul className="list-disc pl-6 mb-6">
+                <li>Exploration of advanced neural network architectures (RNNs, Transformers)</li>
+                <li>Incorporation of sentiment analysis for emotional intelligence</li>
+                <li>Development of personalized chatbot experiences</li>
+                <li>Addressing ethical considerations in chatbot development</li>
               </ul>
 
               <p>This technical deep dive into Mazs AI provides valuable insights into the development of neural network-powered chatbots and highlights potential avenues for future research and improvement in the field of conversational AI.</p>
