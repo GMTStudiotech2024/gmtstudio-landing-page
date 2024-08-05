@@ -56,6 +56,7 @@ const Dashboard: React.FC = () => {
       { name: "Story Vending Machine", progress: 1 },
       { name: "RPG Pixel Game Develop", progress: 10 },
       { name: "Code snippet", progress: 0 },
+      { name: "Mazs AI", progress: 20 },
     ]);
 
     setMailMessages([
