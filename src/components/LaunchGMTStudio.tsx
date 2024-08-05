@@ -37,7 +37,7 @@ const LaunchGMTStudio: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <motion.a href="/dashboard">Launch Mazs AI</motion.a>
+                <motion.a href="https://gmt-studio-ai-workspace.vercel.app/">Launch Mazs AI</motion.a>
                 <ChevronRightIcon className="w-6 h-6 sm:w-7 sm:h-7 ml-2 sm:ml-3" />
               </motion.button>
             </div>
