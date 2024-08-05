@@ -8,6 +8,17 @@ import Beta from '../assets/images/cool_design.png'
 
 const blogPosts = [
   { 
+    image: blogImage1, 
+    title: "Mazs AI: A Technical Deep Dive", 
+    excerpt: "Comprehensive analysis of a neural network-powered chatbot, exploring architecture, training, limitations, and future enhancements in conversational AI", 
+    author: "Alston Chang", 
+    date: "August 5, 2024",
+    link: "/NEWS12",
+    category: "AI",
+    views: 30,
+    readTime: "1 min "
+  },
+  { 
     image: Beta, 
     title: "GMTStudio Beta", 
     excerpt: "Beta version of website from GMTStudio", 
@@ -29,17 +40,7 @@ const blogPosts = [
     views: 20,
     readTime: "3 min"
   },
-  { 
-    image: blogImage1, 
-    title: "GMTStudio AI Workspace", 
-    excerpt: "New UI design for GMTStudio AI Workspace", 
-    author: "Alston Chang", 
-    date: "July 21, 2024",
-    link: "/NEWS9",
-    category: "AI",
-    views: 30,
-    readTime: "1 min "
-  },
+
 ];
 
 const Blog: React.FC = () => {
