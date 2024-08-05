@@ -5,6 +5,9 @@ import { FaChevronDown, FaSearch, FaTags, FaCalendarAlt, FaUser, FaEye, FaShare,
 import blogImage1 from '../assets/images/MazsAiPic.png';
 import DEV from '../assets/images/1.png'
 import Beta from '../assets/images/cool_design.png'
+import News12 from '../components/News/News12';
+import News11 from '../components/News/News11';
+import News10 from '../components/News/News10';
 
 const blogPosts = [
   { 
