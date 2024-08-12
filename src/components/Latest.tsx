@@ -8,8 +8,17 @@ import Theta from '../assets/images/feature.png';
 import ThetaDev from '../assets/images/large-image.png';
 import WebDev from '../assets/images/1.png'
 import Beta from '../assets/images/cool_design.png'
-
+import AI from '../assets/images/AI.png'
 const blogPosts = [
+  {
+    image: AI,
+    title: "Mazs AI v1.0 update: A Technical Deep Dive",
+    excerpt: "Comprehensive analysis of a neural network-powered chatbot, exploring architecture, training, limitations, and future enhancements in conversational AI.",
+    author: "Dr. Alan Turing",
+    date: "August 5, 2024",
+    link: "/NEWS13",
+    category: "AI Development"
+  },
   {
     image: blogImage1,
     title: "Mazs AI: A Technical Deep Dive",

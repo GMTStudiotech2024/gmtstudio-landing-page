@@ -5,15 +5,15 @@ import { FaChevronDown, FaSearch, FaTags, FaCalendarAlt, FaUser, FaEye, FaShare,
 import blogImage1 from '../assets/images/MazsAiPic.png';
 import DEV from '../assets/images/1.png'
 import Beta from '../assets/images/cool_design.png'
-
+import AI from '../assets/images/AI.png'
 const blogPosts = [
   { 
-    image: blogImage1, 
+    image: AI, 
     title: "Mazs AI: A Technical Deep Dive", 
     excerpt: "Comprehensive analysis of a neural network-powered chatbot, exploring architecture, training, limitations, and future enhancements in conversational AI", 
     author: "Alston Chang", 
-    date: "August 5, 2024",
-    link: "/news12",
+    date: "August 12, 2024",
+    link: "/news13",
     category: "AI",
     views: 30,
     readTime: "1 min "
