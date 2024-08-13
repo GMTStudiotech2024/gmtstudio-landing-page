@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBolt, faExclamationCircle, faGlobe, faRocket, faCompass } from '@fortawesome/free-solid-svg-icons';
-import projectImage1 from '../assets/images/MazsAiPic.png';
 import projectImage2 from '../assets/images/blog5.png';
 import projectImage3 from '../assets/images/Story.jpg';
 import { motion, AnimatePresence } from 'framer-motion';
 import game_ohmypc from '../assets/images/Game_ohmypc.jpg';
 import game_dungeon from '../assets/images/Game_dungeon.jpg';
+import AI from '../assets/images/AI.png'
 const projects = [
   {
     title: 'GMTStudio AI WorkSpace',
     description: 'GMTStudio designed their own AI, MAZS AI. Although it is still in development, you can use it!',
-    image: projectImage1,
+    image: AI,
     link: 'https://gmt-studio-ai-workspace.vercel.app/',
     icon: faRocket,
     isInternal: false,
