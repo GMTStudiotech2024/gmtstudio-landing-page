@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
-import bck from '../assets/images/launch_bck.jpg';
+import bck from '../assets/images/AI.png';
+//you dare stand where he stood!?
+
 
 const LaunchGMTStudio: React.FC = () => {
   return (

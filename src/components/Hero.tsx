@@ -10,7 +10,6 @@ const Hero: React.FC = () => {
     window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
   );
   const [currentSlide, setCurrentSlide] = useState(0);
-
   const slides = [
     "Enhanced tools and applications to power up your efficiency.",
     "The tech company that builds the future.",
