@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Search from './components/Search';
 import Hero from './components/Hero';
 import Feature from './components/Feature';
 import OurProjects from './components/OurProjects';
@@ -16,7 +17,6 @@ import './components/st.css';
 import CustomCursor from './components/CustomCursor';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import Sidebar from './components/Sidebar';
-
 import Contact from './components/ContactPage';
 import SignUpLoginPage from './components/SignUp';
 import Latest from './components/Latest';
@@ -42,6 +42,7 @@ import SystemStatus from './components/SystemStatus';
 
 const AppContent: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
@@ -51,12 +52,29 @@ const AppContent: React.FC = () => {
 
   const isHomePage = location.pathname === '/';
 
+  const toggleSearch = useCallback(() => {
+    setIsSearchOpen(prev => !prev);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+        event.preventDefault();
+        toggleSearch();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [toggleSearch]);
+
   return (
     <div className="App bg-gray-900 min-h-screen flex flex-col">
       <CustomCursor />
-      <Navbar />
+      <Navbar onSearchClick={toggleSearch} />
       {!isHomePage && <Sidebar className="hidden md:block" />}
       <main className={`flex-grow ${!isHomePage ? 'md:ml-64' : ''}`}>
+        {isSearchOpen && <Search onClose={toggleSearch} />}
         <Routes>
           <Route path="/" element={
             <>
