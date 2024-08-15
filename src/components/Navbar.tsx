@@ -132,7 +132,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
             <NavLink href="/" label="Home" icon={<FaHome />} isActive={location.pathname === '/'} />
             <NavLink href="/Latest" label="Latest News" icon={<FaFlask />} isActive={location.pathname === '/Latest'} />
             <NavLink href="/Products" label="Products" icon={<FaBox />} isActive={location.pathname === '/Products'} />
-            <NavLink href="/system-status" label="Chatbot" icon={<FaComments />} isActive={location.pathname === '/chatbot'} />
+            <NavLink href="/system-status" label="System-Status" icon={<FaComments />} isActive={location.pathname === '/system-status'} />
           </motion.div>
         )}
       </AnimatePresence>
