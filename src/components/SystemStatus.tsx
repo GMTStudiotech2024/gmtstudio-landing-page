@@ -27,10 +27,8 @@ const SystemStatus: React.FC = () => {
           <a href="https://gmt-studio-ai-workspace.vercel.app/" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300">
             🌐 Visit Official Website
           </a>
-
           <button className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300">
             📊 View Incident History
-
           </button>
         </div>
       </div>
