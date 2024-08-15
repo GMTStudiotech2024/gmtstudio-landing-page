@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaHome, FaNewspaper, FaFlask, FaGraduationCap, FaEnvelope, FaSignInAlt, FaInfoCircle, FaChevronDown, FaChevronUp, FaProjectDiagram, FaRocket, FaRobot, FaDatabase, FaBug, FaExclamationTriangle, FaCode, FaPaintBrush, FaGlobe, FaAtom, FaBrain, FaComments } from 'react-icons/fa';
+import { FaHome, FaNewspaper, FaFlask, FaGraduationCap, FaEnvelope, FaSignInAlt, FaInfoCircle, FaChevronDown, FaChevronUp, FaProjectDiagram, FaRocket, FaRobot, FaDatabase, FaBug, FaExclamationTriangle, FaCode, FaPaintBrush, FaGlobe, FaAtom, FaBrain, FaComments, FaBars } from 'react-icons/fa';
 
 interface SidebarProps {
   className?: string;
@@ -43,6 +43,11 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
       label: 'Learning',
       icon: FaGraduationCap,
       to: '/Learning',
+    },
+    {
+      label: 'Systems Status',
+      icon: FaBars,
+      to: '/system-status',
     },
     { to: '/contact', icon: FaEnvelope, label: 'Contact' },
     { to: '/SignUp', icon: FaSignInAlt, label: 'Sign Up' },
