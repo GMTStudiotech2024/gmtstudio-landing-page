@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaBars, FaTimes, FaUser, FaHome, FaFlask, FaBox, FaEnvelope, FaSearch, FaBell, FaCog, FaQuestionCircle, FaSignOutAlt } from 'react-icons/fa';
+import { FaBars, FaTimes, FaUser, FaHome, FaFlask, FaBox, FaEnvelope, FaSearch, FaBell, FaQuestionCircle, FaSignOutAlt } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
 import { account } from '../appwriteConfig';

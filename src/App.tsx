@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Feature from './components/Feature';
@@ -15,6 +15,7 @@ import { Analytics } from '@vercel/analytics/react';
 import './components/st.css';
 import CustomCursor from './components/CustomCursor';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import Sidebar from './components/Sidebar';
 
 import Contact from './components/ContactPage';
 import SignUpLoginPage from './components/SignUp';
@@ -37,70 +38,78 @@ import PrivateRoute from './components/PrivateRoute';
 import Products from './components/Products';
 import Help from './components/Help';
 import LaunchGMTStudio from './components/LaunchGMTStudio';
-const App: React.FC = () => {
+
+const AppContent: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
 
-
-
+  const isHomePage = location.pathname === '/';
 
   return (
+    <div className="App bg-gray-900 min-h-screen flex flex-col">
+      <CustomCursor />
+      <Navbar />
+      {!isHomePage && <Sidebar />}
+      <main className={`flex-grow ${!isHomePage ? 'ml-64' : ''}`}>
+        <Routes>
+          <Route path="/" element={
+            <>
+              <div ref={heroRef}>
+                <Hero />
+              </div>
+              <LaunchGMTStudio />
+              <Blog />
+              <Feature />
+              <OurProjects />
+            </>
+          } />
+          <Route path="/news1" element={<NEWS1 />} />
+          <Route path="/news2" element={<NEWS2 />} />
+          <Route path="/news3" element={<NEWS3 />} />
+          <Route path="/news4" element={<NEWS4 />} />
+          <Route path="/news5" element={<NEWS5 />} />
+          <Route path="/news6" element={<NEWS6 />} />
+          <Route path="/news7" element={<NEWS7 />} />
+          <Route path="/news8" element={<NEWS8 />} />
+          <Route path="/news9" element={<NEWS9 />} />
+          <Route path="/news10" element={<NEWS10 />} />
+          <Route path="/news11" element={<NEWS11 />} />
+          <Route path="/news12" element={<NEWS12 />} />
+          <Route path="/news13" element={<NEWS13 />} />
+          <Route path="/research" element={<Research />} />
+          <Route path="/learning" element={<Learning />} />
+          <Route path="*" element={<Error />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/signup" element={<SignUpLoginPage setIsAuthenticated={setIsAuthenticated} />} />
+          <Route path="/latest" element={<Latest />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/help" element={<Help />} />
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute isAuthenticated={isAuthenticated}>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </main>
+      <Footer />
+      <Analytics />
+      <SpeedInsights />
+    </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
     <Router>
-      <div className="App bg-gray-900 min-h-screen flex flex-col">
-        <CustomCursor />
-        <Navbar />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={
-              <>
-                <div ref={heroRef}>
-                  <Hero />
-                </div>
-                <LaunchGMTStudio />
-                <Blog />
-                <Feature />
-                <OurProjects />
-              </>
-            } />
-            <Route path="/news1" element={<NEWS1 />} />
-            <Route path="/news2" element={<NEWS2 />} />
-            <Route path="/news3" element={<NEWS3 />} />
-            <Route path="/news4" element={<NEWS4 />} />
-            <Route path="/news5" element={<NEWS5 />} />
-            <Route path="/news6" element={<NEWS6 />} />
-            <Route path="/news7" element={<NEWS7 />} />
-            <Route path="/news8" element={<NEWS8 />} />
-            <Route path="/news9" element={<NEWS9 />} />
-            <Route path="/news10" element={<NEWS10 />} />
-            <Route path="/news11" element={<NEWS11 />} />
-            <Route path="/news12" element={<NEWS12 />} />
-            <Route path="/news13" element={<NEWS13 />} />
-            <Route path="/research" element={<Research />} />
-            <Route path="/learning" element={<Learning />} />
-            <Route path="*" element={<Error />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/signup" element={<SignUpLoginPage setIsAuthenticated={setIsAuthenticated} />} />
-            <Route path="/latest" element={<Latest />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/help" element={<Help />} />
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute isAuthenticated={isAuthenticated}>
-                  <Dashboard />
-                </PrivateRoute>
-              }
-            />
-          </Routes>
-        </main>
-        <Footer />
-        <Analytics />
-        <SpeedInsights />
-      </div>
+      <AppContent />
     </Router>
   );
 };
