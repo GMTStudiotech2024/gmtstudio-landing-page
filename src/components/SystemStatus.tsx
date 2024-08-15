@@ -27,9 +27,11 @@ const SystemStatus: React.FC = () => {
           <a href="https://gmt-studio-ai-workspace.vercel.app/" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300">
             🌐 Visit Official Website
           </a>
-          <a href="#" className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300">
+
+          <button className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300">
             📊 View Incident History
-          </a>
+
+          </button>
         </div>
       </div>
 
@@ -97,6 +99,7 @@ const StatusItem: React.FC<StatusItemProps> = ({ name, status, host, certExpiry,
         <div className="flex items-center">
           <span className={`${getStatusColor(status)} w-3 h-3 rounded-full mr-2`}></span>
           <span className="font-semibold text-lg">{name}</span>
+          {getStatusIcon()}
         </div>
         <div className="flex items-center space-x-2">
           <span className={`${getStatusColor(status)} text-sm font-semibold px-2 py-1 rounded-full`}>
