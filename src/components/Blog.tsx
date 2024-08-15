@@ -2,11 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaChevronDown, FaSearch, FaTags, FaCalendarAlt, FaUser, FaEye, FaShare, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import blogImage1 from '../assets/images/MazsAiPic.png';
 import DEV from '../assets/images/1.png'
 import Beta from '../assets/images/cool_design.png'
 import AI from '../assets/images/AI.png'
+import GMTStudio from '../assets/images/GMTStudio_a.png'
 const blogPosts = [
+  {
+    image:GMTStudio,
+    title:"Bring Mazs AI into our official website",
+    excerpt:"We are excited to announce the integration of Mazs AI into our official website. you can not only now use our AI to search for anything in this website, but also ask any questions.",
+    author:"Alston Chang",
+    date:"August 15, 2024",
+    link:"/news14",
+    category:"Development Log",
+    views:100,
+    readTime:"1 min"
+  },
   { 
     image: AI, 
     title: "Mazs AI: A Technical Deep Dive", 

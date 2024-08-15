@@ -128,4 +128,5 @@ async function exampleConversation() {
   await handleUserInput("Goodbye");
 }
 
-exampleConversation();
+// Comment out or remove this line:
+// exampleConversation();

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaBars, FaTimes, FaUser, FaHome, FaFlask, FaBox, FaSearch, FaBell, FaQuestionCircle, FaSignOutAlt, FaKeyboard } from 'react-icons/fa';
+import { FaBars, FaTimes, FaUser, FaHome, FaFlask, FaBox, FaSearch, FaBell, FaQuestionCircle, FaSignOutAlt, FaKeyboard, FaComments  } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
 import { account } from '../appwriteConfig';
@@ -132,6 +132,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
             <NavLink href="/" label="Home" icon={<FaHome />} isActive={location.pathname === '/'} />
             <NavLink href="/Latest" label="Latest News" icon={<FaFlask />} isActive={location.pathname === '/Latest'} />
             <NavLink href="/Products" label="Products" icon={<FaBox />} isActive={location.pathname === '/Products'} />
+            <NavLink href="/system-status" label="Chatbot" icon={<FaComments />} isActive={location.pathname === '/chatbot'} />
           </motion.div>
         )}
       </AnimatePresence>

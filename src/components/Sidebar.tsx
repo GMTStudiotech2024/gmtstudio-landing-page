@@ -32,6 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
             { to: '/news11', label: 'GMTStudio Beta Release', icon: FaAtom},
             { to: '/news12', label: 'Mazs AI: A Technical Deep Dive into a Neural Network-Powered Chatbot', icon: FaBrain },
             { to: '/news13', label: 'GMTStudio MazsAI v1.0: A Comprehensive Approach to Conversational AI', icon: FaComments },
+            { to: '/news14', label: 'Bring Mazs AI into our official website', icon: FaComments },
         ],
     },
     {

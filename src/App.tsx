@@ -33,6 +33,7 @@ import NEWS10 from './components/News/NEWS10';
 import NEWS11 from './components/News/NEWS11';
 import NEWS12 from './components/News/News12';
 import NEWS13 from './components/News/NEWS13';
+import NEWS14 from './components/News/NEWS14';
 import Dashboard from './components/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
 import Products from './components/Products';
@@ -100,6 +101,7 @@ const AppContent: React.FC = () => {
           <Route path="/news11" element={<NEWS11 />} />
           <Route path="/news12" element={<NEWS12 />} />
           <Route path="/news13" element={<NEWS13 />} />
+          <Route path="/news14" element={<NEWS14 />} />
           <Route path="/research" element={<Research />} />
           <Route path="/learning" element={<Learning />} />
           <Route path="*" element={<Error />} />
