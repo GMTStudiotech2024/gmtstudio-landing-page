@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FaHome, FaNewspaper, FaFlask, FaGraduationCap, FaEnvelope, FaSignInAlt, FaInfoCircle, FaChevronDown, FaChevronUp, FaProjectDiagram, FaRocket, FaRobot, FaDatabase, FaBug, FaExclamationTriangle, FaCode, FaPaintBrush, FaGlobe, FaAtom, FaBrain, FaComments } from 'react-icons/fa';
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  className?: string;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
   const location = useLocation();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
@@ -48,7 +52,7 @@ const Sidebar: React.FC = () => {
   if (location.pathname === '/') return null;
 
   return (
-    <div className="fixed left-0 top-0 h-full w-64 bg-gray-900 text-white p-4 z-50 overflow-y-auto">
+    <div className={`fixed left-0 top-0 h-full w-64 bg-gray-900 text-white p-4 z-40 overflow-y-auto transition-transform duration-300 ease-in-out transform lg:translate-x-0 -translate-x-full ${className}`}>
       <h2 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-cyan-600 dark:to-blue-600">GMTStudio</h2>
       <nav>
         <ul className="space-y-2">

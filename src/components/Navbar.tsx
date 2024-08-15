@@ -5,6 +5,8 @@ import ThemeToggle from './ThemeToggle';
 import { account } from '../appwriteConfig';
 import { Link, useLocation } from 'react-router-dom';
 import { animated } from '@react-spring/web';
+import { useHotkeys as useHotkeysType } from 'react-hotkeys-hook';
+const useHotkeys = useHotkeysType as any;
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,7 +15,7 @@ const Navbar: React.FC = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [user, setUser] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [notifications, setNotifications] = useState([
     { id: 1, message: "New feature released!", read: false, timestamp: new Date().toISOString() },
     { id: 2, message: "New product released.", read: false, timestamp: new Date(Date.now() - 86400000).toISOString() },
@@ -77,11 +79,24 @@ const Navbar: React.FC = () => {
     visible: { opacity: 1, y: 0 },
   };
 
+  useHotkeys('mod+k', (event: KeyboardEvent) => {
+    event.preventDefault();
+    setIsSearchOpen(true);
+  });
+
+  const closeSearch = () => {
+    setIsSearchOpen(false);
+    setSearchTerm('');
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Implement search functionality here
-    console.log('Searching for:', searchTerm);
-    setShowSearch(false);
+    if (searchTerm.trim() !== '') {
+      // Navigate to a search results page with the search term as a query parameter
+      window.location.href = `/search?q=${encodeURIComponent(searchTerm)}`;
+    }
+    closeSearch();
   };
 
   const markAllAsRead = () => {
@@ -92,6 +107,22 @@ const Navbar: React.FC = () => {
     backgroundColor: scrollPosition > 50 ? 'rgba(51, 65, 85, 0.8)' : 'rgba(0, 0, 0, 0)',
     boxShadow: scrollPosition > 50 ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : 'none',
   };
+
+  useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeSearch();
+      }
+    };
+
+    if (isSearchOpen) {
+      document.addEventListener('keydown', handleEsc);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [isSearchOpen]);
 
   return (
     <animated.nav style={navbarStyle} className="fixed w-full z-50 transition-all duration-300 backdrop-blur-md">
@@ -109,7 +140,7 @@ const Navbar: React.FC = () => {
           <NavLink href="/" label="Home" icon={<FaHome />} isActive={location.pathname === '/'} />
           <NavLink href="/Latest" label="Latest News" icon={<FaFlask />} isActive={location.pathname === '/Latest'} />
           <NavLink href="/Products" label="Products" icon={<FaBox />} isActive={location.pathname === '/Products'} />
-          <button onClick={() => setShowSearch(!showSearch)} className="text-xl hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
+          <button onClick={() => setIsSearchOpen(true)} className="text-xl hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300">
             <FaSearch />
           </button>
           <NotificationButton toggleNotificationMenu={toggleNotificationMenu} isNotificationOpen={isNotificationOpen} notifications={notifications} />
@@ -128,25 +159,41 @@ const Navbar: React.FC = () => {
       </div>
 
       <AnimatePresence>
-        {showSearch && (
-          <motion.form
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            onSubmit={handleSearch}
-            className="w-full bg-white dark:bg-gray-800 p-4"
+        {isSearchOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+            onClick={closeSearch}
           >
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full p-2 pl-10 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-yellow-400"
-              />
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            </div>
-          </motion.form>
+            <motion.form
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              exit={{ y: -50 }}
+              onSubmit={handleSearch}
+              className="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full p-4 pl-12 text-lg bg-transparent text-gray-900 dark:text-white focus:outline-none"
+                  autoFocus
+                />
+                <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+                  <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+                    esc
+                  </kbd>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">to close</span>
+                </div>
+              </div>
+            </motion.form>
+          </motion.div>
         )}
       </AnimatePresence>
 

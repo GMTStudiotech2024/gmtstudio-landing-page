@@ -38,6 +38,7 @@ import PrivateRoute from './components/PrivateRoute';
 import Products from './components/Products';
 import Help from './components/Help';
 import LaunchGMTStudio from './components/LaunchGMTStudio';
+import SystemStatus from './components/SystemStatus';
 
 const AppContent: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -54,8 +55,8 @@ const AppContent: React.FC = () => {
     <div className="App bg-gray-900 min-h-screen flex flex-col">
       <CustomCursor />
       <Navbar />
-      {!isHomePage && <Sidebar />}
-      <main className={`flex-grow ${!isHomePage ? 'ml-64' : ''}`}>
+      {!isHomePage && <Sidebar className="hidden md:block" />}
+      <main className={`flex-grow ${!isHomePage ? 'md:ml-64' : ''}`}>
         <Routes>
           <Route path="/" element={
             <>
@@ -97,6 +98,7 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
+          <Route path="/system-status" element={<SystemStatus />} />
         </Routes>
       </main>
       <Footer />
