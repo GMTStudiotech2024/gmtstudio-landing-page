@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSearch, FaTimes, FaHome, FaNewspaper, FaBox, FaFlask, FaGraduationCap, FaEnvelope, FaRobot, FaUsers, FaPaperPlane } from 'react-icons/fa';
+import { FaSearch, FaTimes, FaHome, FaNewspaper, FaBox, FaFlask, FaGraduationCap, FaEnvelope, FaRobot, FaUsers, FaPaperPlane, FaToggleOn, FaToggleOff } from 'react-icons/fa';
 import { processChatbotQuery } from '../components/chatbot';
 
 interface SearchProps {
@@ -12,8 +12,10 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
   const [searchResults, setSearchResults] = useState<Array<{ title: string; link: string; isAIResponse?: boolean }>>([]);
   const [chatbotResponse, setChatbotResponse] = useState<string | null>(null);
   const [botResponse, setBotResponse] = useState<string | null>(null);
+  const [isAdvancedSearch, setIsAdvancedSearch] = useState(false);
+  const [wikiSearchResults, setWikiSearchResults] = useState<Array<{ title: string; snippet: string; pageid: number }>>([]);
 
-  const pages = [
+  const pages = useMemo(() => [
     { title: "Home", link: "/" },
     { title: "Latest News", link: "/Latest" },
     { title: "Products", link: "/Products" },
@@ -23,7 +25,7 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
     { title: "GMTStudio AI WorkSpace", link: "https://gmt-studio-ai-workspace.vercel.app/" },
     { title: "Theta Social Media Platform", link: "https://theta-plum.vercel.app/" },
     // Add more pages as needed
-  ];
+  ], []);
 
   const handleSearch = useCallback(async () => {
     const results = pages.filter(page =>
@@ -34,7 +36,18 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
     // Process chatbot query
     const chatResponse = await processChatbotQuery(searchTerm);
     setChatbotResponse(chatResponse);
-  }, [searchTerm]);
+
+    if (isAdvancedSearch) {
+      const wikiApiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchTerm)}&format=json&origin=*&srlimit=5&srinfo=totalhits|suggestion|rewrittenquery`;
+      try {
+        const response = await fetch(wikiApiUrl);
+        const data = await response.json();
+        setWikiSearchResults(data.query.search);
+      } catch (error) {
+        console.error('Error fetching Wikipedia search results:', error);
+      }
+    }
+  }, [searchTerm, isAdvancedSearch, pages]);
 
   const handleSendQuery = async () => {
     const chatResponse = await processChatbotQuery(searchTerm);
@@ -71,6 +84,10 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
       case 'theta social media platform': return <FaUsers />;
       default: return <FaSearch />;
     }
+  };
+
+  const toggleAdvancedSearch = () => {
+    setIsAdvancedSearch(!isAdvancedSearch);
   };
 
   return (
@@ -117,6 +134,16 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
           </button>
         </div>
         
+        <div className="flex items-center justify-between mt-4 mb-2">
+          <span className="text-white text-sm">Advanced Search</span>
+          <button
+            onClick={toggleAdvancedSearch}
+            className="text-white hover:text-gray-300 transition-colors duration-200"
+          >
+            {isAdvancedSearch ? <FaToggleOn size={24} /> : <FaToggleOff size={24} />}
+          </button>
+        </div>
+        
         <AnimatePresence>
           {searchResults.length > 0 && (
             <motion.div
@@ -157,6 +184,31 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
               </ul>
             </motion.div>
           )}
+          {isAdvancedSearch && wikiSearchResults.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="mt-4"
+            >
+              <h3 className="text-lg font-semibold mb-2 text-white border-b border-white border-opacity-30 pb-1">Advanced Search Results</h3>
+              <ul className="space-y-2 max-h-60 overflow-y-auto">
+                {wikiSearchResults.map((result, index) => (
+                  <motion.li
+                    key={result.pageid}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="p-2 border border-white border-opacity-30 rounded-lg text-white"
+                  >
+                    <h4 className="font-semibold">{result.title}</h4>
+                    <p className="text-sm" dangerouslySetInnerHTML={{ __html: result.snippet }} />
+                    <p className="text-xs mt-1 text-gray-400">Page ID: {result.pageid}</p>
+                  </motion.li>
+                ))}
+              </ul>
+            </motion.div>
+          )}
           {chatbotResponse && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -164,7 +216,7 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
               exit={{ opacity: 0, y: -10 }}
               className="mt-4 p-3 bg-gray-800 rounded-lg"
             >
-              <h3 className="text-lg font-semibold mb-2 text-white">AI Assistant</h3>
+              <h3 className="text-lg font-semibold mb-2 text-white">Mazs AI v1.0 anatra mini</h3>
               <p className="text-sm text-white">{chatbotResponse}</p>
             </motion.div>
           )}
