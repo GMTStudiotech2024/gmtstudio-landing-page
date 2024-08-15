@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { FaCheckCircle, FaGlobe, FaMusic, FaDiscord } from 'react-icons/fa';
+import { FaCheckCircle, FaGlobe, FaRobot, FaUsers, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
+import { BiRefresh } from 'react-icons/bi';
 import Logo from '../assets/images/npc.png';
 
 const SystemStatus: React.FC = () => {
+  const [overallStatus, setOverallStatus] = useState<'operational' | 'partial' | 'major'>('operational');
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+
+  const refreshStatus = () => {
+    // Simulating a refresh action
+    setLastRefresh(new Date());
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8 pt-20">
       <header className="flex items-center mb-8">
@@ -13,18 +22,29 @@ const SystemStatus: React.FC = () => {
       <div className="bg-gray-800 rounded-lg p-6 mb-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <FaCheckCircle className="text-green-500 mr-3 text-2xl" />
-            <h2 className="text-2xl font-semibold">All Systems Operational</h2>
+            {overallStatus === 'operational' && <FaCheckCircle className="text-green-500 mr-3 text-2xl" />}
+            {overallStatus === 'partial' && <FaExclamationTriangle className="text-yellow-500 mr-3 text-2xl" />}
+            {overallStatus === 'major' && <FaExclamationTriangle className="text-red-500 mr-3 text-2xl" />}
+            <h2 className="text-2xl font-semibold">
+              {overallStatus === 'operational' && 'All Systems Operational'}
+              {overallStatus === 'partial' && 'Partial System Outage'}
+              {overallStatus === 'major' && 'Major System Outage'}
+            </h2>
           </div>
-          <div className="text-gray-400">
-            Last updated: {new Date().toLocaleString()}
+          <div className="flex items-center space-x-4">
+            <div className="text-gray-400">
+              Last updated: {lastRefresh.toLocaleString()}
+            </div>
+            <button onClick={refreshStatus} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition duration-300">
+              <BiRefresh className="text-xl" />
+            </button>
           </div>
         </div>
         <p className="mt-4 text-gray-400 text-lg">
           This is the status of the GMTStudio official website and related services.
         </p>
         <div className="mt-6 flex space-x-4">
-          <a href="https://gmt-studio-ai-workspace.vercel.app/" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+          <a href="https://gmtstudio-tech.vercel.app/" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300">
             🌐 Visit Official Website
           </a>
           <button className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300">
@@ -34,18 +54,20 @@ const SystemStatus: React.FC = () => {
       </div>
 
       <div className="space-y-8">
-        <StatusSection title="Official Website" items={[
+        <StatusSection title="Official Website" icon={<FaGlobe />} items={[
           { name: "GMTStudio", status: 100, host: "Vercel", uptime: "99.99%", responseTime: "120ms" }
         ]} />
 
-        <StatusSection title="Mazs Artificial Intelligence" items={[
+        <StatusSection title="Mazs Artificial Intelligence" icon={<FaRobot />} items={[
           { name: "Mazs AI", status: 98, host: "Vercel", uptime: "99.95%", responseTime: "150ms" }
         ]} />
 
-        <StatusSection title="Theta Social Media" items={[
+        <StatusSection title="Theta Social Media" icon={<FaUsers />} items={[
           { name: "Theta Social Media", status: 100, host: "Vercel", uptime: "99.98%", responseTime: "100ms" }
         ]} />
       </div>
+
+      <IncidentHistory />
     </div>
   );
 };
@@ -60,10 +82,12 @@ interface StatusItemProps {
   responseTime?: string;
 }
 
-const StatusSection: React.FC<{ title: string; items: StatusItemProps[] }> = ({ title, items }) => {
+const StatusSection: React.FC<{ title: string; icon: React.ReactNode; items: StatusItemProps[] }> = ({ title, icon, items }) => {
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-2">{title}</h2>
+      <h2 className="text-xl font-semibold mb-2 flex items-center">
+        {icon} {title}
+      </h2>
       {items.map((item, index) => (
         <StatusItem key={index} {...item} />
       ))}
@@ -76,10 +100,10 @@ const StatusItem: React.FC<StatusItemProps> = ({ name, status, host, certExpiry,
     switch (name) {
       case 'Official Website':
         return <FaGlobe />;
-      case 'Mazs AI ':
-        return <FaMusic />;
-      case 'Theta Social media':
-        return <FaDiscord />;
+      case 'Mazs AI':
+        return <FaRobot />;
+      case 'Theta Social Media':
+        return <FaUsers />;
       default:
         return null;
     }
@@ -114,6 +138,11 @@ const StatusItem: React.FC<StatusItemProps> = ({ name, status, host, certExpiry,
             </span>
           )}
         </div>
+      </div>
+      <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-gray-400">
+        {uptime && <div><span className="font-semibold">Uptime:</span> {uptime}</div>}
+        {responseTime && <div><span className="font-semibold">Response Time:</span> {responseTime}</div>}
+        {details && <div className="col-span-2"><span className="font-semibold">Details:</span> {details}</div>}
       </div>
       <DailyStatusBlocks status={status} />
     </div>
@@ -196,6 +225,33 @@ const DailyStatusBlocks: React.FC<{ status: number }> = ({ status }) => {
           {tooltipContent}
         </div>
       )}
+    </div>
+  );
+};
+
+const IncidentHistory: React.FC = () => {
+  const incidents = [
+    { date: '2023-04-15', title: 'Scheduled Maintenance', status: 'Completed' },
+    { date: '2023-04-10', title: 'API Latency Issues', status: 'Resolved' },
+    { date: '2023-04-05', title: 'Database Connectivity Problems', status: 'Resolved' },
+  ];
+
+  return (
+    <div className="mt-12">
+      <h2 className="text-2xl font-semibold mb-4">Incident History</h2>
+      <div className="bg-gray-800 rounded-lg p-4">
+        {incidents.map((incident, index) => (
+          <div key={index} className="flex items-center justify-between py-2 border-b border-gray-700 last:border-b-0">
+            <div>
+              <div className="font-semibold">{incident.title}</div>
+              <div className="text-sm text-gray-400">{incident.date}</div>
+            </div>
+            <div className="bg-green-600 text-xs font-semibold px-2 py-1 rounded-full">
+              {incident.status}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
