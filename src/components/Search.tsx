@@ -144,7 +144,7 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
           <div className="relative flex-grow">
             <input
               type="text"
-              placeholder="Type to search..."
+              placeholder="Type to Search or Ask a Question and wait for Mazs AI to answer"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full p-3 pl-10 pr-4 text-sm text-white bg-black bg-opacity-50 border border-white border-opacity-30 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300 placeholder-gray-400 group-hover:border-opacity-50"
