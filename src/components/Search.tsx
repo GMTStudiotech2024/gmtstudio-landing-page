@@ -340,8 +340,7 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
                     </h4>
                     <p className="text-sm" dangerouslySetInnerHTML={{ __html: result.snippet }} />
                   </motion.li>
-                ))}
-              </ul>
+                ))}              </ul>
             </motion.div>
           )}
           {chatbotResponse && (

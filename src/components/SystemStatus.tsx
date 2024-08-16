@@ -65,18 +65,18 @@ const SystemStatus: React.FC = () => {
   }, [refreshStatus]);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8 pt-20">
-      <header className="flex items-center justify-between mb-8">
-        <div className="flex items-center">
-          <img src={Logo} alt="GMTStudio" className="w-12 h-12 mr-4" />
-          <h1 className="text-3xl font-bold">GMTStudio Status</h1>
+    <div className="min-h-screen bg-gray-900 text-white p-4 sm:p-8 pt-16 sm:pt-20">
+      <header className="flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8">
+        <div className="flex items-center mb-4 sm:mb-0">
+          <img src={Logo} alt="GMTStudio" className="w-10 h-10 sm:w-12 sm:h-12 mr-3 sm:mr-4" />
+          <h1 className="text-2xl sm:text-3xl font-bold">GMTStudio Status</h1>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3 sm:space-x-4">
           <button onClick={() => setShowNotifications(!showNotifications)} className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full transition duration-300">
-            <FaBell className="text-xl" />
+            <FaBell className="text-lg sm:text-xl" />
           </button>
           <button onClick={refreshStatus} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition duration-300">
-            <BiRefresh className="text-xl" />
+            <BiRefresh className="text-lg sm:text-xl" />
           </button>
         </div>
       </header>
@@ -85,13 +85,13 @@ const SystemStatus: React.FC = () => {
 
       <StatusBar services={services} />
 
-      <div className="bg-gray-800 rounded-lg p-6 mb-8 shadow-lg">
+      <div className="bg-gray-800 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             {overallStatus === 'operational' && <FaCheckCircle className="text-green-500 mr-3 text-2xl" />}
             {overallStatus === 'partial' && <FaExclamationTriangle className="text-yellow-500 mr-3 text-2xl" />}
             {overallStatus === 'major' && <FaExclamationTriangle className="text-red-500 mr-3 text-2xl" />}
-            <h2 className="text-2xl font-semibold">
+            <h2 className="text-xl sm:text-2xl font-semibold">
               {overallStatus === 'operational' && 'All Systems Operational'}
               {overallStatus === 'partial' && 'Partial System Outage'}
               {overallStatus === 'major' && 'Major System Outage'}
@@ -106,22 +106,22 @@ const SystemStatus: React.FC = () => {
         </p>
       </div>
 
-      <div className="mb-8">
-        <nav className="flex space-x-4">
+      <div className="mb-6 sm:mb-8 overflow-x-auto">
+        <nav className="flex space-x-2 sm:space-x-4 min-w-max">
           <TabButton active={activeTab === 'overview'} onClick={() => setActiveTab('overview')}>
-            <FaInfoCircle className="mr-2" /> Overview
+            <FaInfoCircle className="mr-1 sm:mr-2" /> <span className="hidden sm:inline">Overview</span>
           </TabButton>
           <TabButton active={activeTab === 'performance'} onClick={() => setActiveTab('performance')}>
-            <FaChartBar className="mr-2" /> Performance
+            <FaChartBar className="mr-1 sm:mr-2" /> <span className="hidden sm:inline">Performance</span>
           </TabButton>
           <TabButton active={activeTab === 'incidents'} onClick={() => setActiveTab('incidents')}>
-            <FaHistory className="mr-2" /> Incident History
+            <FaHistory className="mr-1 sm:mr-2" /> <span className="hidden sm:inline">Incident History</span>
           </TabButton>
         </nav>
       </div>
 
       {activeTab === 'overview' && (
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           <DailyStatusBar dailyStatus={dailyStatus} />
           <StatusSection title="Official Website" icon={<FaGlobe />} items={[
             { name: "GMTStudio", status: 100, host: "Vercel", uptime: "99.99%", responseTime: "120ms" }
@@ -159,8 +159,8 @@ interface StatusItemProps {
 
 const StatusSection: React.FC<StatusSectionProps> = ({ title, icon, items }) => {
   return (
-    <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
-      <h2 className="text-xl font-semibold mb-4 flex items-center">
+    <div className="bg-gray-800 rounded-lg p-4 sm:p-6 shadow-lg">
+      <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center">
         {icon}
         <span className="ml-2">{title}</span>
       </h2>
@@ -202,11 +202,11 @@ const TabButton: React.FC<{ active: boolean; onClick: () => void; children: Reac
 
 const PerformanceMetrics: React.FC = () => {
   return (
-    <div className="mt-8">
-      <h2 className="text-2xl font-semibold mb-4 flex items-center">
+    <div className="mt-6 sm:mt-8">
+      <h2 className="text-xl sm:text-2xl font-semibold mb-4 flex items-center">
         <FaChartBar className="mr-2" /> Performance Metrics
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 sm:mb-8">
         <MetricCard title="Average Response Time" value="135ms" change="-5%" />
         <MetricCard title="Requests per Minute" value="1,240" change="+3%" />
         <MetricCard title="Error Rate" value="0.02%" change="-0.01%" />
@@ -237,11 +237,11 @@ const ResponseTimeHistory: React.FC = () => {
   const maxResponseTime = Math.max(...responseTimes);
 
   return (
-    <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
-      <h3 className="text-xl font-semibold mb-4">Response Time Trend</h3>
-      <div className="flex items-end h-40 space-x-2">
+    <div className="bg-gray-800 rounded-lg p-4 sm:p-6 shadow-lg overflow-x-auto">
+      <h3 className="text-lg sm:text-xl font-semibold mb-4">Response Time Trend</h3>
+      <div className="flex items-end h-40 space-x-2 min-w-max">
         {responseTimes.map((time, index) => (
-          <div key={index} className="flex flex-col items-center flex-1">
+          <div key={index} className="flex flex-col items-center w-16 sm:w-20">
             <div 
               className="bg-blue-500 w-full rounded-t"
               style={{ height: `${(time / maxResponseTime) * 100}%` }}
@@ -341,29 +341,31 @@ interface DailyStatusBarProps {
 }
 
 const DailyStatusBar: React.FC<DailyStatusBarProps> = ({ dailyStatus }) => {
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
   return (
-    <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
-      <h2 className="text-xl font-semibold mb-4 flex items-center">
+    <div className="bg-gray-800 rounded-lg p-4 sm:p-6 shadow-lg overflow-x-auto">
+      <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center">
         <FaCalendarAlt className="mr-2" /> Daily Status
       </h2>
-      {Object.entries(dailyStatus).map(([project, statuses]) => (
-        <div key={project} className="mb-4">
-          <h3 className="text-lg font-semibold mb-2">{project}</h3>
-          <div className="flex">
-            {statuses.map((status, index) => (
-              <div key={index} className="flex-1 text-center">
-                <div className={`w-6 h-6 mx-auto rounded-full ${
-                  status === 'operational' ? 'bg-green-500' :
-                  status === 'partial' ? 'bg-yellow-500' : 'bg-red-500'
-                }`}></div>
-                <div className="text-xs mt-1">{days[index]}</div>
-              </div>
-            ))}
+      <div className="space-y-4">
+        {Object.entries(dailyStatus).map(([project, statuses]) => (
+          <div key={project} className="min-w-max">
+            <h3 className="text-base sm:text-lg font-semibold mb-2">{project}</h3>
+            <div className="flex">
+              {statuses.map((status, index) => (
+                <div key={index} className="flex-1 text-center" style={{ minWidth: '2rem' }}>
+                  <div className={`w-4 h-4 sm:w-6 sm:h-6 mx-auto rounded-full ${
+                    status === 'operational' ? 'bg-green-500' :
+                    status === 'partial' ? 'bg-yellow-500' : 'bg-red-500'
+                  }`}></div>
+                  <div className="text-xs mt-1">{days[index]}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

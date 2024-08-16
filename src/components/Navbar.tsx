@@ -103,7 +103,6 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
           <NavLink href="/" label="Home" icon={<FaHome />} isActive={location.pathname === '/'} />
           <NavLink href="/Latest" label="Latest News" icon={<FaFlask />} isActive={location.pathname === '/Latest'} />
           <NavLink href="/Products" label="Products" icon={<FaBox />} isActive={location.pathname === '/Products'} />
-          <Link to="/advanced-search" className="hover:text-gray-300">Advanced Search</Link>
           <SearchButton onSearchClick={onSearchClick} />
           <NotificationButton toggleNotificationMenu={toggleNotificationMenu} isNotificationOpen={isNotificationOpen} notifications={notifications} />
           <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} user={user} />
