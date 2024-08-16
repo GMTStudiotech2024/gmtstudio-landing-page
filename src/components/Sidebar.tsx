@@ -16,9 +16,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
     setOpenDropdown(openDropdown === label ? null : label);
   };
 
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-  };
 
   const links = [
     { to: '/', icon: FaHome, label: 'Home' },
@@ -66,9 +63,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
             Hello ! User 
           </h2>
         )}
-        <button onClick={toggleSidebar} className="p-2 rounded-full hover:bg-gray-800 transition-colors duration-200">
-          {isCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
-        </button>
       </div>
       {!isCollapsed && (
         <div className="mb-4">
