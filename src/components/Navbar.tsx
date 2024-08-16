@@ -83,7 +83,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
   };
 
   const navbarStyle = useSpring({
-    background: scrollPosition > 50 ? 'rgba(51, 65, 85, 0.8)' : 'rgba(0, 0, 0, 0)',
+    background: scrollPosition > 50 ? 'rgba(17, 24, 39, 0.8)' : 'rgba(0, 0, 0, 0)',
     boxShadow: scrollPosition > 50 ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : 'none',
   });
 
@@ -202,7 +202,7 @@ const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () 
           visible: { opacity: 1, y: 0, scale: 1 },
         }}
         transition={{ duration: 0.2 }}
-        className="absolute right-4 mt-4 bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4 space-y-2 w-64"
+        className="absolute right-4 mt-4 bg-white dark:bg-gray-950 shadow-lg rounded-lg p-4 space-y-2 w-64"
       >
         {user && (
           <div className="flex items-center space-x-2 mb-4 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
@@ -252,7 +252,7 @@ const NotificationDropdown: React.FC<{ isNotificationOpen: boolean; toggleNotifi
           hidden: { opacity: 0, y: -20 },
           visible: { opacity: 1, y: 0 },
         }}
-        className="absolute right-4 mt-4 bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4 space-y-2 w-80"
+        className="absolute right-4 mt-4 bg-white dark:bg-gray-950 shadow-lg rounded-lg p-4 space-y-2 w-80"
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-semibold text-gray-800 dark:text-white">Notifications</h3>
