@@ -25,6 +25,8 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
     { title: "Research", link: "/Research" },
     { title: "Learning", link: "/Learning" },
     { title: "Contact", link: "/Contact" },
+    { title: "System Status", link: "/system-status" },
+    { title: "I think you will use it so press this ", link: "https://www.google.com/" },
     { title: "GMTStudio AI WorkSpace", link: "https://gmt-studio-ai-workspace.vercel.app/" },
     { title: "Theta Social Media Platform", link: "https://theta-plum.vercel.app/" },
     // Add more pages as needed
