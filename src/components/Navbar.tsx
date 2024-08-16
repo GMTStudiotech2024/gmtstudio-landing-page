@@ -16,8 +16,9 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [user, setUser] = useState<any>(null);
   const [notifications, setNotifications] = useState([
-    { id: 1, message: "New feature released!", read: false, timestamp: new Date().toISOString() },
-    { id: 2, message: "New product released.", read: false, timestamp: new Date(Date.now() - 86400000).toISOString() },
+    { id: 0, message: "Search with Cmd+K", read: false, timestamp: new Date().toISOString() },
+    { id: 1, message: "New feature released!", read: true, timestamp: new Date().toISOString() },
+    { id: 2, message: "New product released.", read: true, timestamp: new Date(Date.now() - 86400000).toISOString() },
     { id: 3, message: "Welcome to GMTStudio!", read: true, timestamp: new Date(Date.now() - 172800000).toISOString() },
   ]);
   const location = useLocation();
