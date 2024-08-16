@@ -144,9 +144,19 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
 };
 
 const NavLink: React.FC<{ href: string; label: string; icon: React.ReactNode; isActive: boolean }> = ({ href, label, icon, isActive }) => (
-  <Link to={href} className={`flex px-3 py-2 rounded-md transition-colors duration-300 items-center ${isActive ? 'bg-blue-500 text-white dark:bg-yellow-400 dark:text-gray-900' : 'text-blue-300 dark:text-gray-200 hover:bg-blue-500 hover:text-white dark:hover:bg-yellow-400 dark:hover:text-gray-900'}`}>
-    {icon} <span className="ml-2">{label}</span>
-  </Link>
+  <motion.div
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+  >
+    <Link
+      to={href}
+      className={`flex px-3 py-2 rounded-md transition-colors duration-300 items-center ${
+        isActive ? 'bg-blue-500 text-white dark:bg-yellow-400 dark:text-gray-900' : 'text-blue-300 dark:text-gray-200 hover:bg-blue-500 hover:text-white dark:hover:bg-yellow-400 dark:hover:text-gray-900'
+      }`}
+    >
+      {icon} <span className="ml-2">{label}</span>
+    </Link>
+  </motion.div>
 );
 
 const SearchButton: React.FC<{ onSearchClick: () => void }> = ({ onSearchClick }) => (
@@ -270,6 +280,22 @@ const NotificationDropdown: React.FC<{ isNotificationOpen: boolean; toggleNotifi
       </motion.div>
     )}
   </AnimatePresence>
+);
+
+const MegaMenu: React.FC = () => (
+  <div className="absolute top-full left-0 w-full bg-white dark:bg-gray-900 shadow-lg">
+    <div className="container mx-auto px-4 py-6 grid grid-cols-4 gap-8">
+      <div>
+        <h3 className="font-bold mb-2">Products</h3>
+        <ul>
+          <li><Link to="/products/ai-workspace">AI Workspace</Link></li>
+          <li><Link to="/products/data-analytics">Data Analytics</Link></li>
+          <li><Link to="/products/machine-learning">Machine Learning</Link></li>
+        </ul>
+      </div>
+      {/* Add more sections as needed */}
+    </div>
+  </div>
 );
 
 export default Navbar;
