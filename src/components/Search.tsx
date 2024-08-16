@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSearch, FaTimes, FaHome, FaNewspaper, FaBox, FaFlask, FaGraduationCap, FaEnvelope, FaRobot, FaUsers, FaPaperPlane, FaToggleOn, FaToggleOff, FaHistory, FaInfoCircle, FaExternalLinkAlt, FaLightbulb, FaBookmark, FaTrash, FaVolumeUp } from 'react-icons/fa';
+import { FaSearch, FaTimes, FaHome, FaNewspaper, FaBox, FaFlask, FaGraduationCap, FaEnvelope, FaRobot, FaUsers, FaPaperPlane, FaToggleOn, FaToggleOff, FaHistory, FaInfoCircle, FaExternalLinkAlt } from 'react-icons/fa';
 import { processChatbotQuery } from '../components/chatbot';
 
 interface SearchProps {
@@ -9,14 +9,13 @@ interface SearchProps {
 
 const Search: React.FC<SearchProps> = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<Array<{ title: string; link: string; isAIResponse?: boolean; response?: string }>>([]);
+  const [searchResults, setSearchResults] = useState<Array<{ title: string; link: string; isAIResponse?: boolean }>>([]);
+  const [chatbotResponse, setChatbotResponse] = useState<string | null>(null);
+  const [botResponse, setBotResponse] = useState<string | null>(null);
   const [isAdvancedSearch, setIsAdvancedSearch] = useState(false);
   const [wikiSearchResults, setWikiSearchResults] = useState<Array<{ title: string; snippet: string; pageid: number }>>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [showHistory, setShowHistory] = useState(false);
-  const [bookmarks, setBookmarks] = useState<Array<{ title: string; link: string }>>([]);
-  const [showBookmarks, setShowBookmarks] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const pages = useMemo(() => [
     { title: "Home", link: "/" },
@@ -31,20 +30,15 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
   ], []);
 
   const handleSearch = useCallback(async () => {
-    setIsLoading(true);
     const results = pages.filter(page =>
       page.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    
+    setSearchResults(results);
+
     // Process chatbot query
     const chatResponse = await processChatbotQuery(searchTerm);
-    
-    // Combine regular search results with AI response
-    setSearchResults([
-      ...results,
-      { title: 'Mazs AI v1.0 anatra mini', link: '#', isAIResponse: true, response: chatResponse }
-    ]);
-    
+    setChatbotResponse(chatResponse);
+
     if (isAdvancedSearch) {
       const wikiApiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchTerm)}&format=json&origin=*&srlimit=5&srinfo=totalhits|suggestion|rewrittenquery`;
       try {
@@ -58,32 +52,17 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
 
     // Add search term to history
     setSearchHistory(prev => [searchTerm, ...prev.slice(0, 4)]);
-    setIsLoading(false);
   }, [searchTerm, isAdvancedSearch, pages]);
 
   const handleSendQuery = async () => {
-    setIsLoading(true);
     const chatResponse = await processChatbotQuery(searchTerm);
-    setSearchResults([{ title: 'Mazs AI v1.0 anatra mini', link: '#', isAIResponse: true, response: chatResponse }]);
-    setIsLoading(false);
+    setBotResponse(chatResponse);
+    setSearchResults([{ title: 'Mazs AI v1.0 anatra mini', link: '#', isAIResponse: true }]);
   };
 
   const clearHistory = () => {
     setSearchHistory([]);
     setShowHistory(false);
-  };
-
-  const toggleBookmark = (result: { title: string; link: string }) => {
-    setBookmarks(prev => 
-      prev.some(b => b.link === result.link)
-        ? prev.filter(b => b.link !== result.link)
-        : [...prev, result]
-    );
-  };
-
-  const speakResult = (text: string) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    window.speechSynthesis.speak(utterance);
   };
 
   useEffect(() => {
@@ -126,14 +105,14 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <motion.div
         initial={{ scale: 0.9, y: -20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: -20 }}
-        className="bg-black bg-opacity-90 p-6 rounded-xl shadow-2xl w-full max-w-3xl border border-white border-opacity-30 backdrop-blur-sm"
+        className="bg-black bg-opacity-80 p-6 rounded-xl shadow-2xl w-full max-w-2xl border border-white border-opacity-30 backdrop-blur-sm"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4 border-b border-white border-opacity-30 pb-2">
@@ -154,31 +133,23 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
             placeholder="Type to search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-4 pl-12 pr-32 text-lg text-white bg-gray-900 border-2 border-white border-opacity-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 placeholder-gray-400"
+            className="w-full p-3 pl-10 pr-24 text-sm text-white bg-black bg-opacity-50 border border-white border-opacity-30 rounded-lg focus:outline-none focus:ring-1 focus:ring-white focus:border-transparent transition-all duration-300 placeholder-gray-400"
           />
-          <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-opacity-70 text-xl" />
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center space-x-3">
+          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white text-opacity-70 text-sm" />
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
             <button
               onClick={() => setShowHistory(!showHistory)}
               className="text-white text-opacity-70 hover:text-opacity-100 transition-opacity duration-200"
               title="Search History"
             >
-              <FaHistory size={20} />
-            </button>
-            <button
-              onClick={() => setShowBookmarks(!showBookmarks)}
-              className="text-white text-opacity-70 hover:text-opacity-100 transition-opacity duration-200"
-              title="Bookmarks"
-            >
-              <FaBookmark size={20} />
+              <FaHistory />
             </button>
             <button
               onClick={handleSendQuery}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center"
+              className="text-white text-opacity-70 hover:text-opacity-100 transition-opacity duration-200"
               title="Send Query"
             >
-              <FaPaperPlane className="mr-2" />
-              Send
+              <FaPaperPlane />
             </button>
           </div>
         </div>
@@ -204,30 +175,6 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
           </motion.div>
         )}
         
-        {showBookmarks && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="mb-4 p-3 bg-gray-800 rounded-lg"
-          >
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-sm font-semibold text-white">Bookmarks</h3>
-              <button onClick={() => setBookmarks([])} className="text-xs text-gray-400 hover:text-white">Clear All</button>
-            </div>
-            <ul className="space-y-2">
-              {bookmarks.map((bookmark, index) => (
-                <li key={index} className="flex justify-between items-center text-sm text-gray-300 hover:text-white">
-                  <a href={bookmark.link} className="flex-grow">{bookmark.title}</a>
-                  <button onClick={() => toggleBookmark(bookmark)} className="text-red-500 hover:text-red-400">
-                    <FaTrash size={14} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        )}
-        
         <div className="flex items-center justify-between mt-4 mb-2">
           <span className="text-white text-sm">Advanced Search</span>
           <button
@@ -239,62 +186,45 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
         </div>
         
         <AnimatePresence>
-          {isLoading && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex justify-center items-center py-4"
-            >
-              <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
-            </motion.div>
-          )}
-          
           {searchResults.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="mt-6 bg-gray-900 rounded-lg p-4"
+              className="mt-4"
             >
-              <h3 className="text-xl font-semibold mb-3 text-white border-b border-white border-opacity-30 pb-2">Results</h3>
-              <ul className="space-y-3 max-h-80 overflow-y-auto pr-2">
+              <h3 className="text-lg font-semibold mb-2 text-white border-b border-white border-opacity-30 pb-1">Results</h3>
+              <ul className="space-y-2 max-h-60 overflow-y-auto">
                 {searchResults.map((result, index) => (
                   <motion.li
                     key={index}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="p-3 border border-white border-opacity-30 rounded-lg text-white hover:bg-white hover:bg-opacity-10 transition-all duration-300"
+                    className="p-2 border border-white border-opacity-30 rounded-lg text-white cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-300 flex items-center group"
+                    onClick={() => result.isAIResponse ? null : handleResultClick(result.link)}
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="flex items-center">
-                        <span className="mr-2 text-white text-opacity-70">
-                          {result.isAIResponse ? <FaRobot /> : getIcon(result.title)}
-                        </span>
-                        <span className="font-semibold">{result.title}</span>
-                      </span>
-                      <div className="flex items-center space-x-2">
-                        <button onClick={() => toggleBookmark(result)} className="text-yellow-500 hover:text-yellow-400">
-                          <FaBookmark size={16} />
-                        </button>
-                        <button onClick={() => speakResult(result.title)} className="text-blue-400 hover:text-blue-300">
-                          <FaVolumeUp size={16} />
-                        </button>
-                        {!result.isAIResponse && (
-                          <FaExternalLinkAlt className="text-white text-opacity-50 group-hover:text-opacity-100" />
-                        )}
-                      </div>
-                    </div>
+                    <span className="mr-2 text-white text-opacity-70 group-hover:text-opacity-100 transition-colors duration-300">
+                      {result.isAIResponse ? <FaRobot /> : getIcon(result.title)}
+                    </span>
+                    <span className="text-sm">{result.title}</span>
                     {result.isAIResponse && (
-                      <p className="mt-2 text-sm text-white">{result.response}</p>
+                      <p className="mt-2 text-sm text-white">{botResponse}</p>
+                    )}
+                    {!result.isAIResponse && (
+                      <motion.span
+                        className="ml-auto text-white text-opacity-0 group-hover:text-opacity-100 transition-opacity duration-300"
+                        initial={{ x: -5 }}
+                        animate={{ x: 0 }}
+                      >
+                        →
+                      </motion.span>
                     )}
                   </motion.li>
                 ))}
               </ul>
             </motion.div>
           )}
-          
           {isAdvancedSearch && wikiSearchResults.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -306,6 +236,7 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
               <ul className="space-y-2 max-h-60 overflow-y-auto">
                 {wikiSearchResults.map((result, index) => (
                   <motion.li
+                    key={result.pageid}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
@@ -321,6 +252,22 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
                   </motion.li>
                 ))}
               </ul>
+            </motion.div>
+          )}
+          {chatbotResponse && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="mt-4 p-3 bg-gray-800 rounded-lg relative"
+            >
+              <h3 className="text-lg font-semibold mb-2 text-white flex items-center">
+                Mazs AI v1.0 anatra mini
+                <span className="ml-2 text-xs text-gray-400 cursor-help" title="AI-generated response">
+                  <FaInfoCircle />
+                </span>
+              </h3>
+              <p className="text-sm text-white">{chatbotResponse}</p>
             </motion.div>
           )}
         </AnimatePresence>
