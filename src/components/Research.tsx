@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSearch, FaRocket, FaFlask, FaClock, FaRobot, FaLock, FaList, FaThLarge, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaSearch, FaRocket, FaFlask, FaClock, FaRobot, FaLock, FaList, FaThLarge, FaExternalLinkAlt, FaFilter, FaSort, FaChevronDown } from 'react-icons/fa';
+import { Tooltip } from 'react-tooltip';
 
 interface ResearchPaper {
   id: number;
@@ -20,6 +21,8 @@ const Research: React.FC = () => {
   const [filter, setFilter] = useState('');
   const [sortBy, setSortBy] = useState('date');
   const [isGridView, setIsGridView] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedPaper, setSelectedPaper] = useState<ResearchPaper | null>(null);
 
   useEffect(() => {
     const fetchPapers = async () => {
@@ -121,25 +124,25 @@ const Research: React.FC = () => {
           </div>
 
           <div className="flex space-x-4">
-            <select
-              className="p-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="p-2 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-300 dark:border-gray-700"
+              data-tooltip-id="filter-tooltip"
+              data-tooltip-content="Toggle Filters"
             >
-              <option value="">All Categories</option>
-              <option value="Artificial Intelligence">Artificial Intelligence</option>
-              <option value="Digital Media">Digital Media</option>
-              <option value="Web Technologies">Web Technologies</option>
-            </select>
+              <FaFilter className="text-gray-600 dark:text-gray-300" />
+            </button>
+            <Tooltip id="filter-tooltip" />
 
-            <select
-              className="p-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+            <button
+              onClick={() => setSortBy(sortBy === 'date' ? 'title' : 'date')}
+              className="p-2 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-300 dark:border-gray-700"
+              data-tooltip-id="sort-tooltip"
+              data-tooltip-content={`Sort by ${sortBy === 'date' ? 'Title' : 'Date'}`}
             >
-              <option value="date">Sort by Date</option>
-              <option value="title">Sort by Title</option>
-            </select>
+              <FaSort className="text-gray-600 dark:text-gray-300" />
+            </button>
+            <Tooltip id="sort-tooltip" />
 
             <button
               onClick={() => setIsGridView(!isGridView)}
@@ -150,6 +153,29 @@ const Research: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {showFilters && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-8"
+          >
+            <div className="flex flex-wrap gap-4">
+              <select
+                className="p-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+              >
+                <option value="">All Categories</option>
+                <option value="Artificial Intelligence">Artificial Intelligence</option>
+                <option value="Digital Media">Digital Media</option>
+                <option value="Web Technologies">Web Technologies</option>
+              </select>
+              {/* Add more filters here if needed */}
+            </div>
+          </motion.div>
+        )}
 
         <AnimatePresence>
           <motion.div 
@@ -162,10 +188,11 @@ const Research: React.FC = () => {
             {filteredPapers.map((paper) => (
               <motion.div
                 key={paper.id}
-                className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
+                onClick={() => setSelectedPaper(paper)}
               >
                 <div className="flex justify-between items-start mb-2">
                   <h2 className="text-xl font-semibold">{paper.title}</h2>
@@ -199,6 +226,50 @@ const Research: React.FC = () => {
             ))}
           </motion.div>
         </AnimatePresence>
+
+        {selectedPaper && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+            onClick={() => setSelectedPaper(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              className="bg-white dark:bg-gray-800 p-8 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-2xl font-bold mb-4">{selectedPaper.title}</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                {selectedPaper.authors.join(', ')} • {new Date(selectedPaper.date).toLocaleDateString()}
+              </p>
+              <p className="text-gray-700 dark:text-gray-300 mb-6">{selectedPaper.abstract}</p>
+              <div className="flex justify-between items-center">
+                <span className="inline-block bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-sm px-3 py-1 rounded-full">
+                  {selectedPaper.category}
+                </span>
+                {selectedPaper.doi && (
+                  <a href={`https://doi.org/${selectedPaper.doi}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 transition-colors">
+                    DOI: {selectedPaper.doi}
+                  </a>
+                )}
+              </div>
+              {selectedPaper.pdfLink && (
+                <a
+                  href={selectedPaper.pdfLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-6 inline-block bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors"
+                >
+                  View Full Paper (PDF)
+                </a>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
       </div>
     </div>
   );
