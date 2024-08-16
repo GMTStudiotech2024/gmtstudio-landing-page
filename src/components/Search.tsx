@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { FaSearch, FaTimes, FaHome, FaNewspaper, FaBox, FaFlask, FaGraduationCap, FaEnvelope, FaRobot, FaUsers, FaPaperPlane, FaToggleOn, FaToggleOff, FaHistory, FaInfoCircle, FaExternalLinkAlt, FaChevronDown } from 'react-icons/fa';
+import { FaSearch, FaTimes, FaHome, FaNewspaper, FaBox, FaFlask, FaGraduationCap, FaEnvelope, FaRobot, FaUsers, FaPaperPlane, FaToggleOn, FaToggleOff, FaHistory, FaInfoCircle, FaExternalLinkAlt, FaChevronDown,} from 'react-icons/fa';
 import { processChatbotQuery } from '../components/chatbot';
 
 interface SearchProps {
@@ -93,6 +93,8 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
       case 'research': return <FaFlask />;
       case 'learning': return <FaGraduationCap />;
       case 'contact': return <FaEnvelope />;
+      case 'system status': return <FaInfoCircle />;
+      case 'i think you will use it so press this': return <FaExternalLinkAlt />;
       case 'gmtstudio ai workspace': return <FaRobot />;
       case 'theta social media platform': return <FaUsers />;
       default: return <FaSearch />;
