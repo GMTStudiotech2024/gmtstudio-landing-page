@@ -82,6 +82,7 @@ const Help: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-6 py-3 rounded-full border-2 border-blue-500 focus:outline-none focus:border-blue-600 dark:bg-gray-700 dark:text-white text-lg"
+              aria-label="Search for help"
             />
             <FaSearch className="absolute right-4 top-4 text-blue-500 text-xl" />
           </div>

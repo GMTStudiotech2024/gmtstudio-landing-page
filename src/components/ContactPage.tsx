@@ -1,57 +1,31 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaGithub, FaLinkedin, FaTwitter, FaPaperPlane, FaUser,  } from 'react-icons/fa';
-import { IconType } from 'react-icons';
-
-interface FormData {
-  name: string;
-  email: string;
-  message: string;
-}
-
-interface ContactInfo {
-  icon: IconType;
-  title: string;
-  content: string;
-}
-
-interface SocialLink {
-  icon: IconType;
-  url: string;
-}
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
 const ContactPage: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({ name: '', email: '', message: '' });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: '',
+  });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    
-    try {
-      // Simulated API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSubmitMessage("Thank you for your message. We'll get back to you soon!");
-      setFormData({ name: '', email: '', message: '' });
-    } catch (error) {
-      setSubmitMessage("There was an error sending your message. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Handle form submission logic here
+    console.log('Form submitted:', formData);
   };
 
-  const contactInfo: ContactInfo[] = [
-    { icon: FaEnvelope, title: 'Email', content: 'GMTStudiotech@gmail.com' },
-    { icon: FaPhone, title: 'Phone', content: '+123 456 7890' },
-    { icon: FaMapMarkerAlt, title: 'Address', content: '123 Tech Street, Digital City, Webland' },
+  const contactInfo = [
+    { icon: FaEnvelope, title: 'Email', content: 'contact@gmtstudio.com' },
+    { icon: FaPhone, title: 'Phone', content: '+1 (123) 456-7890' },
+    { icon: FaMapMarkerAlt, title: 'Address', content: '123 Tech Street, Silicon Valley, CA' },
   ];
 
-  const socialLinks: SocialLink[] = [
+  const socialLinks = [
     { icon: FaGithub, url: 'https://github.com/GMTStudiotech' },
     { icon: FaLinkedin, url: 'https://www.linkedin.com/company/gmtstudiotech' },
     { icon: FaTwitter, url: 'https://twitter.com/GMTStudiotech' },
@@ -68,90 +42,82 @@ const ContactPage: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             {contactInfo.map((item, index) => (
-              <div key={index} className="flex flex-col items-center text-center p-6 bg-gray-50 dark:bg-gray-700 rounded-xl transition-all duration-300 hover:shadow-lg hover:scale-105">
+              <motion.div
+                key={index}
+                className="flex flex-col items-center text-center p-6 bg-gray-50 dark:bg-gray-700 rounded-xl transition-all duration-300 hover:shadow-lg hover:scale-105"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
                 <item.icon className="text-4xl text-blue-500 dark:text-yellow-400 mb-3" />
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">{item.title}</h3>
                 <p className="text-gray-600 dark:text-gray-300">{item.content}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
 
-          {submitMessage && (
-            <div className={`p-4 mb-4 text-sm rounded-lg ${submitMessage.includes('Thank you') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`} role="alert">
-              {submitMessage}
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex flex-col">
-                <label htmlFor="name" className="text-gray-800 dark:text-gray-200 mb-2">Name</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-yellow-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-                    required
-                  />
-                  <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                </div>
-              </div>
-              <div className="flex flex-col">
-                <label htmlFor="email" className="text-gray-800 dark:text-gray-200 mb-2">Email</label>
-                <div className="relative">
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-yellow-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-                    required
-                  />
-                  <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                </div>
-              </div>
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
             </div>
-            <div className="flex flex-col">
-              <label htmlFor="message" className="text-gray-800 dark:text-gray-200 mb-2">Message</label>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+            </div>
+            <div>
+              <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Message</label>
               <textarea
                 id="message"
                 name="message"
+                rows={4}
                 value={formData.message}
                 onChange={handleChange}
-                className="px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-yellow-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-                rows={5}
                 required
-              />
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              ></textarea>
             </div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-3 px-6 bg-blue-500 dark:bg-yellow-400 text-white dark:text-gray-800 rounded-lg font-bold hover:bg-blue-600 dark:hover:bg-yellow-500 transition-colors duration-300 flex items-center justify-center"
-            >
-              {isSubmitting ? 'Sending...' : (
-                <>
-                  <FaPaperPlane className="mr-2" />
-                  Send Message
-                </>
-              )}
-            </button>
+            <div>
+              <motion.button
+                type="submit"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Send Message
+              </motion.button>
+            </div>
           </form>
 
-          <div className="flex justify-center space-x-6 mt-8">
+          <div className="flex justify-center space-x-4 mt-8">
             {socialLinks.map((link, index) => (
-              <a
+              <motion.a
                 key={index}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300"
+                className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.9 }}
               >
-                <link.icon className="text-3xl" />
-              </a>
+                <link.icon className="h-6 w-6" />
+              </motion.a>
             ))}
           </div>
         </div>

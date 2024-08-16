@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaBars, FaTimes, FaUser, FaHome, FaFlask, FaBox, FaSearch, FaBell, FaQuestionCircle, FaSignOutAlt, FaKeyboard, FaComments  } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion';
-import ThemeToggle from './ThemeToggle';
-import { account } from '../appwriteConfig';
+import { FaBars, FaTimes, FaUser, FaHome, FaFlask, FaBox, FaSearch, FaBell, FaQuestionCircle, FaSignOutAlt, FaKeyboard, FaComments, FaSun, FaMoon } from 'react-icons/fa';
+import { motion, AnimatePresence, useViewportScroll, useTransform } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
+import { account } from '../services/auth';
 
 interface NavbarProps {
   onSearchClick: () => void;
@@ -22,6 +21,10 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
     { id: 3, message: "Welcome to GMTStudio!", read: true, timestamp: new Date(Date.now() - 172800000).toISOString() },
   ]);
   const location = useLocation();
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { scrollYProgress } = useViewportScroll();
+  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0.8]);
+  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
 
   const handleScroll = useCallback(() => {
     setScrollPosition(window.pageYOffset);
@@ -43,6 +46,10 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
     };
 
     fetchUser();
+
+    const darkModePreference = localStorage.getItem('darkMode') === 'true';
+    setIsDarkMode(darkModePreference);
+    document.documentElement.classList.toggle('dark', darkModePreference);
   }, []);
 
   const toggleMenu = () => {
@@ -63,7 +70,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
 
   const handleLogout = async () => {
     try {
-      await account.deleteSession('current');
+      await account.deleteSession();
       setUser(null);
       setIsProfileOpen(false);
       alert('Logged out successfully');
@@ -82,38 +89,65 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
     setNotifications(notifications.map(notif => ({ ...notif, read: true })));
   };
 
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle('dark');
+    localStorage.setItem('darkMode', (!isDarkMode).toString());
+  };
+
+  const navItems = [
+    { name: 'Home', path: '/', icon: <FaHome /> },
+    { name: 'Latest News', path: '/Latest', icon: <FaFlask /> },
+    { name: 'Products', path: '/Products', icon: <FaBox /> },
+    { name: 'System Status', path: '/system-status', icon: <FaComments /> },
+  ];
+
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+      event.preventDefault();
+      onSearchClick();
+    }
+  }, [onSearchClick]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 backdrop-blur-md ${
-      scrollPosition > 50 ? 'bg-gray-900/80 shadow-md' : 'bg-transparent'
-    }`}>
+    <motion.nav 
+      style={{ opacity }}
+      className={`fixed w-full z-50 transition-all duration-300 backdrop-blur-md ${
+        scrollPosition > 50 ? 'bg-gray-900/80 shadow-md' : 'bg-transparent'
+      }`}
+    >
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           className="text-2xl font-extrabold bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-cyan-600 dark:to-blue-600"
         >
           <Link to="/">GMTStudio</Link>
         </motion.div>
 
         <div className="hidden lg:flex space-x-6 items-center text-white dark:text-gray-200">
-          <NavLink href="/" label="Home" icon={<FaHome />} isActive={location.pathname === '/'} />
-          <NavLink href="/Latest" label="Latest News" icon={<FaFlask />} isActive={location.pathname === '/Latest'} />
-          <NavLink href="/Products" label="Products" icon={<FaBox />} isActive={location.pathname === '/Products'} />
+          {navItems.map((item) => (
+            <NavLink key={item.name} href={item.path} label={item.name} icon={item.icon} isActive={location.pathname === item.path} />
+          ))}
           <SearchButton onSearchClick={onSearchClick} />
           <NotificationButton toggleNotificationMenu={toggleNotificationMenu} isNotificationOpen={isNotificationOpen} notifications={notifications} />
           <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} user={user} />
-          <ThemeToggle />
+          <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
         </div>
 
         <div className="lg:hidden flex items-center space-x-4">
           <SearchButton onSearchClick={onSearchClick} />
           <NotificationButton toggleNotificationMenu={toggleNotificationMenu} isNotificationOpen={isNotificationOpen} notifications={notifications} />
           <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} user={user} />
-          <button onClick={toggleMenu} className="text-xl text-white dark:text-white">
+          <button onClick={toggleMenu} className="text-xl text-white dark:text-white" aria-label="Toggle menu">
             {isOpen ? <FaTimes /> : <FaBars />}
           </button>
-          <ThemeToggle />
+          <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
         </div>
       </div>
 
@@ -126,10 +160,9 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
             variants={menuVariants}
             className="lg:hidden mt-4 bg-white dark:bg-gray-900 shadow-md rounded-lg p-4 space-y-2"
           >
-            <NavLink href="/" label="Home" icon={<FaHome />} isActive={location.pathname === '/'} />
-            <NavLink href="/Latest" label="Latest News" icon={<FaFlask />} isActive={location.pathname === '/Latest'} />
-            <NavLink href="/Products" label="Products" icon={<FaBox />} isActive={location.pathname === '/Products'} />
-            <NavLink href="/system-status" label="System-Status" icon={<FaComments />} isActive={location.pathname === '/system-status'} />
+            {navItems.map((item) => (
+              <NavLink key={item.name} href={item.path} label={item.name} icon={item.icon} isActive={location.pathname === item.path} />
+            ))}
             <Link to="/advanced-search" className="flex px-3 py-2 rounded-md transition-colors duration-300 items-center text-blue-300 dark:text-gray-200 hover:bg-blue-500 hover:text-white dark:hover:bg-yellow-400 dark:hover:text-gray-900">
               <FaSearch className="mr-2" /> <span className="ml-2">Advanced Search</span>
             </Link>
@@ -139,7 +172,9 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
 
       <ProfileDropdown isProfileOpen={isProfileOpen} toggleProfileMenu={toggleProfileMenu} handleLogout={handleLogout} user={user} />
       <NotificationDropdown isNotificationOpen={isNotificationOpen} toggleNotificationMenu={toggleNotificationMenu} notifications={notifications} markAllAsRead={markAllAsRead} />
-    </nav>
+
+      <MegaMenu isOpen={isMegaMenuOpen} onClose={() => setIsMegaMenuOpen(false)} />
+    </motion.nav>
   );
 };
 
@@ -282,20 +317,52 @@ const NotificationDropdown: React.FC<{ isNotificationOpen: boolean; toggleNotifi
   </AnimatePresence>
 );
 
-const MegaMenu: React.FC = () => (
-  <div className="absolute top-full left-0 w-full bg-white dark:bg-gray-900 shadow-lg">
-    <div className="container mx-auto px-4 py-6 grid grid-cols-4 gap-8">
-      <div>
-        <h3 className="font-bold mb-2">Products</h3>
-        <ul>
-          <li><Link to="/products/ai-workspace">AI Workspace</Link></li>
-          <li><Link to="/products/data-analytics">Data Analytics</Link></li>
-          <li><Link to="/products/machine-learning">Machine Learning</Link></li>
-        </ul>
-      </div>
-      {/* Add more sections as needed */}
-    </div>
-  </div>
+const MegaMenu: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => (
+  <AnimatePresence>
+    {isOpen && (
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        className="absolute top-full left-0 w-full bg-white dark:bg-gray-900 shadow-lg"
+      >
+        <div className="container mx-auto px-4 py-6 grid grid-cols-4 gap-8">
+          <div>
+            <h3 className="font-bold mb-2 text-gray-800 dark:text-white">Products</h3>
+            <ul className="space-y-2">
+              <li><Link to="/products/ai-workspace" className="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">AI Workspace</Link></li>
+              <li><Link to="/products/data-analytics" className="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">Data Analytics</Link></li>
+              <li><Link to="/products/machine-learning" className="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">Machine Learning</Link></li>
+            </ul>
+          </div>
+          {/* Add more sections as needed */}
+        </div>
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+          <FaTimes />
+        </button>
+      </motion.div>
+    )}
+  </AnimatePresence>
 );
+
+interface ThemeToggleProps {
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+const ThemeToggle: React.FC<ThemeToggleProps> = ({ isDarkMode, toggleDarkMode }) => {
+  return (
+    <button
+      onClick={toggleDarkMode}
+      className="p-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300"
+    >
+      {isDarkMode ? (
+        <FaSun className="w-5 h-5" />
+      ) : (
+        <FaMoon className="w-5 h-5" />
+      )}
+    </button>
+  );
+};
 
 export default Navbar;
