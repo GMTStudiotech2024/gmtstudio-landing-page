@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSearch, FaTimes, FaHome, FaNewspaper, FaBox, FaFlask, FaGraduationCap, FaEnvelope, FaRobot, FaUsers, FaPaperPlane, FaToggleOn, FaToggleOff } from 'react-icons/fa';
+import { FaSearch, FaTimes, FaHome, FaNewspaper, FaBox, FaFlask, FaGraduationCap, FaEnvelope, FaRobot, FaUsers, FaPaperPlane, FaToggleOn, FaToggleOff, FaHistory, FaInfoCircle, FaExternalLinkAlt } from 'react-icons/fa';
 import { processChatbotQuery } from '../components/chatbot';
 
 interface SearchProps {
@@ -14,6 +14,8 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
   const [botResponse, setBotResponse] = useState<string | null>(null);
   const [isAdvancedSearch, setIsAdvancedSearch] = useState(false);
   const [wikiSearchResults, setWikiSearchResults] = useState<Array<{ title: string; snippet: string; pageid: number }>>([]);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
 
   const pages = useMemo(() => [
     { title: "Home", link: "/" },
@@ -47,12 +49,20 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
         console.error('Error fetching Wikipedia search results:', error);
       }
     }
+
+    // Add search term to history
+    setSearchHistory(prev => [searchTerm, ...prev.slice(0, 4)]);
   }, [searchTerm, isAdvancedSearch, pages]);
 
   const handleSendQuery = async () => {
     const chatResponse = await processChatbotQuery(searchTerm);
     setBotResponse(chatResponse);
     setSearchResults([{ title: 'Mazs AI v1.0 anatra mini', link: '#', isAIResponse: true }]);
+  };
+
+  const clearHistory = () => {
+    setSearchHistory([]);
+    setShowHistory(false);
   };
 
   useEffect(() => {
@@ -102,7 +112,7 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
         initial={{ scale: 0.9, y: -20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: -20 }}
-        className="bg-black bg-opacity-80 p-6 rounded-xl shadow-2xl w-full max-w-md border border-white border-opacity-30 backdrop-blur-sm"
+        className="bg-black bg-opacity-80 p-6 rounded-xl shadow-2xl w-full max-w-2xl border border-white border-opacity-30 backdrop-blur-sm"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4 border-b border-white border-opacity-30 pb-2">
@@ -123,16 +133,47 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
             placeholder="Type to search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-3 pl-10 pr-12 text-sm text-white bg-black bg-opacity-50 border border-white border-opacity-30 rounded-lg focus:outline-none focus:ring-1 focus:ring-white focus:border-transparent transition-all duration-300 placeholder-gray-400"
+            className="w-full p-3 pl-10 pr-24 text-sm text-white bg-black bg-opacity-50 border border-white border-opacity-30 rounded-lg focus:outline-none focus:ring-1 focus:ring-white focus:border-transparent transition-all duration-300 placeholder-gray-400"
           />
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white text-opacity-70 text-sm" />
-          <button
-            onClick={handleSendQuery}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white text-opacity-70 hover:text-opacity-100 transition-opacity duration-200"
-          >
-            <FaPaperPlane />
-          </button>
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="text-white text-opacity-70 hover:text-opacity-100 transition-opacity duration-200"
+              title="Search History"
+            >
+              <FaHistory />
+            </button>
+            <button
+              onClick={handleSendQuery}
+              className="text-white text-opacity-70 hover:text-opacity-100 transition-opacity duration-200"
+              title="Send Query"
+            >
+              <FaPaperPlane />
+            </button>
+          </div>
         </div>
+
+        {showHistory && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="mb-4 p-2 bg-gray-800 rounded-lg"
+          >
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-sm font-semibold text-white">Search History</h3>
+              <button onClick={clearHistory} className="text-xs text-gray-400 hover:text-white">Clear</button>
+            </div>
+            <ul className="space-y-1">
+              {searchHistory.map((term, index) => (
+                <li key={index} className="text-sm text-gray-300 hover:text-white cursor-pointer" onClick={() => setSearchTerm(term)}>
+                  {term}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
         
         <div className="flex items-center justify-between mt-4 mb-2">
           <span className="text-white text-sm">Advanced Search</span>
@@ -199,11 +240,15 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="p-2 border border-white border-opacity-30 rounded-lg text-white"
+                    className="p-2 border border-white border-opacity-30 rounded-lg text-white hover:bg-white hover:bg-opacity-10 transition-colors duration-300"
                   >
-                    <h4 className="font-semibold">{result.title}</h4>
+                    <h4 className="font-semibold flex items-center">
+                      {result.title}
+                      <a href={`https://en.wikipedia.org/?curid=${result.pageid}`} target="_blank" rel="noopener noreferrer" className="ml-2 text-xs text-blue-400 hover:text-blue-300">
+                        <FaExternalLinkAlt />
+                      </a>
+                    </h4>
                     <p className="text-sm" dangerouslySetInnerHTML={{ __html: result.snippet }} />
-                    <p className="text-xs mt-1 text-gray-400">Page ID: {result.pageid}</p>
                   </motion.li>
                 ))}
               </ul>
@@ -214,9 +259,14 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="mt-4 p-3 bg-gray-800 rounded-lg"
+              className="mt-4 p-3 bg-gray-800 rounded-lg relative"
             >
-              <h3 className="text-lg font-semibold mb-2 text-white">Mazs AI v1.0 anatra mini</h3>
+              <h3 className="text-lg font-semibold mb-2 text-white flex items-center">
+                Mazs AI v1.0 anatra mini
+                <span className="ml-2 text-xs text-gray-400 cursor-help" title="AI-generated response">
+                  <FaInfoCircle />
+                </span>
+              </h3>
               <p className="text-sm text-white">{chatbotResponse}</p>
             </motion.div>
           )}

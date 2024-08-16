@@ -127,13 +127,33 @@ const intents: Intent[] = [
     patterns: ['how to get started with gmtstudio', 'gmtstudio for beginners'],
     responses: ['To get started with GMTStudio, you can sign up on our website. We offer tutorials and documentation to help beginners get acquainted with our services.'],
   },
+  {
+    patterns: ['what are the features of theta', 'theta platform features'],
+    responses: ["Theta offers features like personalized content feeds, secure messaging, and community groups. It's designed to provide a unique social experience."],
+  },
+  {
+    patterns: ['how secure is gmtstudio', 'gmtstudio security'],
+    responses: ['GMTStudio takes security seriously. We use encryption, regular security audits, and follow best practices to protect user data and privacy.'],
+  },
+  {
+    patterns: ['can I develop my own AI models', 'custom AI development'],
+    responses: ["Yes, GMTStudio's AI WorkSpace allows you to develop and train custom AI models. You can use various tools and frameworks for your AI projects."],
+  },
+  {
+    patterns: ['what programming languages are supported', 'coding languages in gmtstudio'],
+    responses: ["GMTStudio supports multiple programming languages including Python, JavaScript, and R for AI development. The specific languages may vary based on the service you're using."],
+  },
+  {
+    patterns: ['is there a mobile app', 'gmtstudio on mobile'],
+    responses: ['Yes, GMTStudio offers mobile apps for both iOS and Android, allowing you to access certain features on the go. The Theta platform is fully mobile-compatible.'],
+  },
 ];
 
 const network = new MultilayerPerceptron([10, 16, 8, intents.length]);
 
 function trainNetwork() {
-  const epochs = 5000;
-  const learningRate = 0.05;
+  const epochs = 2500;
+  const learningRate = 0.1;
 
   for (let epoch = 0; epoch < epochs; epoch++) {
     let totalLoss = 0;
@@ -158,10 +178,12 @@ function trainNetwork() {
 }
 
 function encodeInput(query: string): number[] {
-  // Improved encoding: use word presence instead of letter count
   const words = query.toLowerCase().split(/\s+/);
+  const wordSet = new Set(words);
   return intents.map(intent => 
-    intent.patterns.some(pattern => words.some(word => pattern.includes(word))) ? 1 : 0
+    intent.patterns.some(pattern => 
+      pattern.split(/\s+/).some(word => wordSet.has(word))
+    ) ? 1 : 0
   );
 }
 
@@ -173,11 +195,13 @@ export async function processChatbotQuery(query: string): Promise<string> {
   const matchedIntentIndex = prediction.indexOf(maxProbability);
   const matchedIntent = intents[matchedIntentIndex];
   
-  const response = matchedIntent && maxProbability > 0.5
-    ? matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)]
-    : "I'm sorry, I don't understand that query. Can you please rephrase or ask something else?";
-
-  return typeResponse(response);
+  if (matchedIntent && maxProbability > 0.7) {
+    return typeResponse(matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)]);
+  } else if (maxProbability > 0.5) {
+    return typeResponse("I'm not entirely sure, but here's what I think: " + matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)]);
+  } else {
+    return typeResponse("I'm sorry, I don't understand that query. Can you please rephrase or ask something else?");
+  }
 }
 
 async function typeResponse(response: string): Promise<string> {
@@ -200,6 +224,17 @@ export async function handleUserInput(userInput: string): Promise<string> {
   const response = await processChatbotQuery(userInput);
   console.log("Mazs AI:", response);
   return response;
+}
+
+// New function to get conversation suggestions
+export function getConversationSuggestions(): string[] {
+  return [
+    "Tell me about GMTStudio",
+    "What features does Theta offer?",
+    "How can I use the AI WorkSpace?",
+    "Is there a mobile app for GMTStudio?",
+    "What programming languages are supported?",
+  ];
 }
 
 // Example usage (you can remove this in production)
