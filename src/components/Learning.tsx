@@ -701,23 +701,23 @@ const Learning: React.FC = () => {
 
   const renderHeader = () => (
     <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 shadow-md z-10">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">CodeMaster</h1>
-        <div className="flex items-center space-x-4">
-          <div className="relative">
+      <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
+        <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4 sm:mb-0">CodeMaster</h1>
+        <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="relative w-full sm:w-auto">
             <input
               type="text"
               placeholder="Search courses..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              className="w-full sm:w-auto pl-10 pr-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             />
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="py-2 px-4 rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            className="w-full sm:w-auto py-2 px-4 rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
           >
             <option value="all">All Courses</option>
             <option value="html">HTML</option>
@@ -729,13 +729,15 @@ const Learning: React.FC = () => {
             <option value="python">Python</option>
             <option value="git">Git</option>
           </select>
-          <div className="flex items-center space-x-2">
-            <FaUserGraduate className="text-blue-500" />
-            <span className="font-semibold">{userProgress.level}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <FaStar className="text-yellow-500" />
-            <span className="font-semibold">{userProgress.totalPoints} pts</span>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <FaUserGraduate className="text-blue-500" />
+              <span className="font-semibold">{userProgress.level}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <FaStar className="text-yellow-500" />
+              <span className="font-semibold">{userProgress.totalPoints} pts</span>
+            </div>
           </div>
         </div>
       </div>
@@ -783,7 +785,7 @@ const Learning: React.FC = () => {
   );
 
   const renderCourseGrid = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
       {filteredCourses.map(renderCourseCard)}
     </div>
   );
@@ -819,7 +821,7 @@ const Learning: React.FC = () => {
   );
 
   const renderCourseSelection = () => (
-    <div className="flex justify-center space-x-4 mb-8">
+    <div className="flex flex-wrap justify-center gap-4 mb-8">
       {courses.map((course) => (
         <motion.button
           key={course.id}
@@ -834,7 +836,7 @@ const Learning: React.FC = () => {
           }`}
         >
           <course.icon className={`mr-2 ${course.color}`} />
-          {course.title}
+          <span className="hidden sm:inline">{course.title}</span>
         </motion.button>
       ))}
     </div>
@@ -867,7 +869,7 @@ const Learning: React.FC = () => {
         <>
           {renderCourseSelection()}
           <motion.div 
-            className="flex justify-between items-center mb-12 space-x-4 "
+            className="flex flex-col sm:flex-row justify-between items-center mb-12 space-y-4 sm:space-y-0 sm:space-x-4"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -875,7 +877,7 @@ const Learning: React.FC = () => {
             {selectedCourse.lessons.map((lesson, index) => (
               <motion.div 
                 key={index} 
-                className="flex-1 relative cursor-pointer"
+                className="w-full sm:flex-1 relative cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setCurrentLesson(index)}
@@ -994,7 +996,7 @@ const Learning: React.FC = () => {
       return (
         <>
           <motion.div 
-            className="flex justify-between items-center mb-12 space-x-4 pt-20"
+            className="flex flex-col sm:flex-row justify-between items-center mb-12 space-y-4 sm:space-y-0 sm:space-x-4 pt-20"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -1002,7 +1004,7 @@ const Learning: React.FC = () => {
             {tutorial.map((step, index) => (
               <motion.div 
                 key={index} 
-                className="flex-1 relative cursor-pointer"
+                className="w-full sm:flex-1 relative cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setCurrentTutorialStep(index)}
@@ -1081,9 +1083,9 @@ const Learning: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col items-center justify-center p-8 transition-colors duration-300 ${isDarkMode ? 'dark bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
+    <div className={`min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 transition-colors duration-300 ${isDarkMode ? 'dark bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
       {renderHeader()}
-      <div className="max-w-6xl w-full mt-20">
+      <div className="max-w-6xl w-full mt-32 sm:mt-20">
         {renderModeSelection()}
         {mode === 'courses' && renderCourseGrid()}
         {renderContent()}
@@ -1091,20 +1093,20 @@ const Learning: React.FC = () => {
           <motion.button
             onClick={prevLesson}
             disabled={mode === 'courses' ? currentLesson === 0 && courses.indexOf(selectedCourse) === 0 : currentTutorialStep === 0}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out flex items-center"
+            className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out flex items-center"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <FaChevronLeft className="mr-2" /> Previous
+            <FaChevronLeft className="mr-2" /> <span className="hidden sm:inline">Previous</span>
           </motion.button>
           <motion.button
             onClick={nextLesson}
             disabled={mode === 'courses' ? currentLesson === selectedCourse.lessons.length - 1 && courses.indexOf(selectedCourse) === courses.length - 1 : currentTutorialStep === tutorial.length - 1}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out flex items-center"
+            className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out flex items-center"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            Next <FaChevronRight className="ml-2" />
+            <span className="hidden sm:inline">Next</span> <FaChevronRight className="ml-2" />
           </motion.button>
         </div>
         <div className="mt-8 flex justify-center space-x-4">

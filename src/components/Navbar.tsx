@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
 import { account } from '../appwriteConfig';
 import { Link, useLocation } from 'react-router-dom';
-import { animated, useSpring } from '@react-spring/web';
 
 interface NavbarProps {
   onSearchClick: () => void;
@@ -82,13 +81,10 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
     setNotifications(notifications.map(notif => ({ ...notif, read: true })));
   };
 
-  const navbarStyle = useSpring({
-    background: scrollPosition > 50 ? 'rgba(17, 24, 39, 0.8)' : 'rgba(0, 0, 0, 0)',
-    boxShadow: scrollPosition > 50 ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : 'none',
-  });
-
   return (
-    <animated.nav style={navbarStyle} className="fixed w-full z-50 transition-all duration-300 backdrop-blur-md">
+    <nav className={`fixed w-full z-50 transition-all duration-300 backdrop-blur-md ${
+      scrollPosition > 50 ? 'bg-gray-900/80 shadow-md' : 'bg-transparent'
+    }`}>
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -142,7 +138,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
 
       <ProfileDropdown isProfileOpen={isProfileOpen} toggleProfileMenu={toggleProfileMenu} handleLogout={handleLogout} user={user} />
       <NotificationDropdown isNotificationOpen={isNotificationOpen} toggleNotificationMenu={toggleNotificationMenu} notifications={notifications} markAllAsRead={markAllAsRead} />
-    </animated.nav>
+    </nav>
   );
 };
 
