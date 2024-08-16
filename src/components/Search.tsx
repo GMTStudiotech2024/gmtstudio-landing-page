@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { FaSearch, FaTimes, FaHome, FaNewspaper, FaBox, FaFlask, FaGraduationCap, FaEnvelope, FaRobot, FaUsers, FaPaperPlane, FaToggleOn, FaToggleOff, FaHistory, FaInfoCircle, FaExternalLinkAlt, FaChevronDown,} from 'react-icons/fa';
+import { FaSearch, FaTimes, FaHome, FaNewspaper, FaBox, FaFlask, FaGraduationCap, FaEnvelope, FaRobot, FaUsers, FaToggleOn, FaToggleOff, FaHistory, FaInfoCircle, FaExternalLinkAlt, FaChevronDown,} from 'react-icons/fa';
 import { processChatbotQuery } from '../components/chatbot';
 
 interface SearchProps {
@@ -17,6 +17,9 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [isResultsExpanded, setIsResultsExpanded] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [displayedResponse, setDisplayedResponse] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
   const pages = useMemo(() => [
     { title: "Home", link: "/" },
@@ -58,9 +61,27 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
   }, [searchTerm, isAdvancedSearch, pages]);
 
   const handleSendQuery = async () => {
+    setIsLoading(true);
+    setDisplayedResponse('');
     const chatResponse = await processChatbotQuery(searchTerm);
     setBotResponse(chatResponse);
     setSearchResults([{ title: 'Mazs AI v1.0 anatra mini', link: '#', isAIResponse: true }]);
+    setIsLoading(false);
+    setIsTyping(true);
+    simulateTyping(chatResponse);
+  };
+
+  const simulateTyping = (text: string) => {
+    let i = 0;
+    const typingInterval = setInterval(() => {
+      if (i < text.length) {
+        setDisplayedResponse(prev => prev + text.charAt(i));
+        i++;
+      } else {
+        clearInterval(typingInterval);
+        setIsTyping(false);
+      }
+    }, 30); // Adjust typing speed here
   };
 
   const clearHistory = () => {
@@ -117,6 +138,26 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
     }),
   };
 
+  const LoadingDots = () => (
+    <motion.div className="flex space-x-1">
+      {[0, 1, 2].map((index) => (
+        <motion.div
+          key={index}
+          className="w-2 h-2 bg-white rounded-full"
+          animate={{
+            opacity: [0.5, 1, 0.5],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 1,
+            repeat: Infinity,
+            delay: index * 0.2,
+          }}
+        />
+      ))}
+    </motion.div>
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -167,13 +208,6 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
               title="Search History"
             >
               <FaHistory />
-            </button>
-            <button
-              onClick={handleSendQuery}
-              className="text-white text-opacity-70 hover:text-opacity-100 transition-opacity duration-200 p-1 rounded-full hover:bg-white hover:bg-opacity-10"
-              title="Send Query"
-            >
-              <FaPaperPlane />
             </button>
             <button
               onClick={toggleAdvancedSearch}
@@ -245,7 +279,26 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
                       </span>
                       <span className="text-sm">{result.title}</span>
                       {result.isAIResponse && (
-                        <p className="mt-2 text-sm text-white">{botResponse}</p>
+                        <div className="mt-2 text-sm text-white">
+                          {isLoading ? (
+                            <div className="flex items-center">
+                              <span className="mr-2">Mazs AI is thinking</span>
+                              <LoadingDots />
+                            </div>
+                          ) : isTyping ? (
+                            <>
+                              <p>{displayedResponse}</p>
+                              <motion.span
+                                animate={{ opacity: [1, 0] }}
+                                transition={{ duration: 0.5, repeat: Infinity, repeatType: 'reverse' }}
+                              >
+                                |
+                              </motion.span>
+                            </>
+                          ) : (
+                            <p>{displayedResponse}</p>
+                          )}
+                        </div>
                       )}
                       {!result.isAIResponse && (
                         <motion.span

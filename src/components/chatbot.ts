@@ -196,37 +196,19 @@ export async function processChatbotQuery(query: string): Promise<string> {
   const matchedIntent = intents[matchedIntentIndex];
   
   if (matchedIntent && maxProbability > 0.7) {
-    return typeResponse(matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)]);
+    return matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)];
   } else if (maxProbability > 0.5) {
-    return typeResponse("I'm not entirely sure, but here's what I think: " + matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)]);
+    return "I'm not entirely sure, but here's what I think: " + matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)];
   } else {
-    return typeResponse("I'm sorry, I don't understand that query. Can you please rephrase or ask something else?");
+    return "I'm sorry, I don't understand that query. Can you please rephrase or ask something else?";
   }
 }
 
-async function typeResponse(response: string): Promise<string> {
-  let typedResponse = '';
-  for (const char of response) {
-    typedResponse += char;
-    await new Promise(resolve => setTimeout(resolve, Math.random() * 50 + 30)); // Random delay between 30-80ms
-  }
-  return typedResponse;
-}
-
-// Train the network when the module is loaded
-trainNetwork();
-
-console.log("Mazs AI v1.0 mini initialized and trained!");
-
-// New function to handle user input and generate responses
-export async function handleUserInput(userInput: string): Promise<string> {
+export function handleUserInput(userInput: string): Promise<string> {
   console.log("User:", userInput);
-  const response = await processChatbotQuery(userInput);
-  console.log("Mazs AI:", response);
-  return response;
+  return processChatbotQuery(userInput);
 }
 
-// New function to get conversation suggestions
 export function getConversationSuggestions(): string[] {
   return [
     "Tell me about GMTStudio",
@@ -237,12 +219,23 @@ export function getConversationSuggestions(): string[] {
   ];
 }
 
-// Example usage (you can remove this in production)
-async function exampleConversation() {
-  await handleUserInput("Hello");
-  await handleUserInput("What is GMTStudio?");
-  await handleUserInput("Goodbye");
+export function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+
+  return (...args: Parameters<F>): Promise<ReturnType<F>> => {
+    return new Promise((resolve) => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+
+      timeout = setTimeout(() => resolve(func(...args)), waitFor);
+    });
+  };
 }
 
-// Comment out or remove this line:
-// exampleConversation();
+export const debouncedHandleUserInput = debounce(handleUserInput, 300);
+
+// Train the network when the module is loaded
+trainNetwork();
+
+console.log("Mazs AI v1.0 mini initialized and trained!");
