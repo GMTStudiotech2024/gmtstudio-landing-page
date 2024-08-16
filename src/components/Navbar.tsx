@@ -103,6 +103,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
           <NavLink href="/" label="Home" icon={<FaHome />} isActive={location.pathname === '/'} />
           <NavLink href="/Latest" label="Latest News" icon={<FaFlask />} isActive={location.pathname === '/Latest'} />
           <NavLink href="/Products" label="Products" icon={<FaBox />} isActive={location.pathname === '/Products'} />
+          <Link to="/advanced-search" className="hover:text-gray-300">Advanced Search</Link>
           <SearchButton onSearchClick={onSearchClick} />
           <NotificationButton toggleNotificationMenu={toggleNotificationMenu} isNotificationOpen={isNotificationOpen} notifications={notifications} />
           <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} user={user} />
@@ -133,6 +134,9 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
             <NavLink href="/Latest" label="Latest News" icon={<FaFlask />} isActive={location.pathname === '/Latest'} />
             <NavLink href="/Products" label="Products" icon={<FaBox />} isActive={location.pathname === '/Products'} />
             <NavLink href="/system-status" label="System-Status" icon={<FaComments />} isActive={location.pathname === '/system-status'} />
+            <Link to="/advanced-search" className="flex px-3 py-2 rounded-md transition-colors duration-300 items-center text-blue-300 dark:text-gray-200 hover:bg-blue-500 hover:text-white dark:hover:bg-yellow-400 dark:hover:text-gray-900">
+              <FaSearch className="mr-2" /> <span className="ml-2">Advanced Search</span>
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>

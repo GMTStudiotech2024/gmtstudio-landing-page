@@ -40,6 +40,7 @@ import Products from './components/Products';
 import Help from './components/Help';
 import LaunchGMTStudio from './components/LaunchGMTStudio';
 import SystemStatus from './components/SystemStatus';
+import AdvancedSearch from './components/AdvancedSearch';
 
 const AppContent: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -119,6 +120,7 @@ const AppContent: React.FC = () => {
             }
           />
           <Route path="/system-status" element={<SystemStatus />} />
+          <Route path="/advanced-search" element={<AdvancedSearch />} />
         </Routes>
       </main>
       <Footer />

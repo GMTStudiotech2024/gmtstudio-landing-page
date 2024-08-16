@@ -187,7 +187,77 @@ function encodeInput(query: string): number[] {
   );
 }
 
-export async function processChatbotQuery(query: string): Promise<string> {
+// Simple sentiment analysis
+function analyzeSentiment(text: string): number {
+  const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'happy', 'pleased'];
+  const negativeWords = ['bad', 'terrible', 'awful', 'horrible', 'disappointing', 'sad', 'unhappy', 'angry'];
+  
+  const words = text.toLowerCase().split(/\s+/);
+  let sentiment = 0;
+  
+  words.forEach(word => {
+    if (positiveWords.includes(word)) sentiment += 1;
+    if (negativeWords.includes(word)) sentiment -= 1;
+  });
+  
+  return sentiment / words.length;
+}
+
+// Add context awareness
+class ConversationContext {
+  private context: string[] = [];
+  private maxContextLength = 5;
+
+  addToContext(message: string) {
+    this.context.push(message);
+    if (this.context.length > this.maxContextLength) {
+      this.context.shift();
+    }
+  }
+
+  getContext(): string {
+    return this.context.join(' ');
+  }
+
+  clear() {
+    this.context = [];
+  }
+}
+
+const conversationContext = new ConversationContext();
+
+// Improve response selection
+function selectResponse(intent: Intent, sentiment: number): string {
+  const positiveResponses = intent.responses.filter(r => r.includes('!'));
+  const neutralResponses = intent.responses.filter(r => !r.includes('!') && !r.includes('?'));
+  const negativeResponses = intent.responses.filter(r => r.includes('?'));
+
+  let selectedResponses: string[];
+  if (sentiment > 0.3) {
+    selectedResponses = positiveResponses.length > 0 ? positiveResponses : neutralResponses;
+  } else if (sentiment < -0.3) {
+    selectedResponses = negativeResponses.length > 0 ? negativeResponses : neutralResponses;
+  } else {
+    selectedResponses = neutralResponses.length > 0 ? neutralResponses : intent.responses;
+  }
+
+  return selectedResponses[Math.floor(Math.random() * selectedResponses.length)];
+}
+
+// Simple fallback mechanism
+function getFallbackResponse(query: string): string {
+  const fallbackResponses = [
+    "I'm not sure I understand. Could you please rephrase that?",
+    "I don't have information about that. Is there something else I can help with?",
+    "That's an interesting question, but it's outside my current knowledge. Can we talk about GMTStudio or its services?",
+    "I'm still learning and don't have an answer for that. Would you like to know about our AI WorkSpace or Theta platform instead?",
+  ];
+  
+  return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+}
+
+// Update processChatbotQuery function
+export function processChatbotQuery(query: string): string {
   const lowercaseQuery = query.toLowerCase();
   const input = encodeInput(lowercaseQuery);
   const prediction = network.predict(input);
@@ -195,18 +265,25 @@ export async function processChatbotQuery(query: string): Promise<string> {
   const matchedIntentIndex = prediction.indexOf(maxProbability);
   const matchedIntent = intents[matchedIntentIndex];
   
+  const sentiment = analyzeSentiment(query);
+  conversationContext.addToContext(query);
+
+  let response: string;
   if (matchedIntent && maxProbability > 0.7) {
-    return matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)];
+    response = selectResponse(matchedIntent, sentiment);
   } else if (maxProbability > 0.5) {
-    return "I'm not entirely sure, but here's what I think: " + matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)];
+    response = "I'm not entirely sure, but here's what I think: " + selectResponse(matchedIntent, sentiment);
   } else {
-    return "I'm sorry, I don't understand that query. Can you please rephrase or ask something else?";
+    response = getFallbackResponse(query);
   }
+
+  conversationContext.addToContext(response);
+  return response;
 }
 
 export function handleUserInput(userInput: string): Promise<string> {
   console.log("User:", userInput);
-  return processChatbotQuery(userInput);
+  return Promise.resolve(processChatbotQuery(userInput));
 }
 
 export function getConversationSuggestions(): string[] {
@@ -238,4 +315,4 @@ export const debouncedHandleUserInput = debounce(handleUserInput, 300);
 // Train the network when the module is loaded
 trainNetwork();
 
-console.log("Mazs AI v1.0 mini initialized and trained!");
+console.log("Mazs AI v1.2 mini initialized and trained!");
