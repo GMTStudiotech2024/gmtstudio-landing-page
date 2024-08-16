@@ -40,17 +40,6 @@ const blogPosts = [
     views: 10,
     readTime: "1 min "
   },
-  { 
-    image: DEV , 
-    title: "GMTStudio's Official website Update", 
-    excerpt: "We added some new feature to our official website, let's hop into the introduction of the new feature!", 
-    author: "Alston Chang", 
-    date: "July 24, 2024",
-    link: "/news10",
-    category: "Development Log",
-    views: 20,
-    readTime: "3 min"
-  },
 
 ];
 

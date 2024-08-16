@@ -3,21 +3,86 @@ interface Intent {
   responses: string[];
 }
 
-class SimpleNeuralNetwork {
-  private weights: number[];
+class MultilayerPerceptron {
+  private layers: number[];
+  private weights: number[][][];
+  private biases: number[][];
 
-  constructor(inputSize: number) {
-    this.weights = Array(inputSize).fill(0).map(() => Math.random() - 0.5);
+  constructor(layers: number[]) {
+    this.layers = layers;
+    this.weights = [];
+    this.biases = [];
+
+    for (let i = 1; i < layers.length; i++) {
+      this.weights.push(Array(layers[i]).fill(0).map(() => 
+        Array(layers[i-1]).fill(0).map(() => Math.random() - 0.5)
+      ));
+      this.biases.push(Array(layers[i]).fill(0).map(() => Math.random() - 0.5));
+    }
   }
 
-  predict(input: number[]): number {
-    return input.reduce((sum, value, index) => sum + value * this.weights[index], 0);
+  private sigmoid(x: number): number {
+    return 1 / (1 + Math.exp(-x));
   }
 
-  train(input: number[], target: number, learningRate: number = 0.1) {
-    const prediction = this.predict(input);
-    const error = target - prediction;
-    this.weights = this.weights.map((weight, index) => weight + learningRate * error * input[index]);
+  private sigmoidDerivative(x: number): number {
+    return x * (1 - x);
+  }
+
+  predict(input: number[]): number[] {
+    let activation = input;
+    for (let i = 0; i < this.weights.length; i++) {
+      const currentActivation = activation; // Create a local copy
+      let newActivation = [];
+      for (let j = 0; j < this.weights[i].length; j++) {
+        const sum = this.weights[i][j].reduce((sum, weight, k) => sum + weight * currentActivation[k], 0) + this.biases[i][j];
+        newActivation.push(this.sigmoid(sum));
+      }
+      activation = newActivation;
+    }
+    return activation;
+  }
+
+  train(input: number[], target: number[], learningRate: number = 0.1) {
+    // Forward pass
+    let activations = [input];
+    let weightedSums = [];
+
+    for (let i = 0; i < this.weights.length; i++) {
+      let newActivation = [];
+      let newWeightedSum = [];
+      for (let j = 0; j < this.weights[i].length; j++) {
+        const sum = this.weights[i][j].reduce((sum, weight, k) => sum + weight * activations[i][k], 0) + this.biases[i][j];
+        newWeightedSum.push(sum);
+        newActivation.push(this.sigmoid(sum));
+      }
+      weightedSums.push(newWeightedSum);
+      activations.push(newActivation);
+    }
+
+    // Backward pass
+    let deltas = [activations[activations.length - 1].map((output, i) => 
+      (output - target[i]) * this.sigmoidDerivative(output)
+    )];
+
+    for (let i = this.weights.length - 1; i > 0; i--) {
+      let layerDelta = [];
+      for (let j = 0; j < this.weights[i-1].length; j++) {
+        const error = this.weights[i].reduce((sum, neuronWeights, k) => sum + neuronWeights[j] * deltas[0][k], 0);
+        layerDelta.push(error * this.sigmoidDerivative(activations[i][j]));
+      }
+      deltas.unshift(layerDelta);
+    }
+
+    // Update weights and biases
+    for (let i = 0; i < this.weights.length; i++) {
+      for (let j = 0; j < this.weights[i].length; j++) {
+        for (let k = 0; k < this.weights[i][j].length; k++) {
+          this.weights[i][j][k] -= learningRate * deltas[i][j] * activations[i][k];
+        }
+        this.biases[i][j] -= learningRate * deltas[i][j];
+      }
+    }
   }
 }
 
@@ -64,17 +129,31 @@ const intents: Intent[] = [
   },
 ];
 
-const network = new SimpleNeuralNetwork(10); // Adjust input size as needed
+const network = new MultilayerPerceptron([10, 16, 8, intents.length]);
 
 function trainNetwork() {
-  for (let i = 0; i < 1000; i++) {
-    intents.forEach(intent => {
+  const epochs = 5000;
+  const learningRate = 0.05;
+
+  for (let epoch = 0; epoch < epochs; epoch++) {
+    let totalLoss = 0;
+
+    intents.forEach((intent, intentIndex) => {
       intent.patterns.forEach(pattern => {
         const input = encodeInput(pattern);
-        const target = intents.indexOf(intent) / intents.length;
-        network.train(input, target);
+        const target = Array(intents.length).fill(0);
+        target[intentIndex] = 1;
+
+        network.train(input, target, learningRate);
+
+        const prediction = network.predict(input);
+        totalLoss += prediction.reduce((sum, output, i) => sum + Math.pow(output - target[i], 2), 0);
       });
     });
+
+    if (epoch % 100 === 0) {
+      console.log(`Epoch ${epoch}, Loss: ${totalLoss}`);
+    }
   }
 }
 
@@ -90,9 +169,11 @@ export async function processChatbotQuery(query: string): Promise<string> {
   const lowercaseQuery = query.toLowerCase();
   const input = encodeInput(lowercaseQuery);
   const prediction = network.predict(input);
-  const matchedIntent = intents[Math.floor(prediction * intents.length)];
+  const maxProbability = Math.max(...prediction);
+  const matchedIntentIndex = prediction.indexOf(maxProbability);
+  const matchedIntent = intents[matchedIntentIndex];
   
-  const response = matchedIntent
+  const response = matchedIntent && maxProbability > 0.5
     ? matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)]
     : "I'm sorry, I don't understand that query. Can you please rephrase or ask something else?";
 
