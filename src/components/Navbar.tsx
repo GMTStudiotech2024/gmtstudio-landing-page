@@ -140,14 +140,14 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
           <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
         </div>
 
-        <div className="lg:hidden flex items-center space-x-4">
+        <div className="lg:hidden flex items-center space-x-2">
           <SearchButton onSearchClick={onSearchClick} />
           <NotificationButton toggleNotificationMenu={toggleNotificationMenu} isNotificationOpen={isNotificationOpen} notifications={notifications} />
           <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} user={user} />
-          <button onClick={toggleMenu} className="text-xl text-white dark:text-white" aria-label="Toggle menu">
+          <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+          <button onClick={toggleMenu} className="text-xl text-white dark:text-white p-2" aria-label="Toggle menu">
             {isOpen ? <FaTimes /> : <FaBars />}
           </button>
-          <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
         </div>
       </div>
 
@@ -158,7 +158,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
             animate="visible"
             exit="hidden"
             variants={menuVariants}
-            className="lg:hidden mt-4 bg-white dark:bg-gray-900 shadow-md rounded-lg p-4 space-y-2"
+            className="lg:hidden bg-white dark:bg-gray-900 shadow-md rounded-b-lg p-4 space-y-2"
           >
             {navItems.map((item) => (
               <NavLink key={item.name} href={item.path} label={item.name} icon={item.icon} isActive={location.pathname === item.path} />
@@ -197,14 +197,10 @@ const NavLink: React.FC<{ href: string; label: string; icon: React.ReactNode; is
 const SearchButton: React.FC<{ onSearchClick: () => void }> = ({ onSearchClick }) => (
   <button
     onClick={onSearchClick}
-    className="flex items-center px-3 py-2 rounded-md text-blue-300 dark:text-gray-200 hover:bg-blue-500 hover:text-white dark:hover:bg-yellow-400 dark:hover:text-gray-900 transition-colors duration-300"
+    className="p-2 text-blue-300 dark:text-gray-200 hover:bg-blue-500 hover:text-white dark:hover:bg-yellow-400 dark:hover:text-gray-900 transition-colors duration-300 rounded-md"
+    aria-label="Search"
   >
-    <FaSearch className="mr-2" />
-    <span className="hidden md:inline">Search</span>
-    <span className="ml-2 text-xs bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-md">
-      <FaKeyboard className="inline mr-1" />
-      Cmd+K
-    </span>
+    <FaSearch className="w-5 h-5" />
   </button>
 );
 
