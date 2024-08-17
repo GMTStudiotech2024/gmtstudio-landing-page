@@ -41,6 +41,7 @@ import Help from './components/Help';
 import LaunchGMTStudio from './components/LaunchGMTStudio';
 import SystemStatus from './components/SystemStatus';
 import AdvancedSearch from './components/AdvancedSearch';
+import DeepLearning from './components/DeepLearning';
 
 const AppContent: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -121,6 +122,7 @@ const AppContent: React.FC = () => {
           />
           <Route path="/system-status" element={<SystemStatus />} />
           <Route path="/advanced-search" element={<AdvancedSearch />} />
+          <Route path="/deep-learning" element={<DeepLearning />} />
         </Routes>
       </main>
       <Footer />
