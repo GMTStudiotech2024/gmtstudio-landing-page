@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaBars, FaTimes, FaUser, FaHome, FaFlask, FaBox, FaSearch, FaBell, FaQuestionCircle, FaSignOutAlt,  FaComments, FaSun, FaMoon } from 'react-icons/fa';
+import { FaBars, FaTimes, FaHome, FaFlask, FaBox, FaSearch, FaBell, FaQuestionCircle,  FaComments, FaSun, FaMoon } from 'react-icons/fa';
 import { motion, AnimatePresence, useViewportScroll, useTransform } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 
