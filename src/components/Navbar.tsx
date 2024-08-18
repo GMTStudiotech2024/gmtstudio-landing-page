@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { FaBars, FaTimes, FaUser, FaHome, FaFlask, FaBox, FaSearch, FaBell, FaQuestionCircle, FaSignOutAlt,  FaComments, FaSun, FaMoon } from 'react-icons/fa';
 import { motion, AnimatePresence, useViewportScroll, useTransform } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { account } from '../services/auth';
 
 interface NavbarProps {
   onSearchClick: () => void;
@@ -13,7 +12,6 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [user, setUser] = useState<any>(null);
   const [notifications, setNotifications] = useState([
     { id: 0, message: "Search with Cmd+K", read: false, timestamp: new Date().toISOString() },
     { id: 1, message: "New feature released!", read: true, timestamp: new Date().toISOString() },
@@ -36,17 +34,6 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
   }, [handleScroll]);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await account.get();
-        setUser(userData);
-      } catch (error) {
-        console.error('Failed to fetch user data:', error);
-      }
-    };
-
-    fetchUser();
-
     const darkModePreference = localStorage.getItem('darkMode') === 'true';
     setIsDarkMode(darkModePreference);
     document.documentElement.classList.toggle('dark', darkModePreference);
@@ -66,18 +53,6 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
   const toggleNotificationMenu = () => {
     setIsNotificationOpen(!isNotificationOpen);
     setIsProfileOpen(false);
-  };
-
-  const handleLogout = async () => {
-    try {
-      await account.deleteSession();
-      setUser(null);
-      setIsProfileOpen(false);
-      alert('Logged out successfully');
-    } catch (error) {
-      console.error('Failed to log out:', error);
-      alert('An error occurred during logout');
-    }
   };
 
   const menuVariants = {
@@ -130,20 +105,21 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
           <Link to="/">GMTStudio</Link>
         </motion.div>
 
-        <div className="hidden lg:flex space-x-6 items-center text-white dark:text-gray-200">
+        {/* Desktop Menu */}
+        <div className="hidden md:flex space-x-4 lg:space-x-6 items-center text-white dark:text-gray-200">
           {navItems.map((item) => (
             <NavLink key={item.name} href={item.path} label={item.name} icon={item.icon} isActive={location.pathname === item.path} />
           ))}
           <SearchButton onSearchClick={onSearchClick} />
           <NotificationButton toggleNotificationMenu={toggleNotificationMenu} isNotificationOpen={isNotificationOpen} notifications={notifications} />
-          <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} user={user} />
+          <AuthButtons />
           <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
         </div>
 
-        <div className="lg:hidden flex items-center space-x-2">
+        {/* Mobile Menu */}
+        <div className="md:hidden flex items-center space-x-2">
           <SearchButton onSearchClick={onSearchClick} />
           <NotificationButton toggleNotificationMenu={toggleNotificationMenu} isNotificationOpen={isNotificationOpen} notifications={notifications} />
-          <ProfileButton toggleProfileMenu={toggleProfileMenu} isProfileOpen={isProfileOpen} user={user} />
           <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
           <button onClick={toggleMenu} className="text-xl text-white dark:text-white p-2" aria-label="Toggle menu">
             {isOpen ? <FaTimes /> : <FaBars />}
@@ -151,6 +127,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
         </div>
       </div>
 
+      {/* Mobile Menu Dropdown */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -158,11 +135,12 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
             animate="visible"
             exit="hidden"
             variants={menuVariants}
-            className="lg:hidden bg-white dark:bg-gray-900 shadow-md rounded-b-lg p-4 space-y-2"
+            className="md:hidden bg-white dark:bg-gray-900 shadow-md rounded-b-lg p-4 space-y-2"
           >
             {navItems.map((item) => (
               <NavLink key={item.name} href={item.path} label={item.name} icon={item.icon} isActive={location.pathname === item.path} />
             ))}
+            <AuthButtons />
             <Link to="/advanced-search" className="flex px-3 py-2 rounded-md transition-colors duration-300 items-center text-blue-300 dark:text-gray-200 hover:bg-blue-500 hover:text-white dark:hover:bg-yellow-400 dark:hover:text-gray-900">
               <FaSearch className="mr-2" /> <span className="ml-2">Advanced Search</span>
             </Link>
@@ -170,7 +148,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
         )}
       </AnimatePresence>
 
-      <ProfileDropdown isProfileOpen={isProfileOpen} toggleProfileMenu={toggleProfileMenu} handleLogout={handleLogout} user={user} />
+      <ProfileDropdown isProfileOpen={isProfileOpen} toggleProfileMenu={toggleProfileMenu} />
       <NotificationDropdown isNotificationOpen={isNotificationOpen} toggleNotificationMenu={toggleNotificationMenu} notifications={notifications} markAllAsRead={markAllAsRead} />
 
       <MegaMenu isOpen={isMegaMenuOpen} onClose={() => setIsMegaMenuOpen(false)} />
@@ -189,7 +167,7 @@ const NavLink: React.FC<{ href: string; label: string; icon: React.ReactNode; is
         isActive ? 'bg-blue-500 text-white dark:bg-yellow-400 dark:text-gray-900' : 'text-blue-300 dark:text-gray-200 hover:bg-blue-500 hover:text-white dark:hover:bg-yellow-400 dark:hover:text-gray-900'
       }`}
     >
-      {icon} <span className="ml-2">{label}</span>
+      {icon} <span className="ml-2 md:hidden lg:inline">{label}</span>
     </Link>
   </motion.div>
 );
@@ -204,31 +182,18 @@ const SearchButton: React.FC<{ onSearchClick: () => void }> = ({ onSearchClick }
   </button>
 );
 
-const ProfileButton: React.FC<{ toggleProfileMenu: () => void; isProfileOpen: boolean; user: any }> = ({ toggleProfileMenu, isProfileOpen, user }) => (
-  <button onClick={toggleProfileMenu} className="flex p-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 relative">
-    {user && user.image ? (
-      <img
-        src={user.image}
-        alt="User"
-        className="w-8 h-8 rounded-full border-2 border-transparent hover:border-blue-500 dark:hover:border-yellow-400"
-      />
-    ) : (
-      <FaUser className={`w-5 h-5 ${isProfileOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
-    )}
-    {user && <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-3 h-3"></span>}
-  </button>
+const AuthButtons: React.FC = () => (
+  <div className="flex space-x-2">
+    <Link to="/login" className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors duration-300">
+      Log In
+    </Link>
+    <Link to="/signup" className="px-4 py-2 text-sm font-medium text-blue-600 bg-white rounded-md hover:bg-gray-100 transition-colors duration-300">
+      Sign Up
+    </Link>
+  </div>
 );
 
-const NotificationButton: React.FC<{ toggleNotificationMenu: () => void; isNotificationOpen: boolean; notifications: any[] }> = ({ toggleNotificationMenu, isNotificationOpen, notifications }) => (
-  <button onClick={toggleNotificationMenu} className="flex p-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 relative">
-    <FaBell className={`w-5 h-5 ${isNotificationOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
-    {notifications.some(n => !n.read) && (
-      <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-3 h-3 animate-pulse"></span>
-    )}
-  </button>
-);
-
-const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () => void; handleLogout: () => void; user: any }> = ({ isProfileOpen, toggleProfileMenu, handleLogout, user }) => (
+const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () => void }> = ({ isProfileOpen, toggleProfileMenu }) => (
   <AnimatePresence>
     {isProfileOpen && (
       <motion.div
@@ -242,15 +207,6 @@ const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () 
         transition={{ duration: 0.2 }}
         className="absolute right-4 mt-4 bg-white dark:bg-gray-950 shadow-lg rounded-lg p-4 space-y-2 w-64"
       >
-        {user && (
-          <div className="flex items-center space-x-2 mb-4 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-            <img src={user.image || 'https://via.placeholder.com/40'} alt="User" className="w-10 h-10 rounded-full" />
-            <div>
-              <p className="font-semibold text-gray-800 dark:text-white">{user.name}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
-            </div>
-          </div>
-        )}
         <Link to="/help" className="flex px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 items-center rounded-md">
           <FaQuestionCircle className="mr-2" /> Help & Support
         </Link>
@@ -264,19 +220,18 @@ const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () 
         <Link to="/system-status" className="flex px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 items-center rounded-md">
           <FaBars className="mr-2" /> Systems Status
         </Link>
-        {!user && (
-          <Link to="/signup" className="flex px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 items-center rounded-md">
-            <FaUser className="mr-2" /> Sign Up
-          </Link>
-        )}
-        {user && (
-          <button onClick={handleLogout} className="flex w-full text-left px-4 py-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-800 transition-colors duration-300 items-center rounded-md">
-            <FaSignOutAlt className="mr-2" /> Logout
-          </button>
-        )}
       </motion.div>
     )}
   </AnimatePresence>
+);
+
+const NotificationButton: React.FC<{ toggleNotificationMenu: () => void; isNotificationOpen: boolean; notifications: any[] }> = ({ toggleNotificationMenu, isNotificationOpen, notifications }) => (
+  <button onClick={toggleNotificationMenu} className="flex p-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 relative">
+    <FaBell className={`w-5 h-5 ${isNotificationOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
+    {notifications.some(n => !n.read) && (
+      <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-3 h-3 animate-pulse"></span>
+    )}
+  </button>
 );
 
 const NotificationDropdown: React.FC<{ isNotificationOpen: boolean; toggleNotificationMenu: () => void; notifications: any[]; markAllAsRead: () => void }> = ({ isNotificationOpen, toggleNotificationMenu, notifications, markAllAsRead }) => (

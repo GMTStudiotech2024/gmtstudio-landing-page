@@ -42,7 +42,7 @@ import LaunchGMTStudio from './components/LaunchGMTStudio';
 import SystemStatus from './components/SystemStatus';
 import AdvancedSearch from './components/AdvancedSearch';
 import DeepLearning from './components/DeepLearning';
-
+import Login from './components/Login';
 const AppContent: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -109,6 +109,7 @@ const AppContent: React.FC = () => {
           <Route path="*" element={<Error />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/latest" element={<Latest />} />
           <Route path="/products" element={<Products />} />
           <Route path="/help" element={<Help />} />

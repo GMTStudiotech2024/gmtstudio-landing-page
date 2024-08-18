@@ -2,8 +2,13 @@ import { kv } from '@vercel/kv';
 import bcrypt from 'bcryptjs';
 
 const getKVClient = () => {
+  if (!process.env.REACT_APP_KV_REST_API_URL) {
+    console.error('REACT_APP_KV_REST_API_URL is not set');
+  }
+  if (!process.env.REACT_APP_KV_REST_API_TOKEN) {
+    console.error('REACT_APP_KV_REST_API_TOKEN is not set');
+  }
   if (!process.env.REACT_APP_KV_REST_API_URL || !process.env.REACT_APP_KV_REST_API_TOKEN) {
-    console.error('KV environment variables are not set');
     return null;
   }
   return kv;
