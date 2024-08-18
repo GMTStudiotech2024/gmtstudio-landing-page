@@ -125,7 +125,7 @@ const SignUp: React.FC = () => {
           </div>
         </form>
         <div className="text-sm text-center text-gray-600 dark:text-gray-400">
-          <p>By signing up, you agree to our <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">Terms of Service</a> and <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">Privacy Policy</a>.</p>
+          <p>By signing up, you agree to our <Link to="/terms" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">Terms of Service</Link> and <Link to="/privacy" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">Privacy Policy</Link>.</p>
         </div>
       </div>
     </div>

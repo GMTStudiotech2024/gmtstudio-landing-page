@@ -44,7 +44,7 @@ import AdvancedSearch from './components/AdvancedSearch';
 import DeepLearning from './components/DeepLearning';
 import Login from './components/Login';
 const AppContent: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const location = useLocation();

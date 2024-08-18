@@ -1,13 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import blogImage2 from '../assets/GMTStudio_p.png';
 
 const NEWS7: React.FC = () => {
-  const navigate = useNavigate();
 
-  const handleBackToBlog = () => {
-    navigate('/');
-  };
+
 
   return (
     <div className="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col">
