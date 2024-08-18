@@ -16,7 +16,15 @@ const SignUp: React.FC = () => {
       alert('Sign up successful!');
       // Redirect to login page or dashboard
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      if (err instanceof Error) {
+        if (err.message === 'KV client is not initialized') {
+          setError('Unable to connect to the database. Please try again later.');
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError('An unexpected error occurred');
+      }
     }
   };
 
