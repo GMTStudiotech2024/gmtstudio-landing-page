@@ -123,9 +123,28 @@ const recognizeIntent = (text: string): Intent | null => {
   return null;
 };
 
+interface TrainingExample {
+  input: string;
+  output: string;
+}
+
+function preprocessText(text: string): number[] {
+  // Simple preprocessing: convert to lowercase and count character occurrences
+  const lowercaseText = text.toLowerCase();
+  const charCounts = new Array(26).fill(0);
+  for (let char of lowercaseText) {
+    const charCode = char.charCodeAt(0) - 97;
+    if (charCode >= 0 && charCode < 26) {
+      charCounts[charCode]++;
+    }
+  }
+  return charCounts;
+}
+
 const DeepLearning: React.FC = () => {
-  const [network, setNetwork] = useState<NeuralNetwork>(new NeuralNetwork([2, 4, 1]));
+  const [network, setNetwork] = useState<NeuralNetwork>(new NeuralNetwork([26, 10, 1]));
   const [trainingData, setTrainingData] = useState<[number, number, number][]>([]);
+  const [nlTrainingData, setNLTrainingData] = useState<TrainingExample[]>([]);
   const [epochs, setEpochs] = useState<number>(0);
   const [loss, setLoss] = useState<number[]>([]);
   const [userInput, setUserInput] = useState<string>('');
@@ -145,15 +164,16 @@ const DeepLearning: React.FC = () => {
   const trainNetwork = useCallback(() => {
     console.log("Training started");
     console.log("Training data:", trainingData);
+    console.log("NL Training data:", nlTrainingData);
 
-    if (trainingData.length === 0) {
+    if (trainingData.length === 0 && nlTrainingData.length === 0) {
       alert("Please add training data first!");
       return;
     }
 
     setIsTraining(true);
     setIsPaused(false);
-    const newNetwork = new NeuralNetwork([2, 4, 1]);
+    const newNetwork = new NeuralNetwork(nlTrainingData.length > 0 ? [26, 10, 1] : [2, 4, 1]);
     const newLoss: number[] = [];
 
     const runEpoch = (i: number) => {
@@ -165,17 +185,27 @@ const DeepLearning: React.FC = () => {
 
       let epochLoss = 0;
       try {
-        trainingData.forEach(([x1, x2, y]) => {
-          const input = [x1, x2];
-          const target = [y];
-          epochLoss += newNetwork.train(input, target);
-        });
-        newLoss.push(epochLoss / trainingData.length);
+        if (trainingData.length > 0) {
+          trainingData.forEach(([x1, x2, y]) => {
+            const input = [x1, x2];
+            const target = [y];
+            epochLoss += newNetwork.train(input, target);
+          });
+        } else if (nlTrainingData.length > 0) {
+          nlTrainingData.forEach(({ input, output }) => {
+            const processedInput = preprocessText(input);
+            const target = [output === 'positive' ? 1 : 0];
+            epochLoss += newNetwork.train(processedInput, target);
+          });
+        }
+        
+        const dataLength = trainingData.length || nlTrainingData.length;
+        newLoss.push(epochLoss / dataLength);
         setEpochs(i + 1);
         setLoss([...newLoss]);
         setNetwork(newNetwork);
 
-        console.log(`Epoch ${i + 1} completed. Loss: ${epochLoss / trainingData.length}`);
+        console.log(`Epoch ${i + 1} completed. Loss: ${epochLoss / dataLength}`);
 
         requestAnimationFrame(() => runEpoch(i + 1));
       } catch (error) {
@@ -185,7 +215,7 @@ const DeepLearning: React.FC = () => {
     };
 
     runEpoch(0);
-  }, [trainingData, isPaused]);
+  }, [trainingData, nlTrainingData, isPaused]);
 
   const handleUserInput = () => {
     if (userInput.trim() === '') return;
@@ -199,6 +229,12 @@ const DeepLearning: React.FC = () => {
     if (!isNaN(x1) && !isNaN(x2)) {
       const prediction = network.forward([x1, x2])[0];
       const aiMessage = { type: 'ai' as const, message: `Prediction: ${prediction.toFixed(4)}` };
+      setChatHistory(prev => [...prev, aiMessage]);
+    } else if (nlTrainingData.length > 0) {
+      const processedInput = preprocessText(userInput);
+      const prediction = network.forward(processedInput)[0];
+      const sentiment = prediction > 0.5 ? 'positive' : 'negative';
+      const aiMessage = { type: 'ai' as const, message: `Sentiment prediction: ${sentiment} (${prediction.toFixed(4)})` };
       setChatHistory(prev => [...prev, aiMessage]);
     } else if (intent) {
       const response = intent.responses[Math.floor(Math.random() * intent.responses.length)];
@@ -243,17 +279,34 @@ const DeepLearning: React.FC = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const content = e.target?.result as string;
-        const lines = content.split('\n');
-        const newData: [number, number, number][] = lines.map(line => {
-          const [x1, x2, y] = line.split(',').map(Number);
-          return [x1, x2, y];
-        }).filter((row): row is [number, number, number] => 
-          row.length === 3 && row.every(val => !isNaN(val))
-        );
+        const lines = content.split('\n').filter(line => line.trim() !== '');
         
-        setTrainingData(newData);
+        if (lines[0].includes(',')) {
+          // Numeric dataset
+          const newData: [number, number, number][] = lines.map(line => {
+            const [x1, x2, y] = line.split(',').map(Number);
+            return [x1, x2, y];
+          }).filter((row): row is [number, number, number] => 
+            row.length === 3 && row.every(val => !isNaN(val))
+          );
+          
+          setTrainingData(newData);
+          setNLTrainingData([]);
+          console.log("Parsed numeric data:", newData);
+        } else {
+          // Natural language dataset
+          const newData: TrainingExample[] = lines.map(line => {
+            const [input, output] = line.split('\t');
+            return { input: input.trim(), output: output.trim() };
+          }).filter(example => example.input && example.output);
+          
+          setNLTrainingData(newData);
+          setTrainingData([]);
+          console.log("Parsed NL data:", newData);
+        }
+        
         setDatasetName(file.name);
-        const aiMessage = { type: 'ai' as const, message: `Uploaded dataset: ${file.name} with ${newData.length} samples.` };
+        const aiMessage = { type: 'ai' as const, message: `Uploaded dataset: ${file.name} with ${lines.length} samples.` };
         setChatHistory(prev => [...prev, aiMessage]);
       };
       reader.readAsText(file);
@@ -347,7 +400,8 @@ const DeepLearning: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-4 flex items-center">
             <FaBrain className="mr-2" /> Network Training
           </h2>
-          <p className="mb-4">Training Data: {trainingData.length} samples</p>
+          <p className="mb-4">Numeric Training Data: {trainingData.length} samples</p>
+          <p className="mb-4">NL Training Data: {nlTrainingData.length} samples</p>
           <p className="mb-4">Dataset: {datasetName || 'No dataset uploaded'}</p>
           <input
             type="file"
@@ -367,9 +421,9 @@ const DeepLearning: React.FC = () => {
               console.log("Training button clicked");
               isTraining ? setIsPaused(!isPaused) : trainNetwork();
             }}
-            disabled={trainingData.length === 0}
+            disabled={trainingData.length === 0 && nlTrainingData.length === 0}
             className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors w-full ${
-              trainingData.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
+              trainingData.length === 0 && nlTrainingData.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
             {isTraining ? (isPaused ? <><FaPlay className="mr-2" /> Resume Training</> : <><FaPause className="mr-2" /> Pause Training</>) : <><FaPlay className="mr-2" /> Start Training</>}

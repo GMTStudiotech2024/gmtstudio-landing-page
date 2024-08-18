@@ -1,19 +1,29 @@
-const API_URL = 'http://localhost:5000/api';
+import { kv } from '@vercel/kv';
+import bcrypt from 'bcryptjs';
 
-export const signup = async (email: string, password: string, username: string) => {
-  const response = await fetch(`${API_URL}/signup`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password, username }),
-  });
-  return await response.json();
-};
+export async function signUp(email: string, username: string, password: string) {
+  const existingUser = await kv.get(`user:${email}`);
+  if (existingUser) {
+    throw new Error('User already exists');
+  }
 
-export const login = async (email: string, password: string) => {
-  const response = await fetch(`${API_URL}/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
-  return await response.json();
-};
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = { email, username, password: hashedPassword };
+  await kv.set(`user:${email}`, JSON.stringify(user));
+  return { email, username };
+}
+
+export async function login(email: string, password: string) {
+  const userJson = await kv.get(`user:${email}`);
+  if (!userJson) {
+    throw new Error('User not found');
+  }
+
+  const user = JSON.parse(userJson as string);
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    throw new Error('Invalid password');
+  }
+
+  return { email: user.email, username: user.username };
+}

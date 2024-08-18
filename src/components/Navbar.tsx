@@ -265,8 +265,8 @@ const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () 
           <FaBars className="mr-2" /> Systems Status
         </Link>
         {!user && (
-          <Link to="/SignUp" className="flex px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 items-center rounded-md">
-            <FaUser className="mr-2" /> SignUp / Login
+          <Link to="/signup" className="flex px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 items-center rounded-md">
+            <FaUser className="mr-2" /> Sign Up
           </Link>
         )}
         {user && (

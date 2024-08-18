@@ -18,7 +18,7 @@ import CustomCursor from './components/CustomCursor';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import Sidebar from './components/Sidebar';
 import Contact from './components/ContactPage';
-import SignUpLoginPage from './components/SignUp';
+import SignUp from './components/SignUp';
 import Latest from './components/Latest';
 import NEWS1 from './components/News/NEWS1';
 import NEWS2 from './components/News/NEWS2';
@@ -108,7 +108,7 @@ const AppContent: React.FC = () => {
           <Route path="/learning" element={<Learning />} />
           <Route path="*" element={<Error />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/signup" element={<SignUpLoginPage setIsAuthenticated={setIsAuthenticated} />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route path="/latest" element={<Latest />} />
           <Route path="/products" element={<Products />} />
           <Route path="/help" element={<Help />} />
