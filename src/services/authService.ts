@@ -2,18 +2,17 @@ import { kv } from '@vercel/kv';
 import bcrypt from 'bcryptjs';
 
 const getKVClient = () => {
-  if (!process.env.REACT_APP_KV_REST_API_URL) {
-    console.error('REACT_APP_KV_REST_API_URL is not set');
+  if (!process.env.KV_REST_API_URL) {
+    console.error('KV_REST_API_URL is not set');
   }
-  if (!process.env.REACT_APP_KV_REST_API_TOKEN) {
-    console.error('REACT_APP_KV_REST_API_TOKEN is not set');
+  if (!process.env.KV_REST_API_TOKEN) {
+    console.error('KV_REST_API_TOKEN is not set');
   }
-  if (!process.env.REACT_APP_KV_REST_API_URL || !process.env.REACT_APP_KV_REST_API_TOKEN) {
+  if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
     return null;
   }
   return kv;
 };
-
 export async function signUp(email: string, username: string, password: string) {
   const kvClient = getKVClient();
   if (!kvClient) {
