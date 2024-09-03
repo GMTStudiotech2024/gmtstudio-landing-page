@@ -108,15 +108,15 @@ const Products: React.FC = () => {
   };
 
   return (
-    <section id="products" className="py-16 bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-black min-h-screen">
+    <section id="products" className="py-16 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2 
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-5xl font-bold text-gray-900 dark:text-white mb-12 text-center"
+          className="text-4xl font-semibold text-gray-900 dark:text-white mb-12 text-center"
         >
-          Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">Products</span>
+          Our Products
         </motion.h2>
         
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-center">
@@ -129,8 +129,8 @@ const Products: React.FC = () => {
                 whileTap={{ scale: 0.95 }}
                 className={`mx-2 my-1 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   selectedCategory === category
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
                 {category}
@@ -144,13 +144,13 @@ const Products: React.FC = () => {
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 rounded-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-md"
+                className="pl-10 pr-4 py-2 rounded-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
               />
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
             <button
               onClick={() => setIsGridView(!isGridView)}
-              className="p-2 bg-white dark:bg-gray-700 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors shadow-md"
+              className="p-2 bg-white dark:bg-gray-800 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm"
             >
               {isGridView ? <FaList className="text-gray-600 dark:text-gray-300" /> : <FaThLarge className="text-gray-600 dark:text-gray-300" />}
             </button>
@@ -163,66 +163,46 @@ const Products: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className={isGridView ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10" : "space-y-8"}
+            className={isGridView ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-6"}
           >
             {filteredProducts.map((product, index) => (
               <AnimatedItem key={index} className="h-full">
                 <motion.div 
-                  className={`relative flex ${isGridView ? 'flex-col' : 'flex-row'} rounded-xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105`}
-                  whileHover={{ scale: 1.05 }}
+                  className={`relative flex ${isGridView ? 'flex-col' : 'flex-row'} rounded-2xl bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out`}
+                  whileHover={{ scale: 1.02 }}
                   onHoverStart={() => setHoveredProduct(index)}
                   onHoverEnd={() => setHoveredProduct(null)}
                 >
-                  <div className={`relative ${isGridView ? 'h-56' : 'w-1/3 h-full'} overflow-hidden rounded-t-xl ${isGridView ? '' : 'rounded-l-xl rounded-r-none'}`}>
+                  <div className={`relative ${isGridView ? 'h-48' : 'w-1/3 h-full'} overflow-hidden rounded-t-2xl ${isGridView ? '' : 'rounded-l-2xl rounded-r-none'}`}>
                     <img 
                       src={product.image} 
                       alt={product.name} 
-                      className="w-full h-full object-cover transition-transform duration-300 ease-in-out transform hover:scale-110"
+                      className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                      <span className="text-white text-lg font-bold">{product.category}</span>
-                    </div>
-                    <div className="absolute top-2 right-2 bg-white dark:bg-gray-800 rounded-full p-2">
+                    <div className="absolute top-2 right-2 bg-white dark:bg-gray-800 rounded-full p-2 shadow-sm">
                       {getStatusIcon(product.status)}
                     </div>
                   </div>
-                  <div className={`${isGridView ? 'p-6' : 'p-6 w-2/3'}`}>
-                    <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200 flex items-center">
-                      <product.icon className="mr-2 text-2xl text-blue-500 dark:text-yellow-400" />
+                  <div className={`${isGridView ? 'p-4' : 'p-4 w-2/3'}`}>
+                    <h2 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200 flex items-center">
+                      <product.icon className="mr-2 text-xl text-blue-500" />
                       {product.name}
                     </h2>
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">{product.description}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{product.description}</p>
                     <div className="flex justify-between items-center">
                       <a 
                         href={product.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-block rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 py-2 px-4 text-center text-sm font-bold uppercase text-white transition-all hover:shadow-lg focus:shadow-none hover:from-pink-600 hover:to-purple-600"
+                        className="inline-block rounded-full bg-blue-500 py-2 px-4 text-center text-sm font-medium text-white transition-all hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                       >
                         Learn More
                       </a>
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <FaTags className="mr-2" />
-                        <span>{product.category}</span>
+                      <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                        {getStatusText(product.status)}
                       </div>
                     </div>
-                    <div className="mt-4 text-sm font-medium text-gray-500 dark:text-gray-400">
-                      Status: {getStatusText(product.status)}
-                    </div>
                   </div>
-                  {hoveredProduct === index && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 20 }}
-                      className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4"
-                    >
-                      <p className="text-white text-sm">
-                        <FaInfoCircle className="inline mr-2" />
-                        Click to learn more about {product.name}
-                      </p>
-                    </motion.div>
-                  )}
                 </motion.div>
               </AnimatedItem>
             ))}

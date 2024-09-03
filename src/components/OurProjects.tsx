@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBolt, faExclamationCircle, faGlobe, faRocket, faCompass } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { motion, AnimatePresence } from 'framer-motion';
 import projectImage2 from '../assets/images/blog5.png';
 import projectImage3 from '../assets/images/Story.jpg';
-import { motion, AnimatePresence } from 'framer-motion';
 import game_ohmypc from '../assets/images/Game_ohmypc.jpg';
 import game_dungeon from '../assets/images/Game_dungeon.jpg';
 import AI from '../assets/images/AI.png'
+import { faRocket, faExclamationCircle, faGlobe, faCompass } from '@fortawesome/free-solid-svg-icons';
 const projects = [
   {
     title: 'GMTStudio AI WorkSpace',
@@ -95,65 +96,74 @@ const OurProjects: React.FC = () => {
   };
 
   return (
-    <section id="projects" className="projects-section py-20 bg-gradient-to-b from-gray-200 to-gray-200 text-gray-900 dark:from-gray-900 dark:to-black dark:text-white">
+    <section id="projects" className="py-20 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-5xl font-extrabold text-center mb-16">
-          <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            Innovations at GMTStudio
-          </span>
-        </h2>
+        <motion.h2 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-3xl font-semibold text-center mb-12 text-gray-900 dark:text-white"
+        >
+          Innovations at GMTStudio
+        </motion.h2>
 
         <AnimatePresence mode="wait">
           <motion.div 
             key={currentSlide}
-            className="grid grid-cols-1 md:grid-cols-3 gap-12"
-            initial={{ opacity: 0, x: 300 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -300 }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
           >
             {projects.slice(currentSlide * (isMobile ? 1 : 3), currentSlide * (isMobile ? 1 : 3) + (isMobile ? 1 : 3)).map((project, index) => (
-              <div
+              <motion.div
                 key={index}
-                className="group relative overflow-hidden rounded-3xl bg-gray-800 p-1 shadow-2xl transition-all duration-500 hover:scale-105 hover:shadow-lg cursor-pointer"
-                onClick={() => handleProjectClick(project.link, project.isInternal)}
-                role="button"
-                aria-label={`View project ${project.title}`}
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && handleProjectClick(project.link, project.isInternal)}
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden"
+                whileHover={{ y: -5, boxShadow: '0 10px 30px -15px rgba(0, 0, 0, 0.2)' }}
+                transition={{ duration: 0.2 }}
               >
-                <div className={`absolute inset-0 bg-gradient-to-r ${project.color} opacity-75 transition-opacity duration-500 group-hover:opacity-100`}></div>
-                <div className="relative p-6 sm:p-8">
-                  <div className="overflow-hidden rounded-xl shadow-xl transition duration-500 group-hover:scale-105 group-hover:shadow-2xl">
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      loading="lazy"
-                      className="h-48 w-full object-cover object-center transition-transform duration-500 ease-in-out transform group-hover:scale-110"
-                    />
-                  </div>
-                  <div className="relative mt-6">
-                    <h3 className="text-xl font-bold text-white mb-2 flex items-center">
-                      <FontAwesomeIcon icon={project.icon} className="mr-2 text-2xl" />
+                <div className="relative h-48">
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black opacity-50"></div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h3 className="text-xl font-semibold text-white">
                       {project.title}
                     </h3>
-                    <p className="text-sm text-gray-300 mb-4">
-                      {project.description}
-                    </p>
-                    <motion.button 
-                      className="flex items-center justify-center w-full bg-white text-gray-900 font-semibold px-4 py-2 rounded-full hover:bg-opacity-90 transition-all duration-300 group"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <span className="mr-2">Explore</span>
-                      <FontAwesomeIcon icon={faBolt} className="transition-transform duration-300 group-hover:translate-x-1" />
-                    </motion.button>
                   </div>
                 </div>
-              </div>
+                <div className="p-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                    {project.description}
+                  </p>
+                  <button 
+                    onClick={() => handleProjectClick(project.link, project.isInternal)}
+                    className="w-full bg-blue-500 text-white text-sm font-medium py-2 px-4 rounded-full hover:bg-blue-600 transition-colors duration-300 flex items-center justify-center"
+                  >
+                    <span>Learn More</span>
+                    <FontAwesomeIcon icon={faChevronRight} className="ml-2 text-xs" />
+                  </button>
+                </div>
+              </motion.div>
             ))}
           </motion.div>
         </AnimatePresence>
+
+        <div className="flex justify-center mt-8">
+          {Array.from({ length: Math.ceil(projects.length / (isMobile ? 1 : 3)) }).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`w-2 h-2 rounded-full mx-1 ${
+                currentSlide === index ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+              }`}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -39,7 +39,7 @@ const eventsData = [
 ];
 
 const eventVariants = {
-  hidden: { opacity: 0, y: 50 },
+  hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
 };
 
@@ -47,11 +47,11 @@ const UpcomingEvents: React.FC = () => {
   const [expandedEvent, setExpandedEvent] = useState<number | null>(null);
 
   return (
-    <section className="upcoming-events py-24 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black">
+    <section className="upcoming-events py-24 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-black">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2 
-          className="text-6xl font-extrabold mb-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
-          initial={{ opacity: 0, y: -50 }}
+          className="text-4xl font-bold mb-16 text-center text-gray-900 dark:text-white"
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
@@ -61,31 +61,30 @@ const UpcomingEvents: React.FC = () => {
           {eventsData.map((event, index) => (
             <motion.div
               key={index}
-              className={`rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 ${event.color}`}
+              className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
               variants={eventVariants}
             >
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <event.icon className={`h-12 w-12 ${event.textColor}`} />
-                  <span className={`text-sm font-semibold ${event.textColor}`}>{event.date}</span>
+                  <div className={`p-3 rounded-full ${event.color}`}>
+                    <event.icon className={`h-6 w-6 ${event.textColor}`} />
+                  </div>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{event.date}</span>
                 </div>
-                <h3 className={`text-2xl font-bold mb-3 ${event.textColor}`}>{event.title}</h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">{event.description}</p>
-                <div className="flex justify-between items-center">
-                  <button 
-                    className={`mt-4 px-4 py-2 rounded-full ${event.textColor} border border-current hover:bg-opacity-10 hover:bg-current transition-colors duration-300`}
-                    onClick={() => setExpandedEvent(expandedEvent === index ? null : index)}
-                  >
-                    {expandedEvent === index ? 'Less Info' : 'More Info'}
-                  </button>
-                  <ChevronDownIcon 
-                    className={`h-6 w-6 ${event.textColor} transition-transform duration-300 ${expandedEvent === index ? 'transform rotate-180' : ''}`}
-                  />
-                </div>
+                <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{event.title}</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">{event.description}</p>
+                <motion.button 
+                  className="w-full mt-4 px-4 py-2 rounded-full bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors duration-300"
+                  onClick={() => setExpandedEvent(expandedEvent === index ? null : index)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {expandedEvent === index ? 'Less Info' : 'More Info'}
+                </motion.button>
                 <AnimatePresence>
                   {expandedEvent === index && (
                     <motion.div
@@ -93,19 +92,19 @@ const UpcomingEvents: React.FC = () => {
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="mt-4 pt-4 border-t border-current"
+                      className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
                     >
                       <div className="flex items-center mb-2">
-                        <MapPinIcon className={`h-5 w-5 ${event.textColor} mr-2`} />
-                        <p className={`${event.textColor} font-semibold`}>{event.location}</p>
+                        <MapPinIcon className="h-5 w-5 text-gray-400 mr-2" />
+                        <p className="text-gray-700 dark:text-gray-300">{event.location}</p>
                       </div>
                       <div className="flex items-center mb-2">
-                        <ClockIcon className={`h-5 w-5 ${event.textColor} mr-2`} />
-                        <p className={`${event.textColor} font-semibold`}>{event.time}</p>
+                        <ClockIcon className="h-5 w-5 text-gray-400 mr-2" />
+                        <p className="text-gray-700 dark:text-gray-300">{event.time}</p>
                       </div>
                       <div className="flex items-center">
-                        <UserGroupIcon className={`h-5 w-5 ${event.textColor} mr-2`} />
-                        <p className={`${event.textColor} font-semibold`}>Expected Attendees: {event.attendees}</p>
+                        <UserGroupIcon className="h-5 w-5 text-gray-400 mr-2" />
+                        <p className="text-gray-700 dark:text-gray-300">Expected Attendees: {event.attendees}</p>
                       </div>
                     </motion.div>
                   )}

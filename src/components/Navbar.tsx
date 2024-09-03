@@ -21,7 +21,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
   const location = useLocation();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { scrollYProgress } = useViewportScroll();
-  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0.8]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 1]);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
 
   const handleScroll = useCallback(() => {
@@ -93,7 +93,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
     <motion.nav 
       style={{ opacity }}
       className={`fixed w-full z-50 transition-all duration-300 backdrop-blur-md ${
-        scrollPosition > 50 ? 'bg-gray-900/80 shadow-md' : 'bg-transparent'
+        scrollPosition > 50 ? 'bg-white/90 dark:bg-gray-900/90 shadow-sm' : 'bg-transparent'
       }`}
     >
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">

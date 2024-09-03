@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { FaChevronDown, FaSearch, FaTags, FaCalendarAlt, FaUser, FaEye, FaShare, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import DEV from '../assets/images/1.png'
 import Beta from '../assets/images/cool_design.png'
@@ -50,6 +50,12 @@ const Blog: React.FC = () => {
   const [sortBy, setSortBy] = useState('date');
   const categories = ['All', ...Array.from(new Set(blogPosts.map(post => post.category)))];
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  const controls = useAnimation();
+
+  useEffect(() => {
+    controls.start({ opacity: 1, y: 0 });
+  }, [controls]);
 
   useEffect(() => {
     let filtered = blogPosts.filter(post => 
@@ -105,15 +111,15 @@ const Blog: React.FC = () => {
   };
 
   return (
-    <section id="blog" className="py-16 bg-gradient-to-b from-gray-200 to-gray-200 dark:from-gray-900 dark:to-black rounded-t-xl">
+    <section id="blog" className="py-16 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-black">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2 
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-5xl font-bold text-black dark:text-white mb-12 text-center"
+          transition={{ duration: 0.5, type: 'spring', stiffness: 100 }}
+          className="text-4xl font-bold text-gray-900 dark:text-white mb-12 text-center"
         >
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Latest News</span>
+          Latest News
         </motion.h2>
         
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
@@ -122,10 +128,10 @@ const Blog: React.FC = () => {
               <motion.button
                 key={index}
                 onClick={() => setSelectedCategory(category)}
-                className={`m-1 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`m-1 px-6 py-3 rounded-full text-sm font-medium transition-all ${
                   selectedCategory === category
-                    ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                    : 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -142,14 +148,14 @@ const Blog: React.FC = () => {
                 placeholder="Search posts..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 rounded-full bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="pl-10 pr-4 py-3 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               />
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-gray-800 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-white rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
             >
               <option value="date">Sort by Date</option>
               <option value="views">Sort by Views</option>
@@ -159,7 +165,7 @@ const Blog: React.FC = () => {
 
         <AnimatePresence>
           <motion.div 
-            className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-10"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -167,50 +173,44 @@ const Blog: React.FC = () => {
             {filteredPosts.map((post, index) => (
               <motion.div 
                 key={index} 
-                className="relative flex w-full flex-col rounded-xl bg-gray-400 bg-clip-border text-gray-900 shadow-lg dark:bg-gray-900 dark:text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl"
+                className="bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-xl flex flex-col h-full"
                 variants={itemVariants}
               >
-                <div className="relative mx-4 -mt-6 h-56 overflow-hidden rounded-xl bg-gradient-to-r from-red-500 to-orange-500">
+                <div className="relative h-48 overflow-hidden">
                   <img 
                     src={post.image} 
                     alt={post.title} 
-                    className="w-full h-full object-cover transition-transform duration-300 ease-in-out transform hover:scale-110"
+                    className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                    <span className="text-white text-lg font-bold">{post.category}</span>
+                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black opacity-60"></div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <span className="text-white text-sm font-semibold bg-blue-500 px-2 py-1 rounded-full">{post.category}</span>
                   </div>
                 </div>
-                <div className="p-8">
-                  <div className="flex justify-between items-center mb-2">
-                    <p className="text-gray-400 text-sm flex items-center">
-                      <FaCalendarAlt className="mr-2" /> {post.date}
-                    </p>
-                    <p className="text-gray-400 text-sm flex items-center">
-                      <FaEye className="mr-2" /> {post.views} views
-                    </p>
+                <div className="p-6 flex-grow flex flex-col">
+                  <h3 className="text-xl font-semibold text-white mb-2 line-clamp-2">{post.title}</h3>
+                  <p className="text-gray-300 text-sm mb-4 line-clamp-3 flex-grow">{post.excerpt}</p>
+                  <div className="flex justify-between items-center text-sm text-gray-400 mt-auto">
+                    <span className="flex items-center">
+                      <FaUser className="mr-2" />
+                      {post.author}
+                    </span>
+                    <span className="flex items-center">
+                      <FaCalendarAlt className="mr-2" />
+                      {post.date}
+                    </span>
                   </div>
-                  <h5 className="mb-2 text-2xl font-semibold leading-snug tracking-normal text-white">
-                    {post.title}
-                  </h5>
-                  <p className="mb-4 text-gray-200 dark:text-gray-200">
-                    {post.excerpt}
-                  </p>
-                  <div className="flex justify-between items-center">
-                    <p className="text-gray-400 text-sm flex items-center">
-                      <FaUser className="mr-2" /> {post.author}
-                    </p>
-                    <p className="text-gray-400 text-sm">{post.readTime}</p>
-                  </div>
-                  <div className="mt-4 flex justify-between items-center">
-                    <Link 
-                      to={post.link}
-                      className="inline-block rounded-lg bg-gradient-to-r from-red-500 to-orange-500 py-3 px-6 text-center text-base font-bold uppercase text-white transition-all hover:shadow-lg focus:shadow-none hover:from-orange-500 hover:to-red-500"
-                    >
-                      Read More
-                    </Link>
-                    <button className="text-gray-400 hover:text-white transition-colors duration-200">
-                      <FaShare />
-                    </button>
+                </div>
+                <div className="px-6 py-4 bg-gray-700 flex justify-between items-center mt-auto">
+                  <Link 
+                    to={post.link}
+                    className="text-blue-400 font-medium hover:underline"
+                  >
+                    Read More
+                  </Link>
+                  <div className="flex items-center text-sm text-gray-400">
+                    <FaEye className="mr-1" />
+                    {post.views} views
                   </div>
                 </div>
               </motion.div>
@@ -298,7 +298,7 @@ const Blog: React.FC = () => {
         >
           <Link
             to="/Latest"
-            className="mt-4 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors duration-200 flex items-center group"
+            className="mt-4 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors duration-200 flex items-center group text-lg font-medium"
           >
             More News 
             <FaChevronDown className="ml-2 group-hover:translate-y-1 transition-transform duration-200" />
