@@ -225,14 +225,20 @@ const ProfileDropdown: React.FC<{ isProfileOpen: boolean; toggleProfileMenu: () 
   </AnimatePresence>
 );
 
-const NotificationButton: React.FC<{ toggleNotificationMenu: () => void; isNotificationOpen: boolean; notifications: any[] }> = ({ toggleNotificationMenu, isNotificationOpen, notifications }) => (
-  <button onClick={toggleNotificationMenu} className="flex p-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 relative">
-    <FaBell className={`w-5 h-5 ${isNotificationOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
-    {notifications.some(n => !n.read) && (
-      <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-3 h-3 animate-pulse"></span>
-    )}
-  </button>
-);
+const NotificationButton: React.FC<{ toggleNotificationMenu: () => void; isNotificationOpen: boolean; notifications: any[] }> = ({ toggleNotificationMenu, isNotificationOpen, notifications }) => {
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  return (
+    <button onClick={toggleNotificationMenu} className="flex p-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 relative">
+      <FaBell className={`w-5 h-5 ${isNotificationOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
+      {unreadCount > 0 && (
+        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+          {unreadCount}
+        </span>
+      )}
+    </button>
+  );
+};
 
 const NotificationDropdown: React.FC<{ isNotificationOpen: boolean; toggleNotificationMenu: () => void; notifications: any[]; markAllAsRead: () => void }> = ({ isNotificationOpen, toggleNotificationMenu, notifications, markAllAsRead }) => (
   <AnimatePresence>
@@ -242,27 +248,47 @@ const NotificationDropdown: React.FC<{ isNotificationOpen: boolean; toggleNotifi
         animate="visible"
         exit="hidden"
         variants={{
-          hidden: { opacity: 0, y: -20 },
-          visible: { opacity: 1, y: 0 },
+          hidden: { opacity: 0, y: -20, scale: 0.95 },
+          visible: { opacity: 1, y: 0, scale: 1 },
         }}
-        className="absolute right-4 mt-4 bg-white dark:bg-gray-950 shadow-lg rounded-lg p-4 space-y-2 w-80"
+        transition={{ duration: 0.2 }}
+        className="absolute right-4 mt-4 bg-gray-100 dark:bg-gray-800 shadow-lg rounded-2xl p-4 space-y-2 w-80 max-h-[80vh] overflow-y-auto"
       >
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-gray-800 dark:text-white">Notifications</h3>
+          <h3 className="font-semibold text-gray-800 dark:text-white text-lg">Notifications</h3>
           <button onClick={markAllAsRead} className="text-sm text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300">
-            Mark all as read
+            Clear All
           </button>
         </div>
-        {notifications.map((notification) => (
-          <div key={notification.id} className={`p-2 ${notification.read ? 'bg-gray-100 dark:bg-gray-800' : 'bg-blue-50 dark:bg-blue-900'} rounded-md`}>
-            <p className={`text-sm ${notification.read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-white'}`}>
-              {notification.message}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {new Date(notification.timestamp).toLocaleString()}
-            </p>
+        {notifications.length === 0 ? (
+          <p className="text-center text-gray-500 dark:text-gray-400">No notifications</p>
+        ) : (
+          <div className="space-y-2">
+            {notifications.map((notification, index) => (
+              <motion.div
+                key={notification.id}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className={`p-3 bg-white dark:bg-gray-700 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-600`}
+              >
+                <div className="flex items-start">
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="font-semibold text-sm text-gray-800 dark:text-white">GMTStudio</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {new Date(notification.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    <p className={`text-sm ${notification.read ? 'text-gray-600 dark:text-gray-300' : 'text-gray-800 dark:text-white'}`}>
+                      {notification.message}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
-        ))}
+        )}
       </motion.div>
     )}
   </AnimatePresence>
