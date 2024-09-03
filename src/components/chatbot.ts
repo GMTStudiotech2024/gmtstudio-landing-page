@@ -84,6 +84,87 @@ class MultilayerPerceptron {
       }
     }
   }
+
+  // Add a new method for batch training
+  batchTrain(inputs: number[][], targets: number[][], learningRate: number = 0.1, batchSize: number = 32) {
+    for (let i = 0; i < inputs.length; i += batchSize) {
+      const batchInputs = inputs.slice(i, i + batchSize);
+      const batchTargets = targets.slice(i, i + batchSize);
+      
+      let gradients = this.weights.map(layer => layer.map(neuron => neuron.map(() => 0)));
+      let biasGradients = this.biases.map(layer => layer.map(() => 0));
+
+      for (let j = 0; j < batchInputs.length; j++) {
+        const [deltaGradients, deltaBiasGradients] = this.backpropagate(batchInputs[j], batchTargets[j]);
+        
+        gradients = gradients.map((layer, l) => 
+          layer.map((neuron, n) => 
+            neuron.map((grad, w) => grad + deltaGradients[l][n][w])
+          )
+        );
+        
+        biasGradients = biasGradients.map((layer, l) => 
+          layer.map((bias, n) => bias + deltaBiasGradients[l][n])
+        );
+      }
+
+      // Update weights and biases with averaged gradients
+      const batchLearningRate = learningRate / batchInputs.length;
+      this.weights = this.weights.map((layer, l) => 
+        layer.map((neuron, n) => 
+          neuron.map((weight, w) => weight - batchLearningRate * gradients[l][n][w])
+        )
+      );
+      
+      this.biases = this.biases.map((layer, l) => 
+        layer.map((bias, n) => bias - batchLearningRate * biasGradients[l][n])
+      );
+    }
+  }
+
+  // Helper method for backpropagation
+  private backpropagate(input: number[], target: number[]): [number[][][], number[][]] {
+    // Forward pass
+    let activations = [input];
+    let weightedSums = [];
+
+    for (let i = 0; i < this.weights.length; i++) {
+      let newActivation = [];
+      let newWeightedSum = [];
+      for (let j = 0; j < this.weights[i].length; j++) {
+        const sum = this.weights[i][j].reduce((sum, weight, k) => sum + weight * activations[i][k], 0) + this.biases[i][j];
+        newWeightedSum.push(sum);
+        newActivation.push(this.sigmoid(sum));
+      }
+      weightedSums.push(newWeightedSum);
+      activations.push(newActivation);
+    }
+
+    // Backward pass
+    let deltas = [activations[activations.length - 1].map((output, i) => 
+      (output - target[i]) * this.sigmoidDerivative(output)
+    )];
+
+    for (let i = this.weights.length - 1; i > 0; i--) {
+      let layerDelta = [];
+      for (let j = 0; j < this.weights[i-1].length; j++) {
+        const error = this.weights[i].reduce((sum, neuronWeights, k) => sum + neuronWeights[j] * deltas[0][k], 0);
+        layerDelta.push(error * this.sigmoidDerivative(activations[i][j]));
+      }
+      deltas.unshift(layerDelta);
+    }
+
+    // Calculate gradients
+    let gradients = this.weights.map((layer, i) => 
+      layer.map((neuron, j) => 
+        neuron.map((_, k) => deltas[i][j] * activations[i][k])
+      )
+    );
+
+    let biasGradients = deltas;
+
+    return [gradients, biasGradients];
+  }
 }
 
 const intents: Intent[] = [

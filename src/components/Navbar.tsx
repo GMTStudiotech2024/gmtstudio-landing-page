@@ -175,10 +175,13 @@ const NavLink: React.FC<{ href: string; label: string; icon: React.ReactNode; is
 const SearchButton: React.FC<{ onSearchClick: () => void }> = ({ onSearchClick }) => (
   <button
     onClick={onSearchClick}
-    className="p-2 text-blue-300 dark:text-gray-200 hover:bg-blue-500 hover:text-white dark:hover:bg-yellow-400 dark:hover:text-gray-900 transition-colors duration-300 rounded-md"
-    aria-label="Search"
+    className="p-2 text-purple-600 dark:text-purple-400 hover:bg-purple-100 hover:text-purple-800 dark:hover:bg-purple-900 dark:hover:text-purple-200 transition-colors duration-300 rounded-md flex items-center"
+    aria-label="AI Search"
   >
-    <FaSearch className="w-5 h-5" />
+    <svg className="w-5 h-5 mr-1" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+    </svg>
+    <span className="hidden md:inline">Search with AI</span>
   </button>
 );
 
