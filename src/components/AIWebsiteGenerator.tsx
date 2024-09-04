@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaRocket, FaSpinner, FaCopy, FaDownload } from 'react-icons/fa';
-import { FiSettings, FiEye, FiEyeOff, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { FaSpinner, FaCopy, FaDownload,  FaCode } from 'react-icons/fa';
+import { FiSettings, FiEye, FiEyeOff, FiChevronDown, FiChevronUp, FiZap,FiTerminal } from 'react-icons/fi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -11,7 +11,14 @@ interface Component {
   children?: string | Component[];
 }
 
-const generateWebsite = async (input: string, theme: string): Promise<Component[]> => {
+const generateWebsite = async (input: string, theme: string, options: {
+  colorScheme: string;
+  fontFamily: string;
+  responsiveDesign: boolean;
+  accessibilityFeatures: boolean;
+  animations: boolean;
+  customCSS: string;
+}): Promise<Component[]> => {
   await new Promise(resolve => setTimeout(resolve, 2000));
 
   const lowercaseInput = input.toLowerCase();
@@ -114,7 +121,7 @@ const generateWebsite = async (input: string, theme: string): Promise<Component[
         { type: 'div', props: { style: { position: 'relative', zIndex: 1 } }, children: [
           { type: 'h2', props: { style: { fontSize: '3em', marginBottom: '20px' } }, children: 'Welcome to Website' },
           { type: 'p', props: { style: { fontSize: '1.2em', marginBottom: '30px' } }, children: 'Discover our amazing products and services.' },
-          { type: 'button', props: { style: { backgroundColor: colors.secondary, color: colors.bg, padding: '15px 30px', fontSize: '1.2em', border: 'none', borderRadius: '5px', cursor: 'pointer' } }, children: 'Get Started' }
+          { type: 'button', props: { style: { backgroundColor: colors.secondary, color: colors.bg, padding: '15px 30px', fontSize: '1.2em', border: 'none', borderRadius: '5px', cursor: 'none' } }, children: 'Get Started' }
         ]},
         { type: 'div', props: { style: { 
           position: 'absolute', 
@@ -272,7 +279,7 @@ const generateWebsite = async (input: string, theme: string): Promise<Component[
       children: [
         { type: 'h2', props: { style: { marginBottom: '20px' } }, children: 'Ready to Get Started?' },
         { type: 'p', props: { style: { marginBottom: '30px' } }, children: 'Join us today and experience the difference!' },
-        { type: 'button', props: { style: { backgroundColor: colors.secondary, color: colors.bg, padding: '10px 20px', fontSize: '1em', border: 'none', borderRadius: '5px', cursor: 'pointer' } }, children: 'Sign Up Now' }
+        { type: 'button', props: { style: { backgroundColor: colors.secondary, color: colors.bg, padding: '10px 20px', fontSize: '1em', border: 'none', borderRadius: '5px', cursor: 'none' } }, children: 'Sign Up Now' }
       ]
     });
   }
@@ -313,7 +320,7 @@ const generateWebsite = async (input: string, theme: string): Promise<Component[
               backgroundColor: colors.accent, 
               color: colors.bg, 
               padding: '15px 20px', 
-              cursor: 'pointer',
+              cursor: 'none',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center'
@@ -391,7 +398,7 @@ const generateWebsite = async (input: string, theme: string): Promise<Component[
               { type: 'li', props: { style: { margin: '10px 0' } }, children: '✓ Feature 2' },
               { type: 'li', props: { style: { margin: '10px 0' } }, children: '✓ Feature 3' },
             ]},
-            { type: 'button', props: { style: { display: 'block', width: '100%', padding: '10px', backgroundColor: colors.accent, color: colors.bg, border: 'none', borderRadius: '5px', cursor: 'pointer' } }, children: 'Choose Plan' },
+            { type: 'button', props: { style: { display: 'block', width: '100%', padding: '10px', backgroundColor: colors.accent, color: colors.bg, border: 'none', borderRadius: '5px', cursor: 'none' } }, children: 'Choose Plan' },
           ]},
           // ... Add more pricing plans here ...
         ]}
@@ -421,6 +428,192 @@ const generateWebsite = async (input: string, theme: string): Promise<Component[
   return components;
 };
 
+const generateBasicJS = (components: Component[]): string => {
+  let js = '';
+
+  // Helper function to check if a component type exists
+  const hasComponent = (type: string) => components.some(comp => comp.type === type);
+
+  // Navigation menu
+  if (hasComponent('nav')) {
+    js += `
+// Navigation menu functionality
+document.addEventListener('DOMContentLoaded', () => {
+  const navToggle = document.querySelector('.nav-toggle');
+  const navMenu = document.querySelector('.nav-menu');
+
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('active');
+    });
+  }
+
+  // Dropdown functionality
+  const dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(dropdown => {
+    const trigger = dropdown.querySelector('.dropdown-trigger');
+    const content = dropdown.querySelector('.dropdown-content');
+    if (trigger && content) {
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        content.classList.toggle('show');
+      });
+    }
+  });
+});
+`;
+  }
+
+  // Form submission
+  if (hasComponent('form')) {
+    js += `
+// Form submission handling
+document.addEventListener('DOMContentLoaded', () => {
+  const forms = document.querySelectorAll('form');
+  forms.forEach(form => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(form as HTMLFormElement);
+      const data = Object.fromEntries(formData);
+      console.log('Form data:', data);
+      // TODO: Add your form submission logic here
+      alert('Form submitted successfully!');
+    });
+  });
+});
+`;
+  }
+
+  // Modal functionality
+  if (components.some(comp => comp.props.className?.includes('modal'))) {
+    js += `
+// Modal functionality
+document.addEventListener('DOMContentLoaded', () => {
+  const modalTriggers = document.querySelectorAll('[data-modal-target]');
+  const modalCloses = document.querySelectorAll('[data-modal-close]');
+
+  modalTriggers.forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const modalId = trigger.getAttribute('data-modal-target');
+      const modal = document.getElementById(modalId);
+      if (modal) modal.classList.add('active');
+    });
+  });
+
+  modalCloses.forEach(close => {
+    close.addEventListener('click', () => {
+      const modal = close.closest('.modal');
+      if (modal) modal.classList.remove('active');
+    });
+  });
+});
+`;
+  }
+
+  // Carousel/Slider functionality
+  if (components.some(comp => comp.props.className?.includes('carousel') || comp.props.className?.includes('slider'))) {
+    js += `
+// Carousel/Slider functionality
+document.addEventListener('DOMContentLoaded', () => {
+  const carousels = document.querySelectorAll('.carousel, .slider');
+  carousels.forEach(carousel => {
+    const slides = carousel.querySelectorAll('.slide');
+    let currentSlide = 0;
+
+    function showSlide(n) {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (n + slides.length) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }
+
+    function nextSlide() {
+      showSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      showSlide(currentSlide - 1);
+    }
+
+    const nextButton = carousel.querySelector('.next');
+    const prevButton = carousel.querySelector('.prev');
+
+    if (nextButton) nextButton.addEventListener('click', nextSlide);
+    if (prevButton) prevButton.addEventListener('click', prevSlide);
+
+    // Auto-advance slides every 5 seconds
+    setInterval(nextSlide, 5000);
+  });
+});
+`;
+  }
+
+  // Smooth scrolling for anchor links
+  js += `
+// Smooth scrolling for anchor links
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href').substring(1);
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+});
+`;
+
+  // Lazy loading for images
+  if (hasComponent('img')) {
+    js += `
+// Lazy loading for images
+document.addEventListener('DOMContentLoaded', () => {
+  const lazyImages = document.querySelectorAll('img[data-src]');
+  const imageObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target as HTMLImageElement;
+        img.src = img.dataset.src;
+        img.removeAttribute('data-src');
+        imageObserver.unobserve(img);
+      }
+    });
+  });
+
+  lazyImages.forEach(img => imageObserver.observe(img));
+});
+`;
+  }
+
+  // Dark mode toggle
+  if (components.some(comp => comp.props.className?.includes('dark-mode-toggle'))) {
+    js += `
+// Dark mode toggle
+document.addEventListener('DOMContentLoaded', () => {
+  const darkModeToggle = document.querySelector('.dark-mode-toggle');
+  const body = document.body;
+
+  if (darkModeToggle) {
+    darkModeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
+    });
+
+    // Check for saved dark mode preference
+    if (localStorage.getItem('darkMode') === 'true') {
+      body.classList.add('dark-mode');
+    }
+  }
+});
+`;
+  }
+
+  return js;
+};
+
 const AIWebsiteGenerator: React.FC = () => {
   const [userInput, setUserInput] = useState('');
   const [generatedComponents, setGeneratedComponents] = useState<Component[]>([]);
@@ -439,11 +632,17 @@ const AIWebsiteGenerator: React.FC = () => {
   const [selectedPrompt, setSelectedPrompt] = useState('');
 
   const prompts = [
-    "Create a modern business website with a hero section, features, and testimonials",
-    "Design a portfolio website for a photographer with a gallery and about section",
-    "Build an e-commerce website with product listings and a shopping cart",
-    "Develop a blog website with article previews and a sidebar",
+    "Create a modern, responsive e-commerce website for a boutique clothing store. It should have Header which is Navigaion menu, and Hero Section with parallax effect, Features Section with hover effect, and a Footer with social media links.",
+    "Design a professional portfolio website for a freelance graphic designer. Showcase a dynamic gallery of projects, an about me section highlighting skills and experience, a services page detailing offerings, client testimonials, and a contact form. Include a blog for design insights and social media integration.",
+    "Develop a user-friendly recipe sharing platform with Hero section and FAQ and content section including a newsletter signup form",
+    "Build an engaging travel blog website with a vibrant, adventurous feel. need to have a hero section with a parallax effect, and a footer with social media links",
   ];
+
+  const [colorScheme, setColorScheme] = useState('default');
+  const [fontFamily, setFontFamily] = useState('default');
+  const [responsiveDesign, setResponsiveDesign] = useState(true);
+  const [accessibilityFeatures, setAccessibilityFeatures] = useState(false);
+  const [generatedJS, setGeneratedJS] = useState('');
 
   const handlePromptSelect = (prompt: string) => {
     setSelectedPrompt(prompt);
@@ -453,12 +652,21 @@ const AIWebsiteGenerator: React.FC = () => {
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      const components = await generateWebsite(userInput, theme);
+      const components = await generateWebsite(userInput, theme, {
+        colorScheme,
+        fontFamily,
+        responsiveDesign,
+        accessibilityFeatures,
+        animations,
+        customCSS,
+      });
       setGeneratedComponents(components);
       applyCustomStyles(components);
       if (animations) {
         addAnimations(components);
       }
+      const js = generateBasicJS(components);
+      setGeneratedJS(js);
       toast.success('Website generated successfully!');
     } catch (error) {
       console.error('Error generating website:', error);
@@ -470,12 +678,49 @@ const AIWebsiteGenerator: React.FC = () => {
 
   const applyCustomStyles = (components: Component[]) => {
     // Apply custom CSS to components
-    // This is a placeholder function - implement the actual logic
+    components.forEach((component) => {
+      if (component.props && component.props.style) {
+        // Parse the custom CSS string
+        const customStyles = customCSS.split(';').reduce((acc, style) => {
+          const [property, value] = style.split(':').map((s) => s.trim());
+          if (property && value) {
+            acc[property] = value;
+          }
+          return acc;
+        }, {} as Record<string, string>);
+
+        // Merge custom styles with existing styles
+        component.props.style = {
+          ...component.props.style,
+          ...customStyles,
+        };
+      }
+    });
   };
 
   const addAnimations = (components: Component[]) => {
     // Add animation properties to components
-    // This is a placeholder function - implement the actual logic
+    components.forEach((component) => {
+      if (component.props && component.props.style) {
+        // Add a basic fade-in animation
+        component.props.style = {
+          ...component.props.style,
+          animation: 'fadeIn 1s ease-in-out',
+          opacity: 0,
+        };
+      }
+    });
+
+    // Add keyframes for the fade-in animation to the first component's style
+    if (components.length > 0 && components[0].props && components[0].props.style) {
+      components[0].props.style = {
+        ...components[0].props.style,
+        '@keyframes fadeIn': {
+          '0%': { opacity: 0 },
+          '100%': { opacity: 1 },
+        },
+      };
+    }
   };
 
   const handleCopyCode = () => {
@@ -529,6 +774,7 @@ const AIWebsiteGenerator: React.FC = () => {
       </head>
       <body>
         ${generateCode(generatedComponents)}
+        <script>${generatedJS}</script>
       </body>
       </html>
     `;
@@ -581,26 +827,40 @@ const AIWebsiteGenerator: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 py-8 px-4 sm:px-6 lg:px-8 pt-20">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl sm:text-5xl font-bold text-center text-gray-900 dark:text-white mb-8">
-          Mazs AI v1.0 Website Generator
-        </h1>
+        <motion.h1 
+          className="text-4xl sm:text-5xl font-bold text-center text-gray-900 dark:text-white mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          Mazs AI v1.0 anatra Website Generator
+        </motion.h1>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 transition-all duration-300 hover:shadow-xl">
+          <motion.div 
+            className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 transition-all duration-300 hover:shadow-xl"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Input</h2>
               <div className="flex space-x-2">
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300"
                   onClick={() => setShowPrompts(!showPrompts)}
                 >
                   {showPrompts ? <FiChevronUp size={24} /> : <FiChevronDown size={24} />}
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300"
                   onClick={() => setShowSettings(!showSettings)}
                 >
                   <FiSettings size={24} />
-                </button>
+                </motion.button>
               </div>
             </div>
             <div className="relative mb-6">
@@ -610,15 +870,15 @@ const AIWebsiteGenerator: React.FC = () => {
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
               />
-              <div className="absolute bottom-3 right-3 flex space-x-2">
-                <button
-                  className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors duration-300"
-                  onClick={handleGenerate}
-                  disabled={isGenerating}
-                >
-                  {isGenerating ? <FaSpinner className="animate-spin" /> : <FaRocket />}
-                </button>
-              </div>
+              <motion.button
+                className="absolute bottom-3 right-3 bg-blue-500 text-white p-3 rounded-full hover:bg-blue-600 transition-colors duration-300 flex items-center justify-center"
+                onClick={handleGenerate}
+                disabled={isGenerating}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                {isGenerating ? <FaSpinner className="animate-spin" /> : <FiZap size={24} />}
+              </motion.button>
             </div>
             <AnimatePresence>
               {suggestions.length > 0 && (
@@ -703,6 +963,56 @@ const AIWebsiteGenerator: React.FC = () => {
                       <option value="grid">Grid Layout</option>
                     </select>
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Color Scheme</label>
+                    <select
+                      className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                      value={colorScheme}
+                      onChange={(e) => setColorScheme(e.target.value)}
+                    >
+                      <option value="default">Default</option>
+                      <option value="monochrome">Monochrome</option>
+                      <option value="complementary">Complementary</option>
+                      <option value="triadic">Triadic</option>
+                      <option value="analogous">Analogous</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Font Family</label>
+                    <select
+                      className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                      value={fontFamily}
+                      onChange={(e) => setFontFamily(e.target.value)}
+                    >
+                      <option value="default">Default</option>
+                      <option value="serif">Serif</option>
+                      <option value="sans-serif">Sans-serif</option>
+                      <option value="monospace">Monospace</option>
+                      <option value="cursive">Cursive</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="responsiveDesign"
+                      checked={responsiveDesign}
+                      onChange={(e) => setResponsiveDesign(e.target.checked)}
+                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-all duration-300"
+                    />
+                    <label htmlFor="responsiveDesign" className="text-gray-700 dark:text-gray-300">Responsive Design</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="accessibilityFeatures"
+                      checked={accessibilityFeatures}
+                      onChange={(e) => setAccessibilityFeatures(e.target.checked)}
+                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-all duration-300"
+                    />
+                    <label htmlFor="accessibilityFeatures" className="text-gray-700 dark:text-gray-300">Accessibility Features</label>
+                  </div>
                 </div>
                 <div className="flex items-center">
                   <input
@@ -725,35 +1035,43 @@ const AIWebsiteGenerator: React.FC = () => {
                 </div>
               </motion.div>
             )}
-          </div>
-          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 transition-all duration-300 hover:shadow-xl">
+          </motion.div>
+          <motion.div 
+            className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 transition-all duration-300 hover:shadow-xl"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
                 Live Preview
               </h2>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
                 onClick={() => setShowPreview(!showPreview)}
               >
                 {showPreview ? <FiEyeOff size={24} /> : <FiEye size={24} />}
-              </button>
+              </motion.button>
             </div>
             {showPreview && (
               <div className="border rounded-md p-4 bg-white dark:bg-gray-700 h-[600px] overflow-auto">
                 {renderPreview(generatedComponents)}
               </div>
             )}
-          </div>
+          </motion.div>
         </div>
         {generatedComponents.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-8 transition-all duration-300 hover:shadow-xl"
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="bg-gray-900 shadow-lg rounded-lg p-6 mt-8 transition-all duration-300 hover:shadow-xl"
           >
-            <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
-              Generated Components
+            <h2 className="text-2xl font-semibold mb-4 text-green-400 flex items-center">
+              <FiTerminal className="mr-2" />
+              Generated Output
             </h2>
             <div className="mb-4 flex flex-wrap gap-4">
               <motion.button
@@ -763,7 +1081,7 @@ const AIWebsiteGenerator: React.FC = () => {
                 onClick={handleCopyCode}
               >
                 <FaCopy className="mr-2" />
-                {copiedCode ? 'Copied!' : 'Copy Code'}
+                {copiedCode ? 'Copied!' : 'Copy All'}
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -774,44 +1092,43 @@ const AIWebsiteGenerator: React.FC = () => {
                 <FaDownload className="mr-2" />
                 Download HTML
               </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-purple-500 text-white py-2 px-4 rounded-md flex items-center"
+                onClick={() => {/* Implement export to React components */}}
+              >
+                <FaCode className="mr-2" />
+                Export React Components
+              </motion.button>
             </div>
-            <div className="space-y-4">
-              {generatedComponents.map((component, index) => (
-                <div key={index} className="bg-gray-100 dark:bg-gray-700 p-4 rounded-md">
-                  <h3 className="text-lg font-semibold mb-2">{component.type}</h3>
-                  <pre className="text-sm overflow-x-auto bg-gray-200 dark:bg-gray-600 p-2 rounded">
-                    <code>{JSON.stringify(component.props, null, 2)}</code>
-                  </pre>
-                  <button
-                    className="mt-2 bg-blue-500 text-white py-1 px-2 rounded-md text-sm hover:bg-blue-600 transition-colors duration-300"
-                    onClick={() => setEditingComponent(index)}
-                  >
-                    Edit
-                  </button>
-                  {editingComponent === index && (
-                    <div className="mt-4">
-                      <textarea
-                        className="w-full h-40 p-2 border rounded-md dark:bg-gray-600 dark:text-white"
-                        value={JSON.stringify(component.props, null, 2)}
-                        onChange={(e) => {
-                          try {
-                            const newProps = JSON.parse(e.target.value);
-                            handleComponentEdit(index, newProps);
-                          } catch (error) {
-                            console.error('Invalid JSON');
-                          }
-                        }}
-                      />
-                      <button
-                        className="mt-2 bg-green-500 text-white py-1 px-2 rounded-md text-sm hover:bg-green-600 transition-colors duration-300"
-                        onClick={() => setEditingComponent(null)}
-                      >
-                        Save
-                      </button>
-                    </div>
-                  )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="terminal-container">
+                <div className="flex items-center justify-between bg-gray-800 p-2 rounded-t-md">
+                  <span className="text-green-400 font-mono text-sm">HTML</span>
+                  <div className="flex space-x-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  </div>
                 </div>
-              ))}
+                <pre className="bg-gray-800 p-4 rounded-b-md overflow-x-auto text-green-400 font-mono text-sm">
+                  <code>{generateCode(generatedComponents)}</code>
+                </pre>
+              </div>
+              <div className="terminal-container">
+                <div className="flex items-center justify-between bg-gray-800 p-2 rounded-t-md">
+                  <span className="text-blue-400 font-mono text-sm">JavaScript</span>
+                  <div className="flex space-x-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  </div>
+                </div>
+                <pre className="bg-gray-800 p-4 rounded-b-md overflow-x-auto text-blue-400 font-mono text-sm">
+                  <code>{generatedJS}</code>
+                </pre>
+              </div>
             </div>
           </motion.div>
         )}
@@ -822,3 +1139,4 @@ const AIWebsiteGenerator: React.FC = () => {
 };
 
 export default AIWebsiteGenerator;
+       
