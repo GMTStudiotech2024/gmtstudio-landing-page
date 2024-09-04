@@ -43,9 +43,11 @@ import SystemStatus from './components/SystemStatus';
 import AdvancedSearch from './components/AdvancedSearch';
 import DeepLearning from './components/DeepLearning';
 import Login from './components/Login';
+import AIWebsiteGenerator from './components/AIWebsiteGenerator';
 const AppContent: React.FC = () => {
   const [isAuthenticated] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const heroRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
@@ -75,8 +77,14 @@ const AppContent: React.FC = () => {
     <div className="App bg-gray-900 min-h-screen flex flex-col">
       <CustomCursor />
       <Navbar onSearchClick={toggleSearch} />
-      {!isHomePage && <Sidebar className="hidden md:block" />}
-      <main className={`flex-grow ${!isHomePage ? 'md:ml-64' : ''}`}>
+      {!isHomePage && (
+        <Sidebar 
+          className="hidden md:block" 
+          isOpen={isSidebarOpen} 
+          onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+        />
+      )}
+      <main className={`flex-grow transition-all duration-300 ${!isHomePage ? (isSidebarOpen ? 'md:ml-72' : 'md:ml-16') : ''}`}>
         {isSearchOpen && <Search onClose={toggleSearch} />}
         <Routes>
           <Route path="/" element={
@@ -90,6 +98,7 @@ const AppContent: React.FC = () => {
               <OurProjects />
             </>
           } />
+          <Route path="/website-builder" element={<AIWebsiteGenerator />} />
           <Route path="/news1" element={<NEWS1 />} />
           <Route path="/news2" element={<NEWS2 />} />
           <Route path="/news3" element={<NEWS3 />} />

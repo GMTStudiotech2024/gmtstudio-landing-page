@@ -4,12 +4,13 @@ import { FaHome, FaNewspaper, FaFlask, FaGraduationCap, FaEnvelope, FaSignInAlt,
 
 interface SidebarProps {
   className?: string;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
+const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) => {
   const location = useLocation();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   const toggleDropdown = (label: string) => {
@@ -56,15 +57,15 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
   if (location.pathname === '/') return null;
 
   return (
-    <div className={`fixed left-0 top-0 h-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white p-4 z-40 overflow-y-auto transition-all duration-300 ease-in-out pt-20 ${isCollapsed ? 'w-16' : 'w-72'} ${className} shadow-lg`}>
-      <div className="flex justify-between items-center mb-6">
-        {!isCollapsed && (
+    <div className={`fixed left-0 top-0 h-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white p-4 z-40 overflow-y-auto transition-all duration-300 ease-in-out pt-20 ${isOpen ? 'w-72' : 'w-16'} ${className} shadow-lg`}>
+      {isOpen && (
+        <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-center text-gray-800 dark:text-white">
             Hello, User
           </h2>
-        )}
-      </div>
-      {!isCollapsed && (
+        </div>
+      )}
+      {isOpen && (
         <div className="mb-4">
           <div className="relative">
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -89,12 +90,12 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
                     className={`flex items-center justify-between w-full p-2 rounded-lg transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-800 ${openDropdown === link.label ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
                   >
                     <span className="flex items-center">
-                      <link.icon className={`${isCollapsed ? 'text-xl mx-auto' : 'mr-3'} text-gray-600 dark:text-gray-400`} />
-                      {!isCollapsed && <span className="font-medium">{link.label}</span>}
+                      <link.icon className={`${!isOpen ? 'text-xl mx-auto' : 'mr-3'} text-gray-600 dark:text-gray-400`} />
+                      {isOpen && <span className="font-medium">{link.label}</span>}
                     </span>
-                    {!isCollapsed && (openDropdown === link.label ? <FaChevronUp className="text-gray-600 dark:text-gray-400" /> : <FaChevronDown className="text-gray-600 dark:text-gray-400" />)}
+                    {isOpen && (openDropdown === link.label ? <FaChevronUp className="text-gray-600 dark:text-gray-400" /> : <FaChevronDown className="text-gray-600 dark:text-gray-400" />)}
                   </button>
-                  {openDropdown === link.label && !isCollapsed && (
+                  {openDropdown === link.label && isOpen && (
                     <ul className="ml-6 mt-1 space-y-1">
                       {link.subItems.map((subItem) => (
                         <li key={subItem.to}>
@@ -123,8 +124,8 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
                       : 'hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                   }`}
                 >
-                  <link.icon className={`${isCollapsed ? 'text-xl mx-auto' : 'mr-3'} ${location.pathname === link.to ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
-                  {!isCollapsed && <span className="font-medium">{link.label}</span>}
+                  <link.icon className={`${!isOpen ? 'text-xl mx-auto' : 'mr-3'} ${location.pathname === link.to ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
+                  {isOpen && <span className="font-medium">{link.label}</span>}
                 </Link>
               )}
             </li>
@@ -132,10 +133,10 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
         </ul>
       </nav>
       <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
+        onClick={onToggle}
         className="absolute bottom-4 right-4 p-2 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-200"
       >
-        {isCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
+        {isOpen ? <FaChevronLeft /> : <FaChevronRight />}
       </button>
     </div>
   );
