@@ -56,55 +56,58 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
   if (location.pathname === '/') return null;
 
   return (
-    <div className={`fixed left-0 top-0 h-full bg-gray-900 text-white p-4 z-40 overflow-y-auto transition-all duration-300 ease-in-out pt-20 ${isCollapsed ? 'w-16' : 'w-64'} ${className}`}>
+    <div className={`fixed left-0 top-0 h-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white p-4 z-40 overflow-y-auto transition-all duration-300 ease-in-out pt-20 ${isCollapsed ? 'w-16' : 'w-72'} ${className} shadow-lg`}>
       <div className="flex justify-between items-center mb-6">
         {!isCollapsed && (
-          <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-cyan-600 dark:to-blue-600">
-            Hello ! User 
+          <h2 className="text-2xl font-semibold text-center text-gray-800 dark:text-white">
+            Hello, User
           </h2>
         )}
       </div>
       {!isCollapsed && (
         <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-2 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-2 pl-10 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-300 dark:border-gray-700"
+            />
+          </div>
         </div>
       )}
       <nav>
-        <ul className="space-y-2">
+        <ul className="space-y-1">
           {filteredLinks.map((link) => (
             <li key={link.label}>
               {link.subItems ? (
                 <div>
                   <button
                     onClick={() => toggleDropdown(link.label)}
-                    className={`flex items-center justify-between w-full p-2 rounded-lg transition-colors duration-200 hover:bg-gray-800 ${openDropdown === link.label ? 'bg-gray-800' : ''}`}
+                    className={`flex items-center justify-between w-full p-2 rounded-lg transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-800 ${openDropdown === link.label ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
                   >
                     <span className="flex items-center">
-                      <link.icon className={`${isCollapsed ? 'text-2xl mx-auto' : 'mr-3'}`} />
-                      {!isCollapsed && link.label}
+                      <link.icon className={`${isCollapsed ? 'text-xl mx-auto' : 'mr-3'} text-gray-600 dark:text-gray-400`} />
+                      {!isCollapsed && <span className="font-medium">{link.label}</span>}
                     </span>
-                    {!isCollapsed && (openDropdown === link.label ? <FaChevronUp /> : <FaChevronDown />)}
+                    {!isCollapsed && (openDropdown === link.label ? <FaChevronUp className="text-gray-600 dark:text-gray-400" /> : <FaChevronDown className="text-gray-600 dark:text-gray-400" />)}
                   </button>
                   {openDropdown === link.label && !isCollapsed && (
-                    <ul className="ml-6 mt-2 space-y-2">
+                    <ul className="ml-6 mt-1 space-y-1">
                       {link.subItems.map((subItem) => (
                         <li key={subItem.to}>
                           <Link
                             to={subItem.to}
                             className={`flex items-center p-2 rounded-lg transition-colors duration-200 ${
                               location.pathname === subItem.to
-                                ? 'bg-blue-600 text-white'
-                                : 'hover:bg-gray-800'
+                                ? 'bg-blue-500 text-white'
+                                : 'hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                             }`}
                           >
-                            <subItem.icon className="mr-3" />
-                            {subItem.label}
+                            <subItem.icon className="mr-3 text-sm" />
+                            <span className="text-sm">{subItem.label}</span>
                           </Link>
                         </li>
                       ))}
@@ -116,18 +119,24 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
                   to={link.to}
                   className={`flex items-center p-2 rounded-lg transition-colors duration-200 ${
                     location.pathname === link.to
-                      ? 'bg-blue-600 text-white'
-                      : 'hover:bg-gray-800'
+                      ? 'bg-blue-500 text-white'
+                      : 'hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                   }`}
                 >
-                  <link.icon className={`${isCollapsed ? 'text-2xl mx-auto' : 'mr-3'}`} />
-                  {!isCollapsed && link.label}
+                  <link.icon className={`${isCollapsed ? 'text-xl mx-auto' : 'mr-3'} ${location.pathname === link.to ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
+                  {!isCollapsed && <span className="font-medium">{link.label}</span>}
                 </Link>
               )}
             </li>
           ))}
         </ul>
       </nav>
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="absolute bottom-4 right-4 p-2 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-200"
+      >
+        {isCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
+      </button>
     </div>
   );
 };
