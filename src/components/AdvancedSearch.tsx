@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { processChatbotQuery, getConversationSuggestions } from './chatbot';
-import { FaSearch,  FaLightbulb,  FaFilter, FaSort } from 'react-icons/fa';
+import { FaSearch,  FaLightbulb,  FaFilter, FaSort, FaImage } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AdvancedSearch: React.FC = () => {
@@ -18,6 +18,7 @@ const AdvancedSearch: React.FC = () => {
   const [searchType, setSearchType] = useState<'web' | 'images' | 'news'>('web');
   const [filters, setFilters] = useState({ date: '', language: '', region: '' });
   const [sortBy, setSortBy] = useState<'relevance' | 'date'>('relevance');
+  const [imageResults, setImageResults] = useState<any[]>([]);
 
   useEffect(() => {
     setSuggestions(getConversationSuggestions());
@@ -35,6 +36,18 @@ const AdvancedSearch: React.FC = () => {
       return data.search;
     } catch (error) {
       console.error('Error fetching Wikidata:', error);
+      return [];
+    }
+  };
+
+  const searchWikimediaImages = async (query: string) => {
+    const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch=${encodeURIComponent(query)}&gsrlimit=10&prop=imageinfo&iiprop=url&format=json&origin=*`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      return Object.values(data.query.pages);
+    } catch (error) {
+      console.error('Error fetching Wikimedia images:', error);
       return [];
     }
   };
@@ -69,25 +82,30 @@ const AdvancedSearch: React.FC = () => {
 
     setIsLoading(true);
     setTypingResult('');
+    setImageResults([]);
     
     // Simulate different search types
     let searchResults;
     switch (searchType) {
       case 'web':
         searchResults = await processChatbotQuery(query);
+        const wikiResults = await searchWikidata(query);
+        const summarizedResult = summarizeResults(searchResults, wikiResults);
+        setResults([summarizedResult]);
+        simulateTyping(summarizedResult);
         break;
       case 'images':
-        searchResults = "Image search results would appear here.";
+        const images = await searchWikimediaImages(query);
+        setImageResults(images);
+        searchResults = `Found ${images.length} images related to "${query}"`;
+        setResults([searchResults]);
         break;
       case 'news':
         searchResults = "News search results would appear here.";
+        setResults([searchResults]);
         break;
     }
 
-    const wikiResults = await searchWikidata(query);
-    const summarizedResult = summarizeResults(searchResults, wikiResults);
-    setResults([summarizedResult]);
-    simulateTyping(summarizedResult);
     setIsLoading(false);
 
     // Update search history
@@ -207,6 +225,22 @@ const AdvancedSearch: React.FC = () => {
                     {isTyping && <span className="animate-pulse">|</span>}
                   </p>
                 </div>
+                {searchType === 'images' && imageResults.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {imageResults.map((image: any, index: number) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={image.imageinfo[0].url}
+                          alt={image.title}
+                          className="w-full h-40 object-cover rounded-lg"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <FaImage className="text-white text-2xl" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
