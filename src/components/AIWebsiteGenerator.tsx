@@ -50,48 +50,88 @@ const generateWebsite = async (input: string, theme: string, options: {
   // Header
   if (includesAny(['header', 'nav', 'menu', 'navigation', 'top'])) {
     mainContent.push({
-      type: 'header',
-      props: { 
-        style: { 
-          backgroundColor: colors.accent, 
-          padding: '20px', 
-          color: colors.bg,
-          position: 'sticky',
-          top: 0,
-          zIndex: 1000,
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        } 
-      },
+      type: 'nav',
+      props: { className: 'bg-white shadow-lg' },
       children: [
-        { type: 'div', props: { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }, children: [
-          { type: 'h1', props: { style: { margin: 0 } }, children: 'Complex Website' },
-          { type: 'nav', props: {}, children: [
-            { type: 'ul', props: { style: { listStyle: 'none', display: 'flex', gap: '20px', margin: 0, padding: 0 } }, children: [
-              { type: 'li', props: {}, children: [
-                { type: 'a', props: { href: '#', style: { color: colors.bg, textDecoration: 'none' } }, children: 'Home' }
+        { type: 'div', props: { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8' }, children: [
+          { type: 'div', props: { className: 'flex justify-between h-16' }, children: [
+            { type: 'div', props: { className: 'flex items-center' }, children: [
+              { type: 'div', props: { className: 'flex-shrink-0' }, children: [
+                { type: 'img', props: { className: 'h-8 w-auto', src: 'https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg', alt: 'Logo' } }
               ]},
-              { type: 'li', props: { style: { position: 'relative' } }, children: [
-                { type: 'a', props: { href: '#', style: { color: colors.bg, textDecoration: 'none' } }, children: 'Products ▼' },
-                { type: 'ul', props: { style: { position: 'absolute', top: '100%', left: 0, backgroundColor: colors.accent, padding: '10px', display: 'none' } }, children: [
-                  { type: 'li', props: {}, children: [
-                    { type: 'a', props: { href: '#', style: { color: colors.bg, textDecoration: 'none' } }, children: 'Product 1' }
-                  ]},
-                  { type: 'li', props: {}, children: [
-                    { type: 'a', props: { href: '#', style: { color: colors.bg, textDecoration: 'none' } }, children: 'Product 2' }
-                  ]},
+              { type: 'div', props: { className: 'hidden md:block' }, children: [
+                { type: 'div', props: { className: 'ml-10 flex items-baseline space-x-4' }, children: [
+                  { type: 'a', props: { href: '#', className: 'text-gray-800 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium' }, children: 'Home' },
+                  { type: 'a', props: { href: '#', className: 'text-gray-600 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium' }, children: 'Products' },
+                  { type: 'a', props: { href: '#', className: 'text-gray-600 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium' }, children: 'Services' },
+                  { type: 'a', props: { href: '#', className: 'text-gray-600 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium' }, children: 'About' },
+                  { type: 'a', props: { href: '#', className: 'text-gray-600 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium' }, children: 'Contact' }
+                ]}
+              ]}
+            ]},
+            { type: 'div', props: { className: 'hidden md:flex items-center' }, children: [
+              { type: 'div', props: { className: 'relative' }, children: [
+                { type: 'input', props: { type: 'text', placeholder: 'Search', className: 'bg-gray-100 rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white' } },
+                { type: 'svg', props: { xmlns: 'http://www.w3.org/2000/svg', className: 'h-5 w-5 text-gray-500 absolute left-3 top-2.5', viewBox: '0 0 20 20', fill: 'currentColor' }, children: [
+                  { type: 'path', props: { fillRule: 'evenodd', d: 'M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z', clipRule: 'evenodd' } }
                 ]}
               ]},
-              { type: 'li', props: {}, children: [
-                { type: 'a', props: { href: '#', style: { color: colors.bg, textDecoration: 'none' } }, children: 'About' }
+              { type: 'div', props: { className: 'ml-4 relative' }, children: [
+                { type: 'button', props: { className: 'flex items-center' }, children: [
+                  { type: 'img', props: { className: 'h-8 w-8 rounded-full', src: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', alt: 'User profile' } },
+                  { type: 'svg', props: { className: 'ml-1 h-5 w-5 text-gray-400', xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 20 20', fill: 'currentColor', 'aria-hidden': 'true' }, children: [
+                    { type: 'path', props: { fillRule: 'evenodd', d: 'M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z', clipRule: 'evenodd' } }
+                  ]}
+                ]}
+              ]}
+            ]},
+            { type: 'div', props: { className: 'flex md:hidden' }, children: [
+              { type: 'button', props: { type: 'button', className: 'inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500', 'aria-controls': 'mobile-menu', 'aria-expanded': 'false' }, children: [
+                { type: 'span', props: { className: 'sr-only' }, children: 'Open main menu' },
+                { type: 'svg', props: { className: 'block h-6 w-6', xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'aria-hidden': 'true' }, children: [
+                  { type: 'path', props: { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: '2', d: 'M4 6h16M4 12h16M4 18h16' } }
+                ]}
+              ]}
+            ]}
+          ]}
+        ]},
+        { type: 'div', props: { className: 'md:hidden', id: 'mobile-menu' }, children: [
+          { type: 'div', props: { className: 'px-2 pt-2 pb-3 space-y-1 sm:px-3' }, children: [
+            { type: 'a', props: { href: '#', className: 'text-gray-800 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium' }, children: 'Home' },
+            { type: 'a', props: { href: '#', className: 'text-gray-600 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium' }, children: 'Products' },
+            { type: 'a', props: { href: '#', className: 'text-gray-600 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium' }, children: 'Services' },
+            { type: 'a', props: { href: '#', className: 'text-gray-600 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium' }, children: 'About' },
+            { type: 'a', props: { href: '#', className: 'text-gray-600 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium' }, children: 'Contact' }
+          ]},
+          { type: 'div', props: { className: 'pt-4 pb-3 border-t border-gray-200' }, children: [
+            { type: 'div', props: { className: 'flex items-center px-5' }, children: [
+              { type: 'div', props: { className: 'flex-shrink-0' }, children: [
+                { type: 'img', props: { className: 'h-10 w-10 rounded-full', src: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', alt: 'User profile' } }
               ]},
-              { type: 'li', props: {}, children: [
-                { type: 'a', props: { href: '#', style: { color: colors.bg, textDecoration: 'none' } }, children: 'Contact' }
-              ]},
+              { type: 'div', props: { className: 'ml-3' }, children: [
+                { type: 'div', props: { className: 'text-base font-medium text-gray-800' }, children: 'John Doe' },
+                { type: 'div', props: { className: 'text-sm font-medium text-gray-500' }, children: 'john@example.com' }
+              ]}
+            ]},
+            { type: 'div', props: { className: 'mt-3 px-2 space-y-1' }, children: [
+              { type: 'a', props: { href: '#', className: 'block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-200' }, children: 'Your Profile' },
+              { type: 'a', props: { href: '#', className: 'block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-200' }, children: 'Settings' },
+              { type: 'a', props: { href: '#', className: 'block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-200' }, children: 'Sign out' }
             ]}
           ]}
         ]}
       ]
     });
+
+    js += `
+      const toggleMenu = () => {
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenu.classList.toggle('hidden');
+      };
+
+      const menuButton = document.querySelector('button[aria-controls="mobile-menu"]');
+      menuButton.addEventListener('click', toggleMenu);
+    `;
   }
 
   // Hero section with parallax effect
@@ -99,47 +139,37 @@ const generateWebsite = async (input: string, theme: string, options: {
     mainContent.push({
       type: 'section',
       props: { 
-        style: { 
-          backgroundImage: 'url(https://source.unsplash.com/random/1600x900)', 
-          backgroundAttachment: 'fixed',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          color: colors.bg, 
-          padding: '150px 50px', 
-          textAlign: 'center',
-          position: 'relative',
-        } 
+        className: "relative bg-gradient-to-r from-purple-600 to-blue-600 h-screen flex items-center justify-center overflow-hidden"
       },
       children: [
-        { type: 'div', props: { style: { 
-          position: 'absolute', 
-          top: 0, 
-          left: 0, 
-          right: 0, 
-          bottom: 0, 
-          backgroundColor: 'rgba(0,0,0,0.5)' 
-        } }, children: [] },
-        { type: 'div', props: { style: { position: 'relative', zIndex: 1 } }, children: [
-          { type: 'h2', props: { style: { fontSize: '3em', marginBottom: '20px' } }, children: 'Welcome to Website' },
-          { type: 'p', props: { style: { fontSize: '1.2em', marginBottom: '30px' } }, children: 'Discover our amazing products and services.' },
-          { type: 'button', props: { style: { backgroundColor: colors.secondary, color: colors.bg, padding: '15px 30px', fontSize: '1.2em', border: 'none', borderRadius: '5px', cursor: 'none' } }, children: 'Get Started' }
+        { type: 'div', props: { className: "absolute inset-0 bg-black opacity-50" }, children: [] },
+        { type: 'div', props: { className: "relative z-10 text-center px-4 sm:px-6 lg:px-8" }, children: [
+          { type: 'h1', props: { className: "text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-4" }, children: [
+            { type: 'span', props: { className: "block" }, children: "Welcome to the Future" },
+            { type: 'span', props: { className: "block text-yellow-400" }, children: "of Web Design" }
+          ]},
+          { type: 'p', props: { className: "mt-3 max-w-md mx-auto text-base text-gray-300 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl" }, children: "Create stunning, responsive websites with our cutting-edge tools and frameworks. Elevate your online presence today." },
+          { type: 'div', props: { className: "mt-10 flex justify-center" }, children: [
+            { type: 'div', props: { className: "rounded-md shadow" }, children: [
+              { type: 'a', props: { href: "#", className: "w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105" }, children: "Get Started" }
+            ]},
+            { type: 'div', props: { className: "ml-3 rounded-md shadow" }, children: [
+              { type: 'a', props: { href: "#", className: "w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-500 hover:bg-blue-600 md:py-4 md:text-lg md:px-10 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105" }, children: "Learn More" }
+            ]}
+          ]}
         ]},
-        { type: 'div', props: { style: { 
-          position: 'absolute', 
-          bottom: '-50px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '100px',
-          height: '100px',
-          backgroundColor: colors.bg,
-          borderRadius: '50%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-        } }, children: [
-          { type: 'span', props: { style: { fontSize: '2em', color: colors.accent } }, children: '↓' }
-        ] }
+        { type: 'div', props: { className: "absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent" }, children: [] },
+        { type: 'div', props: { className: "absolute top-0 left-0 w-full h-full" }, children: [
+          { type: 'svg', props: { className: "absolute left-0 w-full h-full", viewBox: "0 0 100 100", preserveAspectRatio: "none" }, children: [
+            { type: 'path', props: { d: "M0,0 L100,0 L100,100 L0,100 Z", fill: "url(#hero-gradient)", fillOpacity: "0.4" } }
+          ]},
+          { type: 'defs', props: {}, children: [
+            { type: 'linearGradient', props: { id: "hero-gradient", x1: "0%", y1: "0%", x2: "100%", y2: "100%" }, children: [
+              { type: 'stop', props: { offset: "0%", stopColor: "#667eea" } },
+              { type: 'stop', props: { offset: "100%", stopColor: "#764ba2" } }
+            ]}
+          ]}
+        ]}
       ]
     });
   }
@@ -976,7 +1006,7 @@ const AIWebsiteGenerator: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 py-8 px-4 sm:px-6 lg:px-8 pt-20">
       <div className="max-w-7xl mx-auto">
         <motion.h1 
           className="text-4xl sm:text-5xl font-bold text-center text-gray-900 dark:text-white mb-8"
@@ -1245,7 +1275,7 @@ const AIWebsiteGenerator: React.FC = () => {
                 ref={htmlOutputRef}
                 className="bg-gray-900 p-4 rounded-b-md overflow-x-auto text-green-400 font-mono text-sm h-full scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900"
               >
-                <code>{typedHTML}</code>
+                <code>{isGenerating ? 'Generating HTML...' : typedHTML}</code>
               </pre>
             </div>
           </motion.div>
@@ -1364,7 +1394,7 @@ const AIWebsiteGenerator: React.FC = () => {
                 ref={jsOutputRef}
                 className="bg-gray-900 p-4 rounded-b-md overflow-x-auto text-yellow-400 font-mono text-sm h-full scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900"
               >
-                <code>{typedJS}</code>
+                <code>{isGenerating ? 'Generating JavaScript...' : typedJS}</code>
               </pre>
             </div>
           </motion.div>
