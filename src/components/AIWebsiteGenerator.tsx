@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSpinner, FaCopy, FaDownload,  FaCode } from 'react-icons/fa';
 import { FiSettings, FiEye, FiEyeOff, FiChevronDown, FiChevronUp, FiZap,FiTerminal } from 'react-icons/fi';
@@ -18,11 +18,12 @@ const generateWebsite = async (input: string, theme: string, options: {
   accessibilityFeatures: boolean;
   animations: boolean;
   customCSS: string;
-}): Promise<Component[]> => {
+}): Promise<{ components: Component[], js: string }> => {
   await new Promise(resolve => setTimeout(resolve, 2000));
 
   const lowercaseInput = input.toLowerCase();
   const components: Component[] = [];
+  let js = '';
 
   const themeColors = {
     light: { bg: '#ffffff', text: '#333333', accent: '#3498db', secondary: '#e74c3c', tertiary: '#2ecc71' },
@@ -425,7 +426,63 @@ const generateWebsite = async (input: string, theme: string, options: {
     });
   }
 
-  return components;
+  // Add more modern and creative components
+  if (includesAny(['modern', 'creative', 'innovative'])) {
+    mainContent.push({
+      type: 'section',
+      props: { className: 'py-20 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500' },
+      children: [
+        { type: 'div', props: { className: 'container mx-auto text-center' }, children: [
+          { type: 'h2', props: { className: 'text-4xl font-bold text-white mb-8' }, children: 'Innovative Features' },
+          { type: 'div', props: { className: 'grid grid-cols-1 md:grid-cols-3 gap-8' }, children: [
+            { type: 'div', props: { className: 'bg-white rounded-lg p-6 shadow-lg transform hover:scale-105 transition-transform duration-300' }, children: [
+              { type: 'h3', props: { className: 'text-xl font-semibold mb-4' }, children: 'AI-Powered' },
+              { type: 'p', props: { className: 'text-gray-600' }, children: 'Harness the power of artificial intelligence' },
+            ]},
+            { type: 'div', props: { className: 'bg-white rounded-lg p-6 shadow-lg transform hover:scale-105 transition-transform duration-300' }, children: [
+              { type: 'h3', props: { className: 'text-xl font-semibold mb-4' }, children: 'Blockchain Integration' },
+              { type: 'p', props: { className: 'text-gray-600' }, children: 'Secure and transparent transactions' },
+            ]},
+            { type: 'div', props: { className: 'bg-white rounded-lg p-6 shadow-lg transform hover:scale-105 transition-transform duration-300' }, children: [
+              { type: 'h3', props: { className: 'text-xl font-semibold mb-4' }, children: 'IoT Compatibility' },
+              { type: 'p', props: { className: 'text-gray-600' }, children: 'Connect with smart devices seamlessly' },
+            ]},
+          ]},
+        ]},
+      ],
+    });
+  }
+
+  // Add interactive elements
+  if (includesAny(['interactive', 'dynamic'])) {
+    mainContent.push({
+      type: 'section',
+      props: { className: 'py-20 bg-gray-100' },
+      children: [
+        { type: 'div', props: { className: 'container mx-auto' }, children: [
+          { type: 'h2', props: { className: 'text-3xl font-bold text-center mb-12' }, children: 'Interactive Demo' },
+          { type: 'div', props: { id: 'interactive-demo', className: 'bg-white p-8 rounded-lg shadow-lg' }, children: [
+            { type: 'p', props: { className: 'text-xl mb-4' }, children: 'Click the button to see the magic!' },
+            { type: 'button', props: { id: 'demo-button', className: 'bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition-colors duration-300' }, children: 'Click me' },
+          ]},
+        ]},
+      ],
+    });
+
+    // Add JavaScript for the interactive demo
+    js += `
+      document.getElementById('demo-button').addEventListener('click', function() {
+        const demo = document.getElementById('interactive-demo');
+        demo.style.backgroundColor = getRandomColor();
+      });
+
+      function getRandomColor() {
+        return '#' + Math.floor(Math.random()*16777215).toString(16);
+      }
+    `;
+  }
+
+  return { components, js };
 };
 
 const generateBasicJS = (components: Component[]): string => {
@@ -648,6 +705,7 @@ const AIWebsiteGenerator: React.FC = () => {
 
   const [isGenerationComplete, setIsGenerationComplete] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (generatedComponents.length > 0) {
@@ -686,7 +744,7 @@ const AIWebsiteGenerator: React.FC = () => {
     setGeneratedJS('');
 
     try {
-      const components = await generateWebsite(userInput, theme, {
+      const { components, js } = await generateWebsite(userInput, theme, {
         colorScheme,
         fontFamily,
         responsiveDesign,
@@ -699,19 +757,16 @@ const AIWebsiteGenerator: React.FC = () => {
       if (animations) {
         addAnimations(components);
       }
-      const js = generateBasicJS(components);
       
-      // Set all the generated content at once
       setGeneratedComponents(components);
       setGeneratedJS(js);
       setIsGenerationComplete(true);
       toast.success('Website generated successfully!');
 
-      // Start the preview loading animation
       setPreviewLoading(true);
       setTimeout(() => {
         setPreviewLoading(false);
-      }, 10000);
+      }, 2000);
 
     } catch (error) {
       console.error('Error generating website:', error);
@@ -720,6 +775,20 @@ const AIWebsiteGenerator: React.FC = () => {
       setIsGenerating(false);
     }
   };
+
+  useEffect(() => {
+    if (isGenerationComplete && previewRef.current) {
+      const script = document.createElement('script');
+      script.textContent = generatedJS;
+      previewRef.current.appendChild(script);
+
+      return () => {
+        if (previewRef.current) {
+          previewRef.current.removeChild(script);
+        }
+      };
+    }
+  }, [isGenerationComplete, generatedJS]);
 
   const applyCustomStyles = (components: Component[]) => {
     // Apply custom CSS to components
@@ -1121,7 +1190,7 @@ const AIWebsiteGenerator: React.FC = () => {
               </motion.button>
             </div>
             {showPreview && (
-              <div className="border rounded-md p-4 bg-white dark:bg-gray-700 h-[600px] overflow-auto">
+              <div ref={previewRef} className="border rounded-md p-4 bg-white dark:bg-gray-700 h-[600px] overflow-auto">
                 <AnimatePresence>
                   {previewLoading ? (
                     <motion.div
