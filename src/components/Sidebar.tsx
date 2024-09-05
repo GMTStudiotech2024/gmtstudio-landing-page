@@ -48,7 +48,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
     { label: 'Research', icon: FaFlask, to: '/Research' },
     { label: 'Learning', icon: FaGraduationCap, to: '/Learning' },
     { label: 'Systems Status', icon: FaBars, to: '/system-status' },
-    { to: '/contact', icon: FaEnvelope, label: 'Contact' },
     { to: '/SignUp', icon: FaSignInAlt, label: 'Sign Up' },
     { to: '/help', icon: FaInfoCircle, label: 'Help' },
  ];

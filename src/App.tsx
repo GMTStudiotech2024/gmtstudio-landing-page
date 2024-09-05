@@ -17,7 +17,6 @@ import './components/st.css';
 import CustomCursor from './components/CustomCursor';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import Sidebar from './components/Sidebar';
-import Contact from './components/ContactPage';
 import SignUp from './components/SignUp';
 import Latest from './components/Latest';
 import NEWS1 from './components/News/NEWS1';
@@ -114,7 +113,6 @@ const AppContent: React.FC = () => {
           <Route path="/research" element={<Research />} />
           <Route path="/learning" element={<Learning />} />
           <Route path="*" element={<Error />} />
-          <Route path="/contact" element={<Contact />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/latest" element={<Latest />} />
