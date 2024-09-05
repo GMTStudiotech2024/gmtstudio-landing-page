@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { processChatbotQuery, getConversationSuggestions } from './chatbot';
-import { FaSearch,  FaLightbulb,  FaFilter, FaSort, FaImage } from 'react-icons/fa';
+import { FaSearch, FaLightbulb, FaFilter, FaSort, FaImage, FaHistory, FaTimes, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AdvancedSearch: React.FC = () => {
@@ -19,6 +19,7 @@ const AdvancedSearch: React.FC = () => {
   const [filters, setFilters] = useState({ date: '', language: '', region: '' });
   const [sortBy, setSortBy] = useState<'relevance' | 'date'>('relevance');
   const [imageResults, setImageResults] = useState<any[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     setSuggestions(getConversationSuggestions());
@@ -47,13 +48,30 @@ const AdvancedSearch: React.FC = () => {
   };
 
   const summarizeResults = (chatbotResponse: string, wikiResults: any[]) => {
-    let summary = chatbotResponse + "\n\n";
+    let summary = `Here's a summary of the search results:\n\n`;
+    summary += `${chatbotResponse}\n\n`;
+
     if (wikiResults.length > 0) {
-      summary += "Additionally, I found some relevant information:\n\n";
-      wikiResults.slice(0, 3).forEach(item => {
-        summary += `- ${item.label}: ${item.description}\n`;
+      summary += "Additional relevant information from Wikidata:\n\n";
+      wikiResults.slice(0, 5).forEach((item, index) => {
+        summary += `${index + 1}. ${item.label}:\n   ${item.description}\n `;
       });
     }
+
+    summary += "Key takeaways:\n";
+    const keyPoints = chatbotResponse.split('.').filter(sentence => sentence.trim().length > 20).slice(0, 3);
+    keyPoints.forEach((point, index) => {
+      summary += `• ${point.trim()}.\n`;
+    });
+
+    summary += "\nRelated topics you might want to explore:\n";
+    const relatedTopics = wikiResults.slice(0, 3).map(item => item.label);
+    relatedTopics.forEach((topic, index) => {
+      summary += `${index + 1}. ${topic}\n`;
+    });
+
+    summary += "\nNote: This summary combines AI-generated content and information from internet. For the most accurate and up-to-date information, please verify with authoritative sources.";
+
     return summary;
   };
 
@@ -89,9 +107,7 @@ const AdvancedSearch: React.FC = () => {
         simulateTyping(summarizedResult);
         break;
       case 'images':
-        const images = await searchWikimediaImages(query);
-        setImageResults(images);
-        searchResults = `Found ${images.length} images related to "${query}"`;
+        searchResults = "Sorry, Image Searching is not available now. Please wait until we finish developing it.";
         setResults([searchResults]);
         break;
       case 'news':
@@ -127,111 +143,150 @@ const AdvancedSearch: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300 pt-20">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-8 text-center">
-          AI-Powered Search Engine
-        </h1>
-        <form onSubmit={handleSearch} className="mb-8 relative">
-          <div className="flex items-center border-2 border-gray-300 dark:border-gray-700 rounded-lg py-2 px-4 focus-within:ring-2 focus-within:ring-blue-500 transition duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-in-out pt-20">
+      <div className="max-w-4xl mx-auto">
+        <motion.h1 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-5xl font-bold text-gray-900 dark:text-white mb-12 text-center tracking-tight"
+        >
+          Mazs Search
+        </motion.h1>
+        <form onSubmit={handleSearch} className="mb-12 relative">
+          <div className="flex items-center backdrop-blur-md bg-white/30 dark:bg-gray-800/30 rounded-full py-3 px-6 shadow-lg focus-within:ring-2 focus-within:ring-blue-500 transition duration-300">
             <FaSearch className="text-gray-400 mr-3" />
             <input
               ref={searchInputRef}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="appearance-none bg-transparent border-none w-full text-gray-700 dark:text-gray-300 mr-3 py-1 px-2 leading-tight focus:outline-none"
-              placeholder="Search the web with AI..."
+              className="appearance-none bg-transparent border-none w-full text-gray-700 dark:text-gray-300 mr-3 py-1 px-2 leading-tight focus:outline-none text-lg"
+              placeholder="Search with AI..."
             />
-            <button
+            <motion.button
               type="submit"
-              className="flex-shrink-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+              className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-2 px-6 rounded-full transition duration-300 ease-in-out"
               disabled={isLoading}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               {isLoading ? 'Searching...' : 'Search'}
-            </button>
+            </motion.button>
           </div>
           
           {/* Search type selector */}
-          <div className="flex justify-center mt-4 space-x-4">
+          <div className="flex justify-center mt-6 space-x-4">
             {['web', 'images', 'news'].map((type) => (
-              <button
+              <motion.button
                 key={type}
                 type="button"
                 onClick={() => setSearchType(type as 'web' | 'images' | 'news')}
-                className={`px-4 py-2 rounded-full ${
+                className={`px-6 py-2 rounded-full text-sm font-medium transition duration-300 ${
                   searchType === type
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                } transition duration-300`}
+                    ? 'bg-blue-500 text-white shadow-md'
+                    : 'bg-white/50 text-gray-700 hover:bg-white/70'
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
+                {type === 'web' && <FaSearch className="inline-block mr-2" />}
+                {type === 'images' && <FaImage className="inline-block mr-2" />}
+                {type === 'news' && <FaHistory className="inline-block mr-2" />}
                 {type.charAt(0).toUpperCase() + type.slice(1)}
-              </button>
+              </motion.button>
             ))}
           </div>
 
           {/* Filters and sorting */}
-          <div className="flex justify-between mt-4">
-            <div className="flex items-center space-x-4">
-              <FaFilter className="text-gray-400" />
-              <select
-                value={filters.date}
-                onChange={(e) => setFilters({ ...filters, date: e.target.value })}
-                className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded px-2 py-1"
-              >
-                <option value="">Any time</option>
-                <option value="day">Past 24 hours</option>
-                <option value="week">Past week</option>
-                <option value="month">Past month</option>
-                <option value="year">Past year</option>
-              </select>
-              {/* Add more filter options here */}
-            </div>
-            <div className="flex items-center space-x-4">
-              <FaSort className="text-gray-400" />
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'relevance' | 'date')}
-                className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded px-2 py-1"
-              >
-                <option value="relevance">Sort by relevance</option>
-                <option value="date">Sort by date</option>
-              </select>
-            </div>
-          </div>
+          <motion.div 
+            className="mt-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <button
+              type="button"
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center justify-center w-full py-2 bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 rounded-full hover:bg-white/70 dark:hover:bg-gray-700/70 transition duration-300"
+            >
+              <FaFilter className="mr-2" />
+              {showFilters ? 'Hide Filters' : 'Show Filters'}
+              {showFilters ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+            </button>
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-4 bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-2xl p-6 shadow-lg"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Range</label>
+                      <select
+                        value={filters.date}
+                        onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+                        className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Any time</option>
+                        <option value="day">Past 24 hours</option>
+                        <option value="week">Past week</option>
+                        <option value="month">Past month</option>
+                        <option value="year">Past year</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort By</label>
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as 'relevance' | 'date')}
+                        className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="relevance">Relevance</option>
+                        <option value="date">Date</option>
+                      </select>
+                    </div>
+                    {/* Add more filter options here */}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </form>
 
+        {/* Results section */}
         <AnimatePresence>
           {results.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
-              className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden mb-8 transition-colors duration-300"
+              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md shadow-lg rounded-2xl overflow-hidden mb-12 transition-all duration-300"
             >
-              <div className="px-4 py-5 sm:p-6">
-                <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+              <div className="px-6 py-8">
+                <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
                   {searchType.charAt(0).toUpperCase() + searchType.slice(1)} Results
                 </h3>
-                <div className="mb-4 border-b border-gray-200 dark:border-gray-700 pb-4">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 whitespace-pre-wrap">
+                <div className="mb-6 border-b border-gray-200 dark:border-gray-700 pb-6">
+                  <p className="text-lg text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
                     {isTyping ? typingResult : results[0]}
                     {isTyping && <span className="animate-pulse">|</span>}
                   </p>
                 </div>
                 {searchType === 'images' && imageResults.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {imageResults.map((image: any, index: number) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={image.imageinfo[0].url}
-                          alt={image.title}
-                          className="w-full h-40 object-cover rounded-lg"
-                        />
-                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <FaImage className="text-white text-2xl" />
-                        </div>
-                      </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {imageResults.map((image, index) => (
+                      <motion.img 
+                        key={index} 
+                        src={image.url} 
+                        alt={image.title} 
+                        className="w-full h-40 object-cover rounded-lg shadow-md" 
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.2 }}
+                      />
                     ))}
                   </div>
                 )}
@@ -240,25 +295,77 @@ const AdvancedSearch: React.FC = () => {
           )}
         </AnimatePresence>
 
-        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden transition-colors duration-300">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Suggested Queries</h3>
-            <div className="mt-2 flex flex-wrap gap-2">
+        {/* Suggested Queries section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md shadow-lg rounded-2xl overflow-hidden transition-all duration-300 mb-12"
+        >
+          <div className="px-6 py-8">
+            <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Suggested Queries</h3>
+            <div className="mt-4 flex flex-wrap gap-3">
               {suggestions.map((suggestion, index) => (
                 <motion.button
                   key={index}
                   onClick={() => handleSuggestionClick(suggestion)}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition duration-300 ease-in-out"
+                  className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition duration-300 ease-in-out"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <FaLightbulb className="mr-1" />
+                  <FaLightbulb className="mr-2" />
                   {suggestion}
                 </motion.button>
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
+
+        {/* Search History section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md shadow-lg rounded-2xl overflow-hidden transition-all duration-300"
+        >
+          <div className="px-6 py-8">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">Search History</h3>
+              <button
+                onClick={clearHistory}
+                className="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition duration-300"
+              >
+                Clear History
+              </button>
+            </div>
+            <ul className="space-y-3">
+              {searchHistory.map((item, index) => (
+                <motion.li 
+                  key={index} 
+                  className="py-3 flex justify-between items-center border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <button
+                    onClick={() => handleHistoryClick(item)}
+                    className="text-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition duration-300"
+                  >
+                    {item}
+                  </button>
+                  <FaTimes
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+                    onClick={() => {
+                      const newHistory = searchHistory.filter((_, i) => i !== index);
+                      setSearchHistory(newHistory);
+                      localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+                    }}
+                  />
+                </motion.li>
+              ))}
+            </ul>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
