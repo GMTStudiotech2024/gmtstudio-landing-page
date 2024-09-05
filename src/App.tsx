@@ -118,7 +118,6 @@ const AppContent: React.FC = () => {
           <Route path="/latest" element={<Latest />} />
           <Route path="/products" element={<Products />} />
           <Route path="/help" element={<Help />} />
-
           <Route path="/system-status" element={<SystemStatus />} />
           <Route path="/advanced-search" element={<AdvancedSearch />} />
         </Routes>

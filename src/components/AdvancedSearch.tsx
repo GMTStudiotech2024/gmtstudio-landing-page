@@ -41,15 +41,9 @@ const AdvancedSearch: React.FC = () => {
   };
 
   const searchWikimediaImages = async (query: string) => {
-    const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch=${encodeURIComponent(query)}&gsrlimit=10&prop=imageinfo&iiprop=url&format=json&origin=*`;
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      return Object.values(data.query.pages);
-    } catch (error) {
-      console.error('Error fetching Wikimedia images:', error);
-      return [];
-    }
+    // Image finding is not available now
+    console.log('Image finding is not available now');
+    return [];
   };
 
   const summarizeResults = (chatbotResponse: string, wikiResults: any[]) => {
