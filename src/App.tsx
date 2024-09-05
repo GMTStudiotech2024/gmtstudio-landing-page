@@ -35,8 +35,6 @@ import NEWS12 from './components/News/News12';
 import NEWS13 from './components/News/NEWS13';
 import NEWS14 from './components/News/NEWS14';
 import NEWS15 from './components/News/NEWS15';
-import Dashboard from './components/Dashboard';
-import PrivateRoute from './components/PrivateRoute';
 import Products from './components/Products';
 import Help from './components/Help';
 import LaunchGMTStudio from './components/LaunchGMTStudio';
@@ -45,7 +43,6 @@ import AdvancedSearch from './components/AdvancedSearch';
 import Login from './components/Login';
 import AIWebsiteGenerator from './components/AIWebsiteGenerator';
 const AppContent: React.FC = () => {
-  const [isAuthenticated] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -123,14 +120,7 @@ const AppContent: React.FC = () => {
           <Route path="/latest" element={<Latest />} />
           <Route path="/products" element={<Products />} />
           <Route path="/help" element={<Help />} />
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute isAuthenticated={isAuthenticated}>
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />
+
           <Route path="/system-status" element={<SystemStatus />} />
           <Route path="/advanced-search" element={<AdvancedSearch />} />
         </Routes>
