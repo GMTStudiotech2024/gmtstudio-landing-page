@@ -644,6 +644,37 @@ const AIWebsiteGenerator: React.FC = () => {
   const [accessibilityFeatures, setAccessibilityFeatures] = useState(false);
   const [generatedJS, setGeneratedJS] = useState('');
 
+  const [typedHTML, setTypedHTML] = useState('');
+  const [typedJS, setTypedJS] = useState('');
+
+  const [isGenerationComplete, setIsGenerationComplete] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  useEffect(() => {
+    if (generatedComponents.length > 0) {
+      const htmlCode = generateCode(generatedComponents);
+      typeCode(htmlCode, setTypedHTML);
+    }
+  }, [generatedComponents]);
+
+  useEffect(() => {
+    if (generatedJS) {
+      typeCode(generatedJS, setTypedJS);
+    }
+  }, [generatedJS]);
+
+  const typeCode = (code: string, setTypedCode: React.Dispatch<React.SetStateAction<string>>) => {
+    let i = 0;
+    const typing = setInterval(() => {
+      if (i < code.length) {
+        setTypedCode(prev => prev + code.charAt(i));
+        i++;
+      } else {
+        clearInterval(typing);
+      }
+    }, 1); // Adjust the typing speed here (lower number = faster)
+  };
+
   const handlePromptSelect = (prompt: string) => {
     setSelectedPrompt(prompt);
     setUserInput(prompt);
@@ -651,6 +682,10 @@ const AIWebsiteGenerator: React.FC = () => {
 
   const handleGenerate = async () => {
     setIsGenerating(true);
+    setIsGenerationComplete(false);
+    setGeneratedComponents([]);
+    setGeneratedJS('');
+
     try {
       const components = await generateWebsite(userInput, theme, {
         colorScheme,
@@ -660,14 +695,25 @@ const AIWebsiteGenerator: React.FC = () => {
         animations,
         customCSS,
       });
-      setGeneratedComponents(components);
+      
       applyCustomStyles(components);
       if (animations) {
         addAnimations(components);
       }
       const js = generateBasicJS(components);
+      
+      // Set all the generated content at once
+      setGeneratedComponents(components);
       setGeneratedJS(js);
+      setIsGenerationComplete(true);
       toast.success('Website generated successfully!');
+
+      // Start the preview loading animation
+      setPreviewLoading(true);
+      setTimeout(() => {
+        setPreviewLoading(false);
+      }, 15000);
+
     } catch (error) {
       console.error('Error generating website:', error);
       toast.error('Failed to generate website. Please try again.');
@@ -751,11 +797,38 @@ const AIWebsiteGenerator: React.FC = () => {
   const renderPreview = (components: Component[]) => {
     const renderComponent = (comp: Component, index: number): React.ReactNode => {
       if (typeof comp.children === 'string') {
-        return React.createElement(comp.type, { ...comp.props, key: index, dangerouslySetInnerHTML: { __html: comp.children } });
+        return (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.2 }}
+          >
+            {React.createElement(comp.type, { ...comp.props, dangerouslySetInnerHTML: { __html: comp.children } })}
+          </motion.div>
+        );
       } else if (Array.isArray(comp.children)) {
-        return React.createElement(comp.type, { ...comp.props, key: index }, comp.children.map(renderComponent));
+        return (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.2 }}
+          >
+            {React.createElement(comp.type, comp.props, comp.children.map((child, childIndex) => renderComponent(child, childIndex)))}
+          </motion.div>
+        );
       } else {
-        return React.createElement(comp.type, { ...comp.props, key: index });
+        return (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.2 }}
+          >
+            {React.createElement(comp.type, comp.props)}
+          </motion.div>
+        );
       }
     };
 
@@ -893,7 +966,7 @@ const AIWebsiteGenerator: React.FC = () => {
                     {suggestions.map((suggestion, index) => (
                       <button
                         key={index}
-                        className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300"
+                        className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-sm hover:bg-gray  "  
                         onClick={() => handleSuggestionClick(suggestion)}
                       >
                         {suggestion}
@@ -904,7 +977,7 @@ const AIWebsiteGenerator: React.FC = () => {
               )}
             </AnimatePresence>
             <motion.div
-              initial={false}
+                            initial={false}
               animate={{ height: showPrompts ? 'auto' : 0, opacity: showPrompts ? 1 : 0 }}
               transition={{ duration: 0.3 }}
               className="overflow-hidden"
@@ -926,7 +999,7 @@ const AIWebsiteGenerator: React.FC = () => {
                 ))}
               </div>
             </motion.div>
-            {showSettings && (
+              {showSettings && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
@@ -994,10 +1067,10 @@ const AIWebsiteGenerator: React.FC = () => {
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center">
-                    <input
-                      type="checkbox"
+                      <input
+                        type="checkbox"
                       id="responsiveDesign"
-                      checked={responsiveDesign}
+                        checked={responsiveDesign}
                       onChange={(e) => setResponsiveDesign(e.target.checked)}
                       className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-all duration-300"
                     />
@@ -1057,7 +1130,42 @@ const AIWebsiteGenerator: React.FC = () => {
             </div>
             {showPreview && (
               <div className="border rounded-md p-4 bg-white dark:bg-gray-700 h-[600px] overflow-auto">
-                {renderPreview(generatedComponents)}
+                <AnimatePresence>
+                  {previewLoading ? (
+                    <motion.div
+                      key="loader"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="flex items-center justify-center h-full"
+                    >
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full"
+                      />
+                    </motion.div>
+                  ) : isGenerationComplete ? (
+                    <motion.div
+                      key="preview"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      {renderPreview(generatedComponents)}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="empty"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400"
+                    >
+                      No preview available. Click "Generate" to create a website.
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )}
           </motion.div>
@@ -1113,7 +1221,7 @@ const AIWebsiteGenerator: React.FC = () => {
                   </div>
                 </div>
                 <pre className="bg-gray-800 p-4 rounded-b-md overflow-x-auto text-green-400 font-mono text-sm">
-                  <code>{generateCode(generatedComponents)}</code>
+                  <code>{typedHTML}</code>
                 </pre>
               </div>
               <div className="terminal-container">
@@ -1126,7 +1234,7 @@ const AIWebsiteGenerator: React.FC = () => {
                   </div>
                 </div>
                 <pre className="bg-gray-800 p-4 rounded-b-md overflow-x-auto text-blue-400 font-mono text-sm">
-                  <code>{generatedJS}</code>
+                  <code>{typedJS}</code>
                 </pre>
               </div>
             </div>
