@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSpinner, FaCopy, FaDownload,  FaCode } from 'react-icons/fa';
-import { FiSettings, FiEye, FiEyeOff, FiChevronDown, FiChevronUp, FiZap,FiTerminal } from 'react-icons/fi';
+import { FiSettings, FiEye, FiEyeOff, FiChevronDown, FiChevronUp, FiZap,FiTerminal, FiMaximize2, FiMinimize2 } from 'react-icons/fi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -707,6 +707,23 @@ const AIWebsiteGenerator: React.FC = () => {
   const [previewLoading, setPreviewLoading] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
+  const [isHTMLExpanded, setIsHTMLExpanded] = useState(false);
+  const [isJSExpanded, setIsJSExpanded] = useState(false);
+  const htmlOutputRef = useRef<HTMLPreElement>(null);
+  const jsOutputRef = useRef<HTMLPreElement>(null);
+
+  useEffect(() => {
+    if (htmlOutputRef.current) {
+      htmlOutputRef.current.scrollTop = htmlOutputRef.current.scrollHeight;
+    }
+  }, [typedHTML]);
+
+  useEffect(() => {
+    if (jsOutputRef.current) {
+      jsOutputRef.current.scrollTop = jsOutputRef.current.scrollHeight;
+    }
+  }, [typedJS]);
+
   useEffect(() => {
     if (generatedComponents.length > 0) {
       const htmlCode = generateCode(generatedComponents);
@@ -766,7 +783,7 @@ const AIWebsiteGenerator: React.FC = () => {
       setPreviewLoading(true);
       setTimeout(() => {
         setPreviewLoading(false);
-      }, 2000);
+      }, 10000);
 
     } catch (error) {
       console.error('Error generating website:', error);
@@ -800,7 +817,7 @@ const AIWebsiteGenerator: React.FC = () => {
           if (property && value) {
             acc[property] = value;
           }
-          return acc;
+          return acc as Record<string, string>;
         }, {} as Record<string, string>);
 
         // Merge custom styles with existing styles
@@ -1201,18 +1218,33 @@ const AIWebsiteGenerator: React.FC = () => {
                   <FaDownload className="mr-2" />
                   Download
                 </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-blue-500 text-white py-2 px-4 rounded-md flex items-center"
+                  onClick={() => setIsHTMLExpanded(!isHTMLExpanded)}
+                >
+                  {isHTMLExpanded ? <FiMinimize2 className="mr-2" /> : <FiMaximize2 className="mr-2" />}
+                  {isHTMLExpanded ? 'Minimize' : 'Expand'}
+                </motion.button>
               </div>
             </div>
-            <div className="terminal-container h-64 overflow-auto">
-              <div className="flex items-center justify-between bg-gray-800 p-2 rounded-t-md">
-                <span className="text-green-400 font-mono text-sm">HTML</span>
+            <div className={`terminal-container ${isHTMLExpanded ? 'h-[600px]' : 'h-64'} transition-all duration-300`}>
+              <div className="flex items-center justify-between bg-gray-900 p-2 rounded-t-md">
+                <div className="flex items-center">
+                  <span className="text-green-400 font-mono text-sm mr-2">HTML</span>
+                  <span className="text-gray-400 font-mono text-xs">index.html</span>
+                </div>
                 <div className="flex space-x-2">
                   <div className="w-3 h-3 rounded-full bg-red-500"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
                 </div>
               </div>
-              <pre className="bg-gray-800 p-4 rounded-b-md overflow-x-auto text-green-400 font-mono text-sm">
+              <pre 
+                ref={htmlOutputRef}
+                className="bg-gray-900 p-4 rounded-b-md overflow-x-auto text-green-400 font-mono text-sm h-full scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900"
+              >
                 <code>{typedHTML}</code>
               </pre>
             </div>
@@ -1287,20 +1319,51 @@ const AIWebsiteGenerator: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.8 }}
             className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-8 transition-all duration-300 hover:shadow-xl"
           >
-            <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white flex items-center">
-              <FiTerminal className="mr-2" />
-              Generated JavaScript
-            </h2>
-            <div className="terminal-container">
-              <div className="flex items-center justify-between bg-gray-800 p-2 rounded-t-md">
-                <span className="text-blue-400 font-mono text-sm">JavaScript</span>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white flex items-center">
+                <FiTerminal className="mr-2" />
+                Generated JavaScript
+              </h2>
+              <div className="flex space-x-2">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-green-500 text-white py-2 px-4 rounded-md flex items-center"
+                  onClick={() => {
+                    navigator.clipboard.writeText(generatedJS);
+                    toast.success('JavaScript copied to clipboard!');
+                  }}
+                >
+                  <FaCopy className="mr-2" />
+                  Copy
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-blue-500 text-white py-2 px-4 rounded-md flex items-center"
+                  onClick={() => setIsJSExpanded(!isJSExpanded)}
+                >
+                  {isJSExpanded ? <FiMinimize2 className="mr-2" /> : <FiMaximize2 className="mr-2" />}
+                  {isJSExpanded ? 'Minimize' : 'Expand'}
+                </motion.button>
+              </div>
+            </div>
+            <div className={`terminal-container ${isJSExpanded ? 'h-[600px]' : 'h-64'} transition-all duration-300`}>
+              <div className="flex items-center justify-between bg-gray-900 p-2 rounded-t-md">
+                <div className="flex items-center">
+                  <span className="text-yellow-400 font-mono text-sm mr-2">JavaScript</span>
+                  <span className="text-gray-400 font-mono text-xs">script.js</span>
+                </div>
                 <div className="flex space-x-2">
                   <div className="w-3 h-3 rounded-full bg-red-500"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
                 </div>
               </div>
-              <pre className="bg-gray-800 p-4 rounded-b-md overflow-x-auto text-blue-400 font-mono text-sm">
+              <pre 
+                ref={jsOutputRef}
+                className="bg-gray-900 p-4 rounded-b-md overflow-x-auto text-yellow-400 font-mono text-sm h-full scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900"
+              >
                 <code>{typedJS}</code>
               </pre>
             </div>
