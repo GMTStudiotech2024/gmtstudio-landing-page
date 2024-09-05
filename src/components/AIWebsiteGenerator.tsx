@@ -959,7 +959,7 @@ const AIWebsiteGenerator: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 py-8 px-4 sm:px-6 lg:px-8 pt-20">
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <motion.h1 
           className="text-4xl sm:text-5xl font-bold text-center text-gray-900 dark:text-white mb-8"
@@ -969,7 +969,9 @@ const AIWebsiteGenerator: React.FC = () => {
         >
           Mazs AI v1.0 anatra Website Generator
         </motion.h1>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Input Section */}
           <motion.div 
             className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 transition-all duration-300 hover:shadow-xl"
             initial={{ opacity: 0, x: -20 }}
@@ -999,7 +1001,7 @@ const AIWebsiteGenerator: React.FC = () => {
             </div>
             <div className="relative mb-6">
               <textarea
-                className="w-full h-40 p-4 border-2 border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-base"
+                className="w-full h-64 p-4 border-2 border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-base"
                 placeholder="Describe your website in detail..."
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
@@ -1170,6 +1172,8 @@ const AIWebsiteGenerator: React.FC = () => {
               </motion.div>
             )}
           </motion.div>
+
+          {/* Output Section */}
           <motion.div 
             className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 transition-all duration-300 hover:shadow-xl"
             initial={{ opacity: 0, x: 20 }}
@@ -1177,127 +1181,128 @@ const AIWebsiteGenerator: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.4 }}
           >
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                Live Preview
-              </h2>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
-                onClick={() => setShowPreview(!showPreview)}
-              >
-                {showPreview ? <FiEyeOff size={24} /> : <FiEye size={24} />}
-              </motion.button>
-            </div>
-            {showPreview && (
-              <div ref={previewRef} className="border rounded-md p-4 bg-white dark:bg-gray-700 h-[600px] overflow-auto">
-                <AnimatePresence>
-                  {previewLoading ? (
-                    <motion.div
-                      key="loader"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="flex items-center justify-center h-full"
-                    >
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full"
-                      />
-                    </motion.div>
-                  ) : isGenerationComplete ? (
-                    <motion.div
-                      key="preview"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      {renderPreview(generatedComponents)}
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="empty"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400"
-                    >
-                      No preview available. Click "Generate" to create a website.
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Generated HTML</h2>
+              <div className="flex space-x-2">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-green-500 text-white py-2 px-4 rounded-md flex items-center"
+                  onClick={handleCopyCode}
+                >
+                  <FaCopy className="mr-2" />
+                  {copiedCode ? 'Copied!' : 'Copy'}
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-yellow-500 text-white py-2 px-4 rounded-md flex items-center"
+                  onClick={handleDownloadHTML}
+                >
+                  <FaDownload className="mr-2" />
+                  Download
+                </motion.button>
               </div>
-            )}
+            </div>
+            <div className="terminal-container h-64 overflow-auto">
+              <div className="flex items-center justify-between bg-gray-800 p-2 rounded-t-md">
+                <span className="text-green-400 font-mono text-sm">HTML</span>
+                <div className="flex space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                </div>
+              </div>
+              <pre className="bg-gray-800 p-4 rounded-b-md overflow-x-auto text-green-400 font-mono text-sm">
+                <code>{typedHTML}</code>
+              </pre>
+            </div>
           </motion.div>
         </div>
-        {generatedComponents.length > 0 && (
+
+        {/* Live Preview Section */}
+        <motion.div 
+          className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 transition-all duration-300 hover:shadow-xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Live Preview</h2>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+              onClick={() => setShowPreview(!showPreview)}
+            >
+              {showPreview ? <FiEyeOff size={24} /> : <FiEye size={24} />}
+            </motion.button>
+          </div>
+          {showPreview && (
+            <div ref={previewRef} className="border rounded-md p-4 bg-white dark:bg-gray-700 h-[600px] overflow-auto">
+              <AnimatePresence>
+                {previewLoading ? (
+                  <motion.div
+                    key="loader"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center justify-center h-full"
+                  >
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full"
+                    />
+                  </motion.div>
+                ) : isGenerationComplete ? (
+                  <motion.div
+                    key="preview"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    {renderPreview(generatedComponents)}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="empty"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400"
+                  >
+                    No preview available. Click "Generate" to create a website.
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+        </motion.div>
+
+        {/* JavaScript Output Section */}
+        {generatedJS && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-            className="bg-gray-900 shadow-lg rounded-lg p-6 mt-8 transition-all duration-300 hover:shadow-xl"
+            transition={{ duration: 0.5, delay: 0.8 }}
+            className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-8 transition-all duration-300 hover:shadow-xl"
           >
-            <h2 className="text-2xl font-semibold mb-4 text-green-400 flex items-center">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white flex items-center">
               <FiTerminal className="mr-2" />
-              Generated Output
+              Generated JavaScript
             </h2>
-            <div className="mb-4 flex flex-wrap gap-4">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-green-500 text-white py-2 px-4 rounded-md flex items-center"
-                onClick={handleCopyCode}
-              >
-                <FaCopy className="mr-2" />
-                {copiedCode ? 'Copied!' : 'Copy All'}
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-yellow-500 text-white py-2 px-4 rounded-md flex items-center"
-                onClick={handleDownloadHTML}
-              >
-                <FaDownload className="mr-2" />
-                Download HTML
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-purple-500 text-white py-2 px-4 rounded-md flex items-center"
-                onClick={() => {/* Implement export to React components */}}
-              >
-                <FaCode className="mr-2" />
-                Export React Components
-              </motion.button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="terminal-container">
-                <div className="flex items-center justify-between bg-gray-800 p-2 rounded-t-md">
-                  <span className="text-green-400 font-mono text-sm">HTML</span>
-                  <div className="flex space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  </div>
+            <div className="terminal-container">
+              <div className="flex items-center justify-between bg-gray-800 p-2 rounded-t-md">
+                <span className="text-blue-400 font-mono text-sm">JavaScript</span>
+                <div className="flex space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
                 </div>
-                <pre className="bg-gray-800 p-4 rounded-b-md overflow-x-auto text-green-400 font-mono text-sm">
-                  <code>{typedHTML}</code>
-                </pre>
               </div>
-              <div className="terminal-container">
-                <div className="flex items-center justify-between bg-gray-800 p-2 rounded-t-md">
-                  <span className="text-blue-400 font-mono text-sm">JavaScript</span>
-                  <div className="flex space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  </div>
-                </div>
-                <pre className="bg-gray-800 p-4 rounded-b-md overflow-x-auto text-blue-400 font-mono text-sm">
-                  <code>{typedJS}</code>
-                </pre>
-              </div>
+              <pre className="bg-gray-800 p-4 rounded-b-md overflow-x-auto text-blue-400 font-mono text-sm">
+                <code>{typedJS}</code>
+              </pre>
             </div>
           </motion.div>
         )}
