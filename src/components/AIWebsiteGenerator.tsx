@@ -624,7 +624,6 @@ const AIWebsiteGenerator: React.FC = () => {
   const [layout, setLayout] = useState('default');
   const [customCSS, setCustomCSS] = useState('');
   const [animations, setAnimations] = useState(false);
-  const [editingComponent, setEditingComponent] = useState<number | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showPrompts, setShowPrompts] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -712,7 +711,7 @@ const AIWebsiteGenerator: React.FC = () => {
       setPreviewLoading(true);
       setTimeout(() => {
         setPreviewLoading(false);
-      }, 15000);
+      }, 10000);
 
     } catch (error) {
       console.error('Error generating website:', error);
@@ -858,13 +857,6 @@ const AIWebsiteGenerator: React.FC = () => {
     a.download = 'generated-website.html';
     a.click();
     URL.revokeObjectURL(url);
-  };
-
-
-  const handleComponentEdit = (index: number, newProps: Record<string, any>) => {
-    const updatedComponents = [...generatedComponents];
-    updatedComponents[index] = { ...updatedComponents[index], props: { ...updatedComponents[index].props, ...newProps } };
-    setGeneratedComponents(updatedComponents);
   };
 
   useEffect(() => {
