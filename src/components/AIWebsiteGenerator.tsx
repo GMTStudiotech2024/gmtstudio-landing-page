@@ -178,64 +178,46 @@ const generateWebsite = async (input: string, theme: string, options: {
   if (includesAny(['features', 'services', 'offerings', 'what we do', 'our work'])) {
     mainContent.push({
       type: 'section',
-      props: { style: { padding: '100px 50px', backgroundColor: colors.bg } },
+      props: { className: "py-20 bg-gray-100" },
       children: [
-        { type: 'h2', props: { style: { textAlign: 'center', color: colors.accent, marginBottom: '60px', fontSize: '2.5em' } }, children: 'Our Features' },
-        { type: 'div', props: { style: { display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap' } }, children: [
-          { type: 'div', props: { style: { 
-            width: '30%', 
-            minWidth: '250px', 
-            margin: '20px', 
-            textAlign: 'center',
-            padding: '30px',
-            borderRadius: '10px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-            ':hover': {
-              transform: 'translateY(-10px)',
-              boxShadow: '0 10px 20px rgba(0,0,0,0.2)'
-            }
-          } }, children: [
-            { type: 'div', props: { style: { fontSize: '3em', color: colors.accent, marginBottom: '20px' } }, children: '🚀' },
-            { type: 'h3', props: { style: { color: colors.secondary } }, children: 'Fast Performance' },
-            { type: 'p', props: {}, children: 'Lightning-fast load times and smooth interactions.' }
+        { type: 'div', props: { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" }, children: [
+          { type: 'div', props: { className: "text-center" }, children: [
+            { type: 'h2', props: { className: "text-3xl font-extrabold text-gray-900 sm:text-4xl" }, children: 'Our Features' },
+            { type: 'p', props: { className: "mt-4 text-xl text-gray-600" }, children: 'Discover why our platform is the preferred choice for businesses worldwide.' }
           ]},
-          { type: 'div', props: { style: { 
-            width: '30%', 
-            minWidth: '250px', 
-            margin: '20px', 
-            textAlign: 'center',
-            padding: '30px',
-            borderRadius: '10px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-            ':hover': {
-              transform: 'translateY(-10px)',
-              boxShadow: '0 10px 20px rgba(0,0,0,0.2)'
-            }
-          } }, children: [
-            { type: 'div', props: { style: { fontSize: '3em', color: colors.accent, marginBottom: '20px' } }, children: '🛡️' },
-            { type: 'h3', props: { style: { color: colors.secondary } }, children: 'Secure Platform' },
-            { type: 'p', props: {}, children: 'Top-notch security to protect your data.' }
+          { type: 'div', props: { className: "mt-20" }, children: [
+            { type: 'div', props: { className: "grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3" }, children: [
+              { type: 'div', props: { className: "flex flex-col items-center p-6 bg-white rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl" }, children: [
+                { type: 'div', props: { className: "flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-indigo-500 text-white" }, children: [
+                  { type: 'i', props: { className: "fas fa-bolt text-2xl" }, children: [] }
+                ]},
+                { type: 'h3', props: { className: "mb-2 text-xl font-semibold text-gray-800" }, children: 'Fast Performance' },
+                { type: 'p', props: { className: "text-center text-gray-600" }, children: 'Lightning-fast load times and smooth interactions.' }
+              ]},
+              { type: 'div', props: { className: "flex flex-col items-center p-6 bg-white rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl" }, children: [
+                { type: 'div', props: { className: "flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-indigo-500 text-white" }, children: [
+                  { type: 'i', props: { className: "fas fa-shield-alt text-2xl" }, children: [] }
+                ]},
+                { type: 'h3', props: { className: "mb-2 text-xl font-semibold text-gray-800" }, children: 'Secure Platform' },
+                { type: 'p', props: { className: "text-center text-gray-600" }, children: 'Top-notch security to protect your data.' }
+              ]},
+              { type: 'div', props: { className: "flex flex-col items-center p-6 bg-white rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl" }, children: [
+                { type: 'div', props: { className: "flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-indigo-500 text-white" }, children: [
+                  { type: 'i', props: { className: "fas fa-magic text-2xl" }, children: [] }
+                ]},
+                { type: 'h3', props: { className: "mb-2 text-xl font-semibold text-gray-800" }, children: 'Mobile Friendly' },
+                { type: 'p', props: { className: "text-center text-gray-600" }, children: 'Fully responsive design for all devices.' }
+              ]}
+            ]}
           ]},
-          { type: 'div', props: { style: { 
-            width: '30%', 
-            minWidth: '250px', 
-            margin: '20px', 
-            textAlign: 'center',
-            padding: '30px',
-            borderRadius: '10px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-            ':hover': {
-              transform: 'translateY(-10px)',
-              boxShadow: '0 10px 20px rgba(0,0,0,0.2)'
-            }
-          } }, children: [
-            { type: 'div', props: { style: { fontSize: '3em', color: colors.accent, marginBottom: '20px' } }, children: '📱' },
-            { type: 'h3', props: { style: { color: colors.secondary } }, children: 'Mobile Friendly' },
-            { type: 'p', props: {}, children: 'Fully responsive design for all devices.' }
-          ]},
+          { type: 'div', props: { className: "mt-20 text-center" }, children: [
+            { type: 'a', props: { href: "#", className: "inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:text-lg md:px-10 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg" }, children: [
+              
+              { type: 'svg', props: { xmlns: "http://www.w3.org/2000/svg", className: "ml-2 h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" }, children: [
+                { type: 'path', props: { fillRule: "evenodd", d: "M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z", clipRule: "evenodd" }, children: [] }
+              ]}
+            ]}
+          ]}
         ]}
       ]
     });
@@ -243,62 +225,138 @@ const generateWebsite = async (input: string, theme: string, options: {
 
   // Testimonials section with carousel effect
   if (includesAny(['testimonials', 'reviews', 'feedback', 'what people say', 'customer stories'])) {
+    const testimonials = [
+      {
+        id: 1,
+        name: "Sarah Johnson",
+        role: "CEO",
+        company: "TechCorp",
+        image: "https://randomuser.me/api/portraits/women/1.jpg",
+        quote: "This product has revolutionized our workflow. It's intuitive, powerful, and has saved us countless hours. I couldn't imagine running our business without it now."
+      },
+      {
+        id: 2,
+        name: "Michael Chen",
+        role: "Marketing Director",
+        company: "GlobalBrand",
+        image: "https://randomuser.me/api/portraits/men/2.jpg",
+        quote: "The customer support is phenomenal. Any time we've had an issue, the team has been quick to respond and always goes above and beyond to help us out."
+      },
+      {
+        id: 3,
+        name: "Emily Rodriguez",
+        role: "Freelance Designer",
+        company: "Self-employed",
+        image: "https://randomuser.me/api/portraits/women/3.jpg",
+        quote: "As a solo entrepreneur, this tool has been a game-changer for me. It's like having a whole team at my fingertips. Highly recommended!"
+      },
+      {
+        id: 4,
+        name: "David Okafor",
+        role: "CTO",
+        company: "InnovateTech",
+        image: "https://randomuser.me/api/portraits/men/4.jpg",
+        quote: "The scalability of this solution is impressive. We've grown our user base tenfold, and the platform hasn't skipped a beat. It's robust and reliable."
+      }
+    ];
+
     mainContent.push({
       type: 'section',
-      props: { style: { padding: '100px 50px', backgroundColor: colors.tertiary, color: colors.bg } },
+      props: { className: "py-20 bg-gradient-to-r from-blue-500 to-indigo-600" },
       children: [
-        { type: 'h2', props: { style: { textAlign: 'center', marginBottom: '60px', fontSize: '2.5em' } }, children: 'What Our Customers Say' },
-        { type: 'div', props: { style: { 
-          display: 'flex', 
-          overflowX: 'auto', 
-          scrollSnapType: 'x mandatory',
-          scrollBehavior: 'smooth',
-          WebkitOverflowScrolling: 'touch',
-          '::-webkit-scrollbar': { display: 'none' }
-        } }, children: [
-          { type: 'div', props: { style: { 
-            flex: '0 0 auto',
-            width: '300px',
-            margin: '0 20px',
-            padding: '30px',
-            backgroundColor: colors.bg,
-            color: colors.text,
-            borderRadius: '10px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            scrollSnapAlign: 'center'
-          } }, children: [
-            { type: 'p', props: { style: { fontStyle: 'italic', marginBottom: '10px' } }, children: '"This product changed my life! Highly recommended!"' },
-            { type: 'p', props: { style: { fontWeight: 'bold' } }, children: '- John Doe' }
-          ]},
-          { type: 'div', props: { style: { 
-            flex: '0 0 auto',
-            width: '300px',
-            margin: '0 20px',
-            padding: '30px',
-            backgroundColor: colors.bg,
-            color: colors.text,
-            borderRadius: '10px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            scrollSnapAlign: 'center'
-          } }, children: [
-            { type: 'p', props: { style: { fontStyle: 'italic', marginBottom: '10px' } }, children: '"Exceptional service and top-quality products. Will buy again!"' },
-            { type: 'p', props: { style: { fontWeight: 'bold' } }, children: '- Jane Smith' }
-          ]},
+        { type: 'div', props: { className: "max-w-6xl mx-auto px-4 sm:px-6 lg:px-8" }, children: [
+          { type: 'h2', props: { className: "text-4xl font-extrabold text-center text-white mb-12" }, children: 'What Our Customers Say' },
+          { type: 'div', props: { className: "relative" }, children: [
+            { type: 'div', props: { className: "flex justify-center items-center space-x-8" }, children: 
+              testimonials.map((testimonial, index) => ({
+                type: 'div',
+                props: { key: testimonial.id, className: `w-full max-w-lg ${index === 0 ? 'block' : 'hidden'}` },
+                children: [
+                  { type: 'div', props: { className: `bg-white rounded-lg shadow-xl p-8 transition-all duration-500 ease-in-out transform ${index === 0 ? 'scale-105 z-10' : 'scale-95 opacity-50'}` }, children: [
+                    { type: 'div', props: { className: "flex items-center mb-4" }, children: [
+                      { type: 'img', props: { className: "w-16 h-16 rounded-full mr-4", src: testimonial.image, alt: testimonial.name } },
+                      { type: 'div', props: {}, children: [
+                        { type: 'h3', props: { className: "text-xl font-semibold text-gray-800" }, children: testimonial.name },
+                        { type: 'p', props: { className: "text-gray-600" }, children: `${testimonial.role} at ${testimonial.company}` }
+                      ]}
+                    ]},
+                    { type: 'p', props: { className: "text-gray-700 italic" }, children: `"${testimonial.quote}"` }
+                  ]}
+                ]
+              }))
+            },
+            { type: 'button', props: { className: "absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition duration-300 ease-in-out" }, children: [
+              { type: 'svg', props: { className: "w-6 h-6 text-gray-600", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg" }, children: [
+                { type: 'path', props: { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M15 19l-7-7 7-7" } }
+              ]}
+            ]},
+            { type: 'button', props: { className: "absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition duration-300 ease-in-out" }, children: [
+              { type: 'svg', props: { className: "w-6 h-6 text-gray-600", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg" }, children: [
+                { type: 'path', props: { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M9 5l7 7-7 7" } }
+              ]}
+            ]}
+          ]}
         ]}
       ]
     });
+
+    js += `
+      const testimonialButtons = document.querySelectorAll('.testimonial-button');
+      const testimonials = document.querySelectorAll('.testimonial');
+      let currentTestimonial = 0;
+
+      function showTestimonial(index) {
+        testimonials.forEach((testimonial, i) => {
+          if (i === index) {
+            testimonial.classList.remove('hidden');
+            testimonial.classList.add('block', 'scale-105', 'z-10');
+            testimonial.classList.remove('scale-95', 'opacity-50');
+          } else {
+            testimonial.classList.add('hidden');
+            testimonial.classList.remove('block', 'scale-105', 'z-10');
+            testimonial.classList.add('scale-95', 'opacity-50');
+          }
+        });
+      }
+
+      testimonialButtons.forEach((button, index) => {
+        button.addEventListener('click', () => {
+          if (index === 0) {
+            currentTestimonial = (currentTestimonial - 1 + testimonials.length) % testimonials.length;
+          } else {
+            currentTestimonial = (currentTestimonial + 1) % testimonials.length;
+          }
+          showTestimonial(currentTestimonial);
+        });
+      });
+    `;
   }
 
   // Content section
   if (includesAny(['content', 'about', 'information', 'details', 'main'])) {
     mainContent.push({
-      type: 'main',
-      props: { style: { padding: '50px', maxWidth: '800px', margin: '0 auto' } },
+      type: 'div',
+      props: { className: 'max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12' },
       children: [
-        { type: 'h2', props: { style: { color: colors.accent, marginBottom: '20px' } }, children: 'Main Content' },
-        { type: 'p', props: { style: { marginBottom: '20px' } }, children: 'This is the main content area of the website. You can add more sections and details here to provide valuable information to your visitors.' },
-        { type: 'p', props: { style: { marginBottom: '20px' } }, children: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.' }
-      ]
+        {
+          type: 'Content',
+          props: {
+            title: 'Main Content',
+            subtitle: 'Discover more about our services and offerings',
+            author: {
+              name: 'John Doe',
+              avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+            },
+            date: new Date().toLocaleDateString(),
+            coverImage: 'https://source.unsplash.com/random/1200x600?business',
+            content: `
+              <p>This is the main content area of the website. You can add more sections and details here to provide valuable information to your visitors.</p>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.</p>
+            `,
+            tags: ['Information', 'About Us', 'Services'],
+          },
+        },
+      ],
     });
   }
 
