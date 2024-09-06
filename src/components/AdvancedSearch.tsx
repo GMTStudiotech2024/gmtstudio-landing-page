@@ -42,9 +42,19 @@ const AdvancedSearch: React.FC = () => {
   };
 
   const searchWikimediaImages = async (query: string) => {
-    // Image finding is not available now
-    console.log('Image finding is not available now');
-    return [];
+    const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch=${encodeURIComponent(query)}&gsrlimit=3&prop=imageinfo&iiprop=url&format=json&origin=*`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      const pages = data.query.pages;
+      return Object.values(pages).map((page: any) => ({
+        title: page.title,
+        url: page.imageinfo[0].url,
+      }));
+    } catch (error) {
+      console.error('Error fetching Wikimedia images:', error);
+      return [];
+    }
   };
 
   const summarizeResults = (chatbotResponse: string, wikiResults: any[]) => {
@@ -107,8 +117,9 @@ const AdvancedSearch: React.FC = () => {
         simulateTyping(summarizedResult);
         break;
       case 'images':
-        searchResults = "Sorry, Image Searching is not available now. Please wait until we finish developing it.";
-        setResults([searchResults]);
+        const images = await searchWikimediaImages(query);
+        setImageResults(images);
+        searchResults = `Found ${images.length} images related to "${query}"`;
         break;
       case 'news':
         searchResults = "News search results would appear here.";
@@ -116,6 +127,7 @@ const AdvancedSearch: React.FC = () => {
         break;
     }
 
+    setResults([searchResults]);
     setIsLoading(false);
 
     // Update search history
@@ -277,16 +289,20 @@ const AdvancedSearch: React.FC = () => {
                   </p>
                 </div>
                 {searchType === 'images' && imageResults.length > 0 && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {imageResults.map((image, index) => (
-                      <motion.img 
-                        key={index} 
-                        src={image.url} 
-                        alt={image.title} 
-                        className="w-full h-40 object-cover rounded-lg shadow-md" 
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {imageResults.slice(0, 3).map((image, index) => (
+                      <motion.div 
+                        key={index}
+                        className="aspect-w-16 aspect-h-9"
                         whileHover={{ scale: 1.05 }}
                         transition={{ duration: 0.2 }}
-                      />
+                      >
+                        <img 
+                          src={image.url} 
+                          alt={image.title} 
+                          className="w-full h-full object-cover rounded-lg shadow-md" 
+                        />
+                      </motion.div>
                     ))}
                   </div>
                 )}

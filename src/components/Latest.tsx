@@ -12,6 +12,15 @@ import AI from '../assets/images/AI.png'
 import GMTStudio from '../assets/images/GMTStudio_a.png'
 const blogPosts = [
   {
+    image:AI,
+    title:"Mazs AI v1.0 Anatra update",
+    excerpt:"Mazs AI v1.0 Anatra is a new AI website generator that is powered by the latest technology and it is the first of its kind.",
+    author:"Alston Chang",
+    date:"August 15, 2024",
+    link:"/news15",
+    category:"AI",
+  },
+  {
     image:GMTStudio,
     title:"Bring Mazs AI into our official website",
     excerpt:"We are excited to announce the integration of Mazs AI into our official website. you can not only now use our AI to search for anything in this website, but also ask any questions.",

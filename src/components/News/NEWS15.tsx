@@ -35,7 +35,13 @@ const NEWS14: React.FC = () => {
 
               <h2 className="text-2xl font-semibold mt-8 mb-4">Project Highlights</h2>
               <p>
-                This is the latest project we are working on. you can find it in the sidebar and products page.
+                Our Artificial intelligent related project is now available. you can find it in the sidebar and products page. 
+                here is a list of all features:
+                <ul>
+                  <li>1. Mazs AI v1.0 anatra website generator</li>
+                  <li>2. Mazs AI v1.0 anatra Search engine</li>
+                  <li>3. Mazs AI v1.0 anatra Chatbot </li>
+                </ul>
                 </p>
               <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
                 <p className="font-semibold text-blue-800 dark:text-blue-200">We look forward to sharing more details about this exciting new project with you soon. Thank you for your continued support.</p>
