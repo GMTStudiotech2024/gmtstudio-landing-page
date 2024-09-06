@@ -124,13 +124,17 @@ const generateWebsite = async (input: string, theme: string, options: {
     });
 
     js += `
-      const toggleMenu = () => {
-        const mobileMenu = document.getElementById('mobile-menu');
-        mobileMenu.classList.toggle('hidden');
-      };
+      (function() {
+        if (typeof toggleMenu === 'undefined') {
+          const toggleMenu = () => {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+          };
 
-      const menuButton = document.querySelector('button[aria-controls="mobile-menu"]');
-      menuButton.addEventListener('click', toggleMenu);
+          const menuButton = document.querySelector('button[aria-controls="mobile-menu"]');
+          menuButton.addEventListener('click', toggleMenu);
+        }
+      })();
     `;
   }
 
@@ -159,7 +163,7 @@ const generateWebsite = async (input: string, theme: string, options: {
           ]}
         ]},
         { type: 'div', props: { className: "absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent" }, children: [] },
-        { type: 'div', props: { className: "absolute top-0 left-0 w-full h-full" }, children: [
+                { type: 'div', props: { className: "absolute top-0 left-0 w-full h-full" }, children: [
           { type: 'svg', props: { className: "absolute left-0 w-full h-full", viewBox: "0 0 100 100", preserveAspectRatio: "none" }, children: [
             { type: 'path', props: { d: "M0,0 L100,0 L100,100 L0,100 Z", fill: "url(#hero-gradient)", fillOpacity: "0.4" } }
           ]},
