@@ -167,6 +167,294 @@ class MultilayerPerceptron {
   }
 }
 
+// New class for text processing and generation
+class NaturalLanguageProcessor {
+  private vocabulary: Set<string>;
+  private wordFrequency: Map<string, number>;
+  private bigramFrequency: Map<string, Map<string, number>>;
+  private trigramFrequency: Map<string, Map<string, Map<string, number>>>;
+  private wordVectors: Map<string, number[]>;
+  private idf: Map<string, number>;
+  private documents: string[];
+
+  constructor() {
+    this.vocabulary = new Set();
+    this.wordFrequency = new Map();
+    this.bigramFrequency = new Map();
+    this.trigramFrequency = new Map();
+    this.wordVectors = new Map();
+    this.idf = new Map();
+    this.documents = [];
+  }
+
+  trainOnText(text: string) {
+    const words = this.tokenize(text);
+    this.documents.push(text);
+    
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i];
+      this.vocabulary.add(word);
+      this.wordFrequency.set(word, (this.wordFrequency.get(word) || 0) + 1);
+      
+      if (i < words.length - 1) {
+        const nextWord = words[i + 1];
+        if (!this.bigramFrequency.has(word)) {
+          this.bigramFrequency.set(word, new Map());
+        }
+        const bigramMap = this.bigramFrequency.get(word)!;
+        bigramMap.set(nextWord, (bigramMap.get(nextWord) || 0) + 1);
+      }
+
+      if (i < words.length - 2) {
+        const nextWord = words[i + 1];
+        const nextNextWord = words[i + 2];
+        if (!this.trigramFrequency.has(word)) {
+          this.trigramFrequency.set(word, new Map());
+        }
+        if (!this.trigramFrequency.get(word)!.has(nextWord)) {
+          this.trigramFrequency.get(word)!.set(nextWord, new Map());
+        }
+        const trigramMap = this.trigramFrequency.get(word)!.get(nextWord)!;
+        trigramMap.set(nextNextWord, (trigramMap.get(nextNextWord) || 0) + 1);
+      }
+    }
+
+    this.updateIDF();
+    this.generateWordEmbeddings();
+  }
+
+  private tokenize(text: string): string[] {
+    return text.toLowerCase().match(/\b(\w+)\b/g) || [];
+  }
+
+  private updateIDF() {
+    this.vocabulary.forEach(word => {
+      const documentFrequency = this.documents.filter(doc => doc.includes(word)).length;
+      this.idf.set(word, Math.log(this.documents.length / (1 + documentFrequency)));
+    });
+  }
+
+  private generateWordEmbeddings() {
+    const vectorSize = 100;
+    const contextWindow = 2;
+    const learningRate = 0.01;
+    const iterations = 5;
+
+    // Initialize word vectors
+    this.vocabulary.forEach(word => {
+      this.wordVectors.set(word, Array.from({ length: vectorSize }, () => Math.random() - 0.5));
+    });
+
+    // Train word vectors using skip-gram model
+    for (let iter = 0; iter < iterations; iter++) {
+      this.documents.forEach(doc => {
+        const words = this.tokenize(doc);
+        for (let i = 0; i < words.length; i++) {
+          const currentWord = words[i];
+          for (let j = Math.max(0, i - contextWindow); j <= Math.min(words.length - 1, i + contextWindow); j++) {
+            if (i !== j) {
+              const contextWord = words[j];
+              const currentVector = this.wordVectors.get(currentWord)!;
+              const contextVector = this.wordVectors.get(contextWord)!;
+              
+              // Compute gradient and update vectors
+              const dot = currentVector.reduce((sum, val, idx) => sum + val * contextVector[idx], 0);
+              const error = Math.exp(dot) / (1 + Math.exp(dot)) - 1;
+              
+              for (let k = 0; k < vectorSize; k++) {
+                currentVector[k] -= learningRate * error * contextVector[k];
+                contextVector[k] -= learningRate * error * currentVector[k];
+              }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  generateSentence(startWord: string, maxLength: number = 20): string {
+    let sentence = [startWord];
+    let currentWord = startWord;
+    let previousWord = '';
+
+    for (let i = 1; i < maxLength; i++) {
+      let nextWord = '';
+      if (this.trigramFrequency.has(previousWord) && this.trigramFrequency.get(previousWord)!.has(currentWord)) {
+        const trigramCandidates = this.trigramFrequency.get(previousWord)!.get(currentWord)!;
+        nextWord = this.selectNextWord(trigramCandidates);
+      } else if (this.bigramFrequency.has(currentWord)) {
+        const bigramCandidates = this.bigramFrequency.get(currentWord)!;
+        nextWord = this.selectNextWord(bigramCandidates);
+      } else {
+        break;
+      }
+
+      sentence.push(nextWord);
+      previousWord = currentWord;
+      currentWord = nextWord;
+
+      if (nextWord.endsWith('.') || nextWord.endsWith('!') || nextWord.endsWith('?')) break;
+    }
+
+    return sentence.join(' ');
+  }
+
+  private selectNextWord(candidates: Map<string, number>): string {
+    const totalFrequency = Array.from(candidates.values()).reduce((sum, freq) => sum + freq, 0);
+    let random = Math.random() * totalFrequency;
+    
+    for (const [word, freq] of Array.from(candidates.entries())) {
+      random -= freq;
+      if (random <= 0) return word;
+    }
+
+    return Array.from(candidates.keys())[0];
+  }
+
+  analyzeSentiment(text: string): { score: number, explanation: string } {
+    const words = this.tokenize(text);
+    const sentimentLexicon = new Map([
+      ['good', 1], ['great', 2], ['excellent', 2], ['amazing', 2], ['wonderful', 2],
+      ['bad', -1], ['terrible', -2], ['awful', -2], ['horrible', -2], ['disappointing', -1],
+      ['happy', 1], ['sad', -1], ['angry', -2], ['pleased', 1], ['unhappy', -1]
+    ]);
+
+    let totalScore = 0;
+    let explanation: string[] = [];
+
+    words.forEach(word => {
+      if (sentimentLexicon.has(word)) {
+        const score = sentimentLexicon.get(word)!;
+        totalScore += score;
+        explanation.push(`"${word}" contributes ${score > 0 ? '+' : ''}${score}`);
+      }
+    });
+
+    const normalizedScore = Math.tanh(totalScore / words.length);
+    
+    return {
+      score: normalizedScore,
+      explanation: `Sentiment score: ${normalizedScore.toFixed(2)}. ${explanation.join(', ')}.`
+    };
+  }
+
+  understandQuery(query: string): { intent: string, entities: { [key: string]: string }, keywords: string[] } {
+    const words = this.tokenize(query);
+    const queryVector = this.getTfIdfVector(words);
+    
+    let bestIntent = '';
+    let maxSimilarity = -Infinity;
+    
+    intents.forEach(intent => {
+      const intentVector = this.getTfIdfVector(intent.patterns.join(' ').split(/\s+/));
+      const similarity = this.cosineSimilarity(queryVector, intentVector);
+      if (similarity > maxSimilarity) {
+        maxSimilarity = similarity;
+        bestIntent = intent.patterns[0];
+      }
+    });
+
+    const entities = this.extractEntities(query);
+    const keywords = this.extractKeywords(words);
+
+    return { intent: bestIntent, entities, keywords };
+  }
+
+  private getTfIdfVector(words: string[]): Map<string, number> {
+    const tf = new Map<string, number>();
+    words.forEach(word => {
+      tf.set(word, (tf.get(word) || 0) + 1);
+    });
+
+    const tfidf = new Map<string, number>();
+    tf.forEach((freq, word) => {
+      const idf = this.idf.get(word) || Math.log(this.documents.length);
+      tfidf.set(word, freq * idf);
+    });
+
+    return tfidf;
+  }
+
+  private cosineSimilarity(vec1: Map<string, number>, vec2: Map<string, number>): number {
+    let dotProduct = 0;
+    let mag1 = 0;
+    let mag2 = 0;
+
+    vec1.forEach((val1, key) => {
+      const val2 = vec2.get(key) || 0;
+      dotProduct += val1 * val2;
+      mag1 += val1 * val1;
+    });
+
+    vec2.forEach((val2) => {
+      mag2 += val2 * val2;
+    });
+
+    return dotProduct / (Math.sqrt(mag1) * Math.sqrt(mag2));
+  }
+
+  private extractEntities(query: string): { [key: string]: string } {
+    const entities: { [key: string]: string } = {};
+    const dateMatch = query.match(/\b(\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{2,4})\b/);
+    if (dateMatch) entities['date'] = dateMatch[0];
+    const nameMatch = query.match(/\b([A-Z][a-z]+ [A-Z][a-z]+)\b/);
+    if (nameMatch) entities['name'] = nameMatch[0];
+    const emailMatch = query.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/);
+    if (emailMatch) entities['email'] = emailMatch[0];
+    return entities;
+  }
+
+  private extractKeywords(words: string[]): string[] {
+    const tfidf = this.getTfIdfVector(words);
+    return Array.from(tfidf.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(entry => entry[0]);
+  }
+
+  generateResponse(intent: string, entities: { [key: string]: string }, keywords: string[]): string {
+    const matchedIntent = intents.find(i => i.patterns.includes(intent));
+    if (matchedIntent) {
+      let response = matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)];
+      Object.entries(entities).forEach(([key, value]) => {
+        response = response.replace(`{${key}}`, value);
+      });
+      
+      // Enhance response with keywords
+      const keywordSentence = this.generateSentence(keywords[0] || "Additionally", 10);
+      response += " " + keywordSentence;
+
+      return response;
+    }
+    return this.generateSentence("I'm not sure I understand. ", 15) + " Can you please rephrase your question?";
+  }
+
+  findMostSimilarIntent(query: string, intents: Intent[]): Intent | null {
+    const { intent } = this.understandQuery(query);
+    return intents.find(i => i.patterns.includes(intent)) || null;
+  }
+}
+
+// Update processChatbotQuery function
+export function processChatbotQuery(query: string): string {
+  const { intent, entities, keywords } = nlp.understandQuery(query);
+  const sentiment = nlp.analyzeSentiment(query);
+
+  console.log(`Intent: ${intent}`);
+  console.log(`Entities:`, entities);
+  console.log(`Keywords:`, keywords);
+  console.log(`Sentiment:`, sentiment);
+
+  const matchedIntent = intents.find(i => i.patterns.includes(intent));
+  if (matchedIntent) {
+    const response = nlp.generateResponse(intent, entities, keywords);
+    const emoji = sentiment.score > 0 ? " 😊" : sentiment.score < 0 ? " 🤔" : "";
+    return response + emoji;
+  } else {
+    return nlp.generateSentence("I'm not sure I understand. ", 15) + " Can you please rephrase your question?";
+  }
+}
+
 const intents: Intent[] = [
   {
     patterns: ['hello', 'hi', 'hey'],
@@ -268,99 +556,13 @@ function encodeInput(query: string): number[] {
   );
 }
 
-// Simple sentiment analysis
-function analyzeSentiment(text: string): number {
-  const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'happy', 'pleased'];
-  const negativeWords = ['bad', 'terrible', 'awful', 'horrible', 'disappointing', 'sad', 'unhappy', 'angry'];
-  
-  const words = text.toLowerCase().split(/\s+/);
-  let sentiment = 0;
-  
-  words.forEach(word => {
-    if (positiveWords.includes(word)) sentiment += 1;
-    if (negativeWords.includes(word)) sentiment -= 1;
-  });
-  
-  return sentiment / words.length;
-}
+const nlp = new NaturalLanguageProcessor();
 
-// Add context awareness
-class ConversationContext {
-  private context: string[] = [];
-  private maxContextLength = 5;
-
-  addToContext(message: string) {
-    this.context.push(message);
-    if (this.context.length > this.maxContextLength) {
-      this.context.shift();
-    }
-  }
-
-  getContext(): string {
-    return this.context.join(' ');
-  }
-
-  clear() {
-    this.context = [];
-  }
-}
-
-const conversationContext = new ConversationContext();
-
-// Improve response selection
-function selectResponse(intent: Intent, sentiment: number): string {
-  const positiveResponses = intent.responses.filter(r => r.includes('!'));
-  const neutralResponses = intent.responses.filter(r => !r.includes('!') && !r.includes('?'));
-  const negativeResponses = intent.responses.filter(r => r.includes('?'));
-
-  let selectedResponses: string[];
-  if (sentiment > 0.3) {
-    selectedResponses = positiveResponses.length > 0 ? positiveResponses : neutralResponses;
-  } else if (sentiment < -0.3) {
-    selectedResponses = negativeResponses.length > 0 ? negativeResponses : neutralResponses;
-  } else {
-    selectedResponses = neutralResponses.length > 0 ? neutralResponses : intent.responses;
-  }
-
-  return selectedResponses[Math.floor(Math.random() * selectedResponses.length)];
-}
-
-// Simple fallback mechanism
-function getFallbackResponse(query: string): string {
-  const fallbackResponses = [
-    "I'm not sure I understand. Could you please rephrase that?",
-    "I don't have information about that. Is there something else I can help with?",
-    "That's an interesting question, but it's outside my current knowledge. Can we talk about GMTStudio or its services?",
-    "I'm still learning and don't have an answer for that. Would you like to know about our AI WorkSpace or Theta platform instead?",
-  ];
-  
-  return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
-}
-
-// Update processChatbotQuery function
-export function processChatbotQuery(query: string): string {
-  const lowercaseQuery = query.toLowerCase();
-  const input = encodeInput(lowercaseQuery);
-  const prediction = network.predict(input);
-  const maxProbability = Math.max(...prediction);
-  const matchedIntentIndex = prediction.indexOf(maxProbability);
-  const matchedIntent = intents[matchedIntentIndex];
-  
-  const sentiment = analyzeSentiment(query);
-  conversationContext.addToContext(query);
-
-  let response: string;
-  if (matchedIntent && maxProbability > 0.7) {
-    response = selectResponse(matchedIntent, sentiment);
-  } else if (maxProbability > 0.5) {
-    response = "I'm not entirely sure, but here's what I think: " + selectResponse(matchedIntent, sentiment);
-  } else {
-    response = getFallbackResponse(query);
-  }
-
-  conversationContext.addToContext(response);
-  return response;
-}
+// Train the NLP model
+intents.forEach(intent => {
+  intent.patterns.forEach(pattern => nlp.trainOnText(pattern));
+  intent.responses.forEach(response => nlp.trainOnText(response));
+});
 
 export function handleUserInput(userInput: string): Promise<string> {
   console.log("User:", userInput);
@@ -396,4 +598,4 @@ export const debouncedHandleUserInput = debounce(handleUserInput, 300);
 // Train the network when the module is loaded
 trainNetwork();
 
-console.log("Mazs AI v1.2 mini initialized and trained!");
+console.log("Mazs AI v2.0 with NLP capabilities initialized!");

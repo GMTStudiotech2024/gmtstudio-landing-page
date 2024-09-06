@@ -50,6 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
       subItems: [
         {to: '/website-builder', label: 'Mazs AI v1.0 anatra Website Builder', icon: FaCode},
         {to: '/advanced-search', label: 'Mazs Search', icon: FaCode},
+        {to: 'https://gmt-studio-ai-workspace.vercel.app/', label: 'Mazs AI v1.0', icon: FaCode},
       ],
     },
     { label: 'Research', icon: FaFlask, to: '/Research' },
