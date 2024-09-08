@@ -176,6 +176,7 @@ class NaturalLanguageProcessor {
   private wordVectors: Map<string, number[]>;
   private idf: Map<string, number>;
   private documents: string[];
+  private sentenceContext: string[];
 
   constructor() {
     this.vocabulary = new Set();
@@ -185,6 +186,7 @@ class NaturalLanguageProcessor {
     this.wordVectors = new Map();
     this.idf = new Map();
     this.documents = [];
+    this.sentenceContext = [];
   }
 
   trainOnText(text: string) {
@@ -273,30 +275,62 @@ class NaturalLanguageProcessor {
   }
 
   generateSentence(startWord: string, maxLength: number = 20): string {
+    this.sentenceContext = [startWord];
     let sentence = [startWord];
-    let currentWord = startWord;
-    let previousWord = '';
 
     for (let i = 1; i < maxLength; i++) {
-      let nextWord = '';
-      if (this.trigramFrequency.has(previousWord) && this.trigramFrequency.get(previousWord)!.has(currentWord)) {
-        const trigramCandidates = this.trigramFrequency.get(previousWord)!.get(currentWord)!;
-        nextWord = this.selectNextWord(trigramCandidates);
-      } else if (this.bigramFrequency.has(currentWord)) {
-        const bigramCandidates = this.bigramFrequency.get(currentWord)!;
-        nextWord = this.selectNextWord(bigramCandidates);
-      } else {
-        break;
-      }
+      const nextWord = this.predictNextWord(sentence.join(' '));
+      if (!nextWord) break;
 
       sentence.push(nextWord);
-      previousWord = currentWord;
-      currentWord = nextWord;
+      this.sentenceContext.push(nextWord);
 
       if (nextWord.endsWith('.') || nextWord.endsWith('!') || nextWord.endsWith('?')) break;
     }
 
     return sentence.join(' ');
+  }
+
+  private predictNextWord(partialSentence: string): string | null {
+    const words = this.tokenize(partialSentence);
+    const context = words.slice(-3);  // Use last 3 words as context
+
+    let candidates = new Map<string, number>();
+
+    // Use trigram if available
+    if (context.length >= 2) {
+      const [w1, w2] = context.slice(-2);
+      if (this.trigramFrequency.has(w1) && this.trigramFrequency.get(w1)!.has(w2)) {
+        candidates = this.trigramFrequency.get(w1)!.get(w2)!;
+      }
+    }
+
+    // Fallback to bigram if trigram is not available
+    if (candidates.size === 0 && context.length >= 1) {
+      const w = context[context.length - 1];
+      if (this.bigramFrequency.has(w)) {
+        candidates = this.bigramFrequency.get(w)!;
+      }
+    }
+
+    // Fallback to unigram if bigram is not available
+    if (candidates.size === 0) {
+      candidates = this.wordFrequency;
+    }
+
+    // Filter out words already in the context
+    const contextSet = new Set(this.sentenceContext);
+    candidates = new Map(Array.from(candidates).filter(([word]) => !contextSet.has(word)));
+
+    // Use word embeddings to find semantically similar words
+    const similarWords = this.findSimilarWords(words[words.length - 1], 5);
+    similarWords.forEach(word => {
+      if (!contextSet.has(word)) {
+        candidates.set(word, (candidates.get(word) || 0) + 1);
+      }
+    });
+
+    return this.selectNextWord(candidates);
   }
 
   private selectNextWord(candidates: Map<string, number>): string {
@@ -338,7 +372,7 @@ class NaturalLanguageProcessor {
     };
   }
 
-  understandQuery(query: string): { intent: string, entities: { [key: string]: string }, keywords: string[] } {
+  understandQuery(query: string): { intent: string, entities: { [key: string]: string }, keywords: string[], analysis: string } {
     const words = this.tokenize(query);
     const queryVector = this.getTfIdfVector(words);
     
@@ -356,8 +390,14 @@ class NaturalLanguageProcessor {
 
     const entities = this.extractEntities(query);
     const keywords = this.extractKeywords(words);
+    const sentiment = this.analyzeSentiment(query);
 
-    return { intent: bestIntent, entities, keywords };
+    const analysis = `Intent: ${bestIntent} (confidence: ${maxSimilarity.toFixed(2)})\n` +
+                     `Entities: ${JSON.stringify(entities)}\n` +
+                     `Keywords: ${keywords.join(', ')}\n` +
+                     `Sentiment: ${sentiment.score.toFixed(2)} - ${sentiment.explanation}`;
+
+    return { intent: bestIntent, entities, keywords, analysis };
   }
 
   private getTfIdfVector(words: string[]): Map<string, number> {
@@ -433,27 +473,40 @@ class NaturalLanguageProcessor {
     const { intent } = this.understandQuery(query);
     return intents.find(i => i.patterns.includes(intent)) || null;
   }
+
+  private findSimilarWords(word: string, n: number): string[] {
+    if (!this.wordVectors.has(word)) return [];
+
+    const wordVector = this.wordVectors.get(word)!;
+    const similarities = Array.from(this.wordVectors.entries())
+      .map(([w, vec]) => [w, this.cosineSimilarity(new Map(vec.map((v, i) => [i.toString(), v])), new Map(wordVector.map((v, i) => [i.toString(), v])))])
+      .sort((a, b) => (b[1] as number) - (a[1] as number))
+      .slice(1, n + 1);  // Exclude the word itself
+
+    return similarities.map(s => s[0] as string);
+  }
 }
 
 // Update processChatbotQuery function
 export function processChatbotQuery(query: string): string {
-  const { intent, entities, keywords } = nlp.understandQuery(query);
-  const sentiment = nlp.analyzeSentiment(query);
-
-  console.log(`Intent: ${intent}`);
-  console.log(`Entities:`, entities);
-  console.log(`Keywords:`, keywords);
-  console.log(`Sentiment:`, sentiment);
+  const { intent, entities, keywords, analysis } = nlp.understandQuery(query);
+  console.log("Query Analysis:", analysis);
 
   const matchedIntent = intents.find(i => i.patterns.includes(intent));
   if (matchedIntent) {
-    const response = nlp.generateResponse(intent, entities, keywords);
-    const emoji = sentiment.score > 0 ? " 😊" : sentiment.score < 0 ? " 🤔" : "";
-    return response + emoji;
+    let response = nlp.generateResponse(intent, entities, keywords);
+    
+    // Generate additional context-aware sentence
+    const contextSentence = nlp.generateSentence(keywords[0] || response.split(' ')[0], 10);
+    response += " " + contextSentence;
+
+    return response;
   } else {
     return nlp.generateSentence("I'm not sure I understand. ", 15) + " Can you please rephrase your question?";
   }
 }
+
+console.log("Mazs AI v2.1 with enhanced NLP capabilities initialized!");
 
 const intents: Intent[] = [
   {
