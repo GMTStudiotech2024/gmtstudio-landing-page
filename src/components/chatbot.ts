@@ -178,6 +178,11 @@ class NaturalLanguageProcessor {
   private documents: string[];
   private contextMemory: string[];
   private sentimentLexicon: Map<string, number>;
+  public knowledgeBase: Map<string, string>;
+  private aiResponses: Map<string, string[]>;
+  private maxContextLength: number = 5;
+  private learningMemory: Map<string, { response: string, feedback: number }>;
+  private feedbackThreshold: number = 0.7;
 
   constructor() {
     this.vocabulary = new Set();
@@ -188,10 +193,107 @@ class NaturalLanguageProcessor {
     this.idf = new Map();
     this.documents = [];
     this.contextMemory = [];
+    this.learningMemory = new Map();
+    
+    // Expand sentiment lexicon
     this.sentimentLexicon = new Map([
       ['good', 1], ['great', 2], ['excellent', 2], ['amazing', 2], ['wonderful', 2],
       ['bad', -1], ['terrible', -2], ['awful', -2], ['horrible', -2], ['disappointing', -1],
-      ['happy', 1], ['sad', -1], ['angry', -2], ['pleased', 1], ['unhappy', -1]
+      ['happy', 1], ['sad', -1], ['angry', -2], ['pleased', 1], ['unhappy', -1],
+      ['love', 2], ['hate', -2], ['like', 1], ['dislike', -1], ['adore', 2],
+      ['excited', 2], ['bored', -1], ['interested', 1], ['fascinating', 2], ['dull', -1],
+      ['brilliant', 2], ['stupid', -2], ['smart', 1], ['clever', 1], ['foolish', -1],
+      ['beautiful', 2], ['ugly', -2], ['pretty', 1], ['handsome', 1], ['attractive', 1],
+      ['friendly', 1], ['mean', -1], ['kind', 1], ['cruel', -2], ['nice', 1],
+      ['helpful', 1], ['useless', -1], ['useful', 1], ['beneficial', 1], ['harmful', -1],
+      ['easy', 1], ['difficult', -1], ['simple', 1], ['complicated', -1], ['complex', -1],
+      ['fast', 1], ['slow', -1], ['quick', 1], ['efficient', 1], ['inefficient', -1],
+      ['expensive', -1], ['cheap', -1], ['affordable', 1], ['overpriced', -1], ['valuable', 1],
+      ['reliable', 1], ['unreliable', -1], ['trustworthy', 1], ['untrustworthy', -1], ['honest', 1],
+      ['innovative', 1], ['outdated', -1], ['modern', 1], ['ancient', -1], ['cutting-edge', 2]
+    ]);
+
+    // Expand knowledge base
+    this.knowledgeBase = new Map([
+      ['artificial intelligence', 'AI is the simulation of human intelligence in machines.'],
+      ['machine learning', 'ML is a subset of AI that enables systems to learn and improve from experience.'],
+      ['deep learning', 'Deep learning is a subset of ML using neural networks with multiple layers.'],
+      ['natural language processing', 'NLP is a branch of AI that helps computers understand and interpret human language.'],
+      ['computer vision', 'Computer vision is an AI field that trains computers to interpret and understand visual information.'],
+      ['robotics', 'Robotics is a field that combines computer science and engineering to design and build robots.'],
+      ['blockchain', 'Blockchain is a decentralized, distributed ledger technology.'],
+      ['cryptocurrency', 'Cryptocurrency is a digital or virtual currency that uses cryptography for security.'],
+      ['internet of things', 'IoT refers to the interconnected network of physical devices embedded with electronics, software, and sensors.'],
+      ['5g', '5G is the fifth generation technology standard for cellular networks.'],
+      ['quantum computing', 'Quantum computing uses quantum-mechanical phenomena to perform computation.'],
+      ['augmented reality', 'AR is an interactive experience that combines the real world and computer-generated content.'],
+      ['virtual reality', 'VR is a simulated experience that can be similar to or completely different from the real world.'],
+      ['cloud computing', 'Cloud computing is the on-demand availability of computer system resources, especially data storage and computing power.'],
+      ['edge computing', 'Edge computing is a distributed computing paradigm that brings computation and data storage closer to the sources of data.'],
+      ['cybersecurity', 'Cybersecurity is the practice of protecting systems, networks, and programs from digital attacks.'],
+      ['data science', 'Data science is an interdisciplinary field that uses scientific methods, processes, algorithms and systems to extract knowledge from data.'],
+      ['big data', 'Big data refers to extremely large data sets that may be analyzed computationally to reveal patterns, trends, and associations.'],
+      ['devops', 'DevOps is a set of practices that combines software development and IT operations to shorten the systems development life cycle.'],
+      ['agile methodology', 'Agile is an iterative approach to software development that emphasizes flexibility, interactivity, and transparency.'],
+      ['gmtstudio', 'GMTStudio is a platform that offers various services, including an AI WorkSpace and a social media platform called Theta.'],
+      ['theta', 'Theta is a social media platform developed by GMTStudio, offering unique features for connecting and sharing content.'],
+      ['ai workspace', 'The AI WorkSpace is a powerful tool offered by GMTStudio for AI development, allowing users to train models and run experiments.'],
+      ['machine learning applications', 'Machine learning has various applications, including image recognition, natural language processing, and predictive analytics.'],
+      ['blockchain technology', 'Blockchain technology has applications beyond cryptocurrency, including supply chain management and secure voting systems.'],
+      ['internet of things applications', 'IoT applications include smart home devices, industrial automation, and connected healthcare systems.'],
+      ['5g impact', '5G technology is expected to revolutionize industries through faster data speeds and lower latency, enabling new applications like autonomous vehicles and remote surgery.'],
+      ['quantum computing potential', 'Quantum computing has the potential to solve complex problems in fields like cryptography, drug discovery, and financial modeling.'],
+      ['augmented reality applications', 'AR applications include interactive gaming experiences, virtual try-on for clothing and makeup, and enhanced navigation systems.'],
+      ['virtual reality in education', 'VR in education can provide immersive learning experiences, virtual field trips, and hands-on training simulations.'],
+      ['cloud computing benefits', 'Cloud computing offers benefits such as scalability, cost-efficiency, and improved collaboration for businesses.'],
+      ['cybersecurity best practices', 'Cybersecurity best practices include using strong passwords, enabling two-factor authentication, and keeping software up to date.'],
+      ['big data analytics', 'Big data analytics helps organizations gain insights from large datasets, improving decision-making and identifying trends.'],
+      ['artificial intelligence ethics', 'AI ethics involves considerations such as bias in algorithms, privacy concerns, and the impact of AI on employment.'],
+      ['renewable energy technologies', 'Renewable energy technologies include solar power, wind energy, hydroelectric power, and geothermal energy.'],
+      ['space exploration advancements', 'Recent space exploration advancements include reusable rockets, plans for Mars colonization, and the search for exoplanets.'],
+      ['genetic engineering applications', 'Genetic engineering has applications in agriculture, medicine, and environmental conservation.'],
+      ['nanotechnology innovations', 'Nanotechnology innovations include advanced materials, targeted drug delivery systems, and more efficient solar cells.'],
+      ['autonomous vehicles challenges', 'Challenges for autonomous vehicles include navigating complex traffic scenarios, ethical decision-making, and regulatory hurdles.'],
+      ['3d printing applications', '3D printing has applications in manufacturing, medicine, architecture, and even food production.']
+    ]);
+
+    // Add basic AI responses
+    this.aiResponses = new Map([
+      ['greeting', [
+        "Hello! How can I assist you today?",
+        "Hi there! What would you like to know?",
+        "Greetings! I'm here to help. What's on your mind?",
+        "Welcome! How may I be of service?",
+        "Good day! What can I help you with?"
+      ]],
+      ['farewell', [
+        "Goodbye! Have a great day!",
+        "Take care! Feel free to return if you have more questions.",
+        "Farewell! It was a pleasure assisting you.",
+        "Until next time! Stay curious!",
+        "Bye for now! Remember, I'm always here if you need information."
+      ]],
+      ['thanks', [
+        "You're welcome! I'm glad I could help.",
+        "It's my pleasure to assist you!",
+        "I'm happy I could be of help. Is there anything else you'd like to know?",
+        "Anytime! Don't hesitate to ask if you have more questions.",
+        "I'm here to help! Feel free to ask about any other topics you're curious about."
+      ]],
+      ['confusion', [
+        "I apologize, but I'm not sure I understand. Could you please rephrase your question?",
+        "I'm having trouble grasping that. Can you explain it differently?",
+        "I'm afraid I didn't quite catch that. Could you provide more context?",
+        "Sorry, I'm a bit confused. Can you break down your question for me?",
+        "I want to help, but I'm not sure what you're asking. Can you try asking in a different way?"
+      ]],
+      ['curiosity', [
+        "That's an interesting topic! Would you like to know more about it?",
+        "Fascinating question! I'd be happy to delve deeper into that subject.",
+        "Great inquiry! There's a lot to explore in that area. Where should we start?",
+        "You've piqued my interest! Shall we explore this topic further?",
+        "That's a thought-provoking question! I'd love to discuss it in more detail."
+      ]]
     ]);
   }
 
@@ -281,21 +383,28 @@ class NaturalLanguageProcessor {
   }
 
   generateSentence(startWord: string, userInput: string, maxLength: number = 20): string {
-    this.contextMemory = [startWord];
     let sentence = [startWord];
-    let currentContext = userInput;
+    let currentContext = `${this.contextMemory.join(' ')} ${userInput}`.trim();
 
     for (let i = 1; i < maxLength; i++) {
       const nextWord = this.predictNextWord(sentence.join(' '), currentContext);
       if (!nextWord) break;
 
       sentence.push(nextWord);
-      this.contextMemory.push(nextWord);
       currentContext = `${currentContext} ${nextWord}`;
 
-      if (nextWord.endsWith('.') || nextWord.endsWith('!') || nextWord.endsWith('?')) break;
+      const { sentiment, topics } = this.analyzeContext(currentContext);
+      const adjustedNextWord = this.adjustWordBasedOnAnalysis(nextWord, sentiment, topics);
+      sentence[sentence.length - 1] = adjustedNextWord;
+
+      if (adjustedNextWord.endsWith('.') || adjustedNextWord.endsWith('!') || adjustedNextWord.endsWith('?')) break;
+
+      // Analyze the new word as a new input
+      const newWordAnalysis = this.understandQuery(adjustedNextWord);
+      currentContext = `${currentContext} ${this.generateContextFromAnalysis(newWordAnalysis)}`;
     }
 
+    this.updateContextMemory(sentence.join(' '));
     return sentence.join(' ');
   }
 
@@ -323,16 +432,10 @@ class NaturalLanguageProcessor {
       candidates = this.wordFrequency;
     }
 
-    // Filter out words already in the context
-    const contextSet = new Set(this.contextMemory);
-    candidates = new Map(Array.from(candidates).filter(([word]) => !contextSet.has(word)));
-
     // Use word embeddings to find semantically similar words
     const similarWords = this.findSimilarWords(words[words.length - 1], 5);
     similarWords.forEach(word => {
-      if (!contextSet.has(word)) {
-        candidates.set(word, (candidates.get(word) || 0) + 1);
-      }
+      candidates.set(word, (candidates.get(word) || 0) + 1);
     });
 
     // Boost candidates based on context
@@ -351,7 +454,106 @@ class NaturalLanguageProcessor {
       }
     });
 
+    // Add knowledge base information
+    this.knowledgeBase.forEach((info, topic) => {
+      if (context.toLowerCase().includes(topic)) {
+        const topicWords = this.tokenize(info);
+        topicWords.forEach(word => {
+          candidates.set(word, (candidates.get(word) || 0) + 2);
+        });
+      }
+    });
+
+    // Consider context memory
+    this.contextMemory.forEach(memoryItem => {
+      const memoryWords = this.tokenize(memoryItem);
+      memoryWords.forEach(word => {
+        if (candidates.has(word)) {
+          candidates.set(word, candidates.get(word)! * 1.2);
+        }
+      });
+    });
+
     return this.selectNextWord(candidates);
+  }
+
+  private analyzeContext(context: string): { sentiment: { score: number, explanation: string }, topics: string[], entities: { [key: string]: string }, keywords: string[] } {
+    const sentiment = this.analyzeSentiment(context);
+    const topics = this.identifyTopics(context);
+    const entities = this.extractEntities(context);
+    const keywords = this.extractKeywords(this.tokenize(context));
+
+    return { 
+      sentiment, 
+      topics,
+      entities,
+      keywords
+    };
+  }
+
+  private adjustWordBasedOnAnalysis(word: string, sentiment: { score: number, explanation: string }, topics: string[]): string {
+    let adjustedWord = word;
+
+    // Adjust based on sentiment
+    if (sentiment.score > 0.5 && !this.isPositiveWord(word)) {
+      adjustedWord = this.findSimilarPositiveWord(word);
+    } else if (sentiment.score < -0.5 && !this.isNegativeWord(word)) {
+      adjustedWord = this.findSimilarNegativeWord(word);
+    }
+
+    // Adjust based on topics
+    if (topics.length > 0) {
+      const topicRelatedWord = this.findTopicRelatedWord(adjustedWord, topics);
+      if (topicRelatedWord) {
+        adjustedWord = topicRelatedWord;
+      }
+    }
+
+    // Consider context memory
+    const contextSentiment = this.analyzeSentiment(this.contextMemory.join(' '));
+    if (Math.abs(contextSentiment.score - sentiment.score) > 0.5) {
+      adjustedWord = this.findWordWithSimilarSentiment(adjustedWord, contextSentiment.score);
+    }
+
+    return adjustedWord;
+  }
+
+  private isPositiveWord(word: string): boolean {
+    return (this.sentimentLexicon.get(word) || 0) > 0;
+  }
+
+  private isNegativeWord(word: string): boolean {
+    return (this.sentimentLexicon.get(word) || 0) < 0;
+  }
+
+  private findSimilarPositiveWord(word: string): string {
+    const similarWords = this.findSimilarWords(word, 10);
+    return similarWords.find(w => this.isPositiveWord(w)) || word;
+  }
+
+  private findSimilarNegativeWord(word: string): string {
+    const similarWords = this.findSimilarWords(word, 10);
+    return similarWords.find(w => this.isNegativeWord(w)) || word;
+  }
+
+  private findTopicRelatedWord(word: string, topics: string[]): string | null {
+    for (const topic of topics) {
+      if (this.knowledgeBase.has(topic)) {
+        const topicWords = this.tokenize(this.knowledgeBase.get(topic)!);
+        const similarWords = this.findSimilarWords(word, 10);
+        const relatedWord = similarWords.find(w => topicWords.includes(w));
+        if (relatedWord) return relatedWord;
+      }
+    }
+    return null;
+  }
+
+  private findWordWithSimilarSentiment(word: string, targetSentiment: number): string {
+    const similarWords = this.findSimilarWords(word, 10);
+    return similarWords.find(w => {
+      const sentiment = this.analyzeSentiment(w).score;
+      return Math.abs(sentiment - targetSentiment) < 0.3;
+    }) || word;
   }
 
   private getNgramCandidates(ngram: string, n: number): Map<string, number> {
@@ -405,7 +607,7 @@ class NaturalLanguageProcessor {
     };
   }
 
-  understandQuery(query: string): { intent: string, entities: { [key: string]: string }, keywords: string[], analysis: string, sentiment: { score: number, explanation: string } } {
+  understandQuery(query: string): { intent: string, entities: { [key: string]: string }, keywords: string[], analysis: string, sentiment: { score: number, explanation: string }, topics: string[] } {
     const words = this.tokenize(query);
     const queryVector = this.getTfIdfVector(words);
     
@@ -424,13 +626,18 @@ class NaturalLanguageProcessor {
     const entities = this.extractEntities(query);
     const keywords = this.extractKeywords(words);
     const sentiment = this.analyzeSentiment(query);
+    const topics = this.identifyTopics(query);
 
-    const analysis = `Intent: ${bestIntent} (confidence: ${maxSimilarity.toFixed(2)})\n` +
-                     `Entities: ${JSON.stringify(entities)}\n` +
-                     `Keywords: ${keywords.join(', ')}\n` +
-                     `Sentiment: ${sentiment.score.toFixed(2)} - ${sentiment.explanation}`;
+    let analysis = `Intent: ${bestIntent} (confidence: ${maxSimilarity.toFixed(2)})\n` +
+                   `Entities: ${JSON.stringify(entities)}\n` +
+                   `Keywords: ${keywords.join(', ')}\n` +
+                   `Sentiment: ${sentiment.score.toFixed(2)} - ${sentiment.explanation}\n` +
+                   `Topics: ${topics.join(', ')}`;
 
-    return { intent: bestIntent, entities, keywords, analysis, sentiment };
+    const contextualAnalysis = this.analyzeContextualRelevance(query);
+    analysis += `\nContextual Relevance: ${contextualAnalysis}`;
+
+    return { intent: bestIntent, entities, keywords, analysis, sentiment, topics };
   }
 
   private getTfIdfVector(words: string[]): Map<string, number> {
@@ -485,7 +692,48 @@ class NaturalLanguageProcessor {
       .map(entry => entry[0]);
   }
 
-  generateResponse(intent: string, entities: { [key: string]: string }, keywords: string[]): string {
+  private identifyTopics(query: string): string[] {
+    const words = this.tokenize(query);
+    return Array.from(this.knowledgeBase.keys())
+      .filter(topic => words.some(word => topic.includes(word)))
+      .slice(0, 3);
+  }
+
+  learnFromInteraction(query: string, response: string, feedback: number) {
+    const normalizedQuery = query.toLowerCase().trim();
+    this.learningMemory.set(normalizedQuery, { response, feedback });
+    
+    // If feedback is positive, add the query and response to training data
+    if (feedback > this.feedbackThreshold) {
+      this.trainOnText(query);
+      this.trainOnText(response);
+      
+      // Update knowledge base if the response contains new information
+      const potentialNewInfo = response.match(/([^.!?]+[.!?])/g);
+      if (potentialNewInfo) {
+        potentialNewInfo.forEach(info => {
+          const keywords = this.extractKeywords(this.tokenize(info));
+          if (keywords.length > 0) {
+            const key = keywords.join(' ');
+            if (!this.knowledgeBase.has(key)) {
+              this.knowledgeBase.set(key, info);
+            }
+          }
+        });
+      }
+    }
+  }
+
+  generateResponse(intent: string, entities: { [key: string]: string }, keywords: string[], topics: string[]): string {
+    // Check learning memory first
+    const queryKey = keywords.join(' ').toLowerCase();
+    if (this.learningMemory.has(queryKey)) {
+      const learned = this.learningMemory.get(queryKey)!;
+      if (learned.feedback > this.feedbackThreshold) {
+        return learned.response;
+      }
+    }
+
     const matchedIntent = intents.find(i => i.patterns.includes(intent));
     if (matchedIntent) {
       let response = matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)];
@@ -493,13 +741,40 @@ class NaturalLanguageProcessor {
         response = response.replace(`{${key}}`, value);
       });
       
-      // Enhance response with keywords
+      // Enhance response with keywords and topics
       const keywordSentence = this.generateSentence(keywords[0] || "Additionally", "", 10);
       response += " " + keywordSentence;
 
+      // Add information from knowledge base
+      topics.forEach(topic => {
+        if (this.knowledgeBase.has(topic)) {
+          response += " " + this.knowledgeBase.get(topic);
+        }
+      });
+
+      // Add a human-like touch with AI responses
+      const aiResponseType = this.getAIResponseType(intent, keywords);
+      if (this.aiResponses.has(aiResponseType)) {
+        const aiResponses = this.aiResponses.get(aiResponseType)!;
+        response += " " + aiResponses[Math.floor(Math.random() * aiResponses.length)];
+      }
+
+      // Enhance response with context memory
+      const contextMemoryAnalysis = this.analyzeContext(this.contextMemory.join(' '));
+      const contextSentence = this.generateSentence(contextMemoryAnalysis.keywords[0] || "Furthermore", "", 10);
+      response += " " + contextSentence;
+
       return response;
     }
-    return this.generateSentence("I'm not sure I understand. ", "", 15) + " Can you please rephrase your question?";
+    return this.generateSentence("I'm not sure I understand. ", "", 15) + " " + this.aiResponses.get('confusion')![Math.floor(Math.random() * this.aiResponses.get('confusion')!.length)];
+  }
+
+  private getAIResponseType(intent: string, keywords: string[]): string {
+    if (intent.includes('hello') || intent.includes('hi')) return 'greeting';
+    if (intent.includes('bye') || intent.includes('goodbye')) return 'farewell';
+    if (keywords.some(word => ['thanks', 'thank', 'appreciate'].includes(word))) return 'thanks';
+    if (keywords.some(word => ['what', 'how', 'why', 'when', 'where'].includes(word))) return 'curiosity';
+    return 'confusion';
   }
 
   findMostSimilarIntent(query: string, intents: Intent[]): Intent | null {
@@ -518,14 +793,33 @@ class NaturalLanguageProcessor {
 
     return similarities.map(s => s[0] as string);
   }
+
+  private updateContextMemory(sentence: string) {
+    this.contextMemory.push(sentence);
+    if (this.contextMemory.length > this.maxContextLength) {
+      this.contextMemory.shift();
+    }
+  }
+
+  private generateContextFromAnalysis(analysis: ReturnType<typeof this.understandQuery>): string {
+    return `${analysis.intent} ${analysis.keywords.join(' ')} ${Object.values(analysis.entities).join(' ')}`;
+  }
+
+  private analyzeContextualRelevance(query: string): string {
+    const queryVector = this.getTfIdfVector(this.tokenize(query));
+    const contextVector = this.getTfIdfVector(this.tokenize(this.contextMemory.join(' ')));
+    const similarity = this.cosineSimilarity(queryVector, contextVector);
+    return `Similarity to context: ${similarity.toFixed(2)}`;
+  }
 }
 
-export function processChatbotQuery(query: string): string {  const { intent, entities, keywords, analysis, sentiment } = nlp.understandQuery(query);
+export function processChatbotQuery(query: string): string {
+  const { intent, entities, keywords, analysis, sentiment, topics } = nlp.understandQuery(query);
   console.log("Query Analysis:", analysis);
 
   const matchedIntent = intents.find(i => i.patterns.includes(intent));
   if (matchedIntent) {
-    let response = nlp.generateResponse(intent, entities, keywords);
+    let response = nlp.generateResponse(intent, entities, keywords, topics);
     
     // Generate additional context-aware sentence
     const contextSentence = nlp.generateSentence(keywords[0] || response.split(' ')[0], query, 15);
@@ -533,14 +827,27 @@ export function processChatbotQuery(query: string): string {  const { intent, en
 
     // Adjust response based on sentiment
     if (sentiment.score < -0.5) {
-      response += " I apologize if I've misunderstood. Can you please provide more details?";
+      response += " I sense some frustration. Can you tell me more about your concerns?";
     } else if (sentiment.score > 0.5) {
-      response += " I'm glad I could help! Is there anything else you'd like to know?";
+      response += " I'm glad you're feeling positive! Is there anything specific you'd like to explore further?";
     }
+
+    // Add relevant information from knowledge base
+    topics.forEach(topic => {
+      if (nlp.knowledgeBase.has(topic)) {
+        response += " " + nlp.knowledgeBase.get(topic);
+      }
+    });
+
+    // Consider entities in the response
+    Object.entries(entities).forEach(([entityType, entityValue]) => {
+      response += ` Regarding the ${entityType} "${entityValue}", `;
+      response += nlp.generateSentence(entityValue, query, 10);
+    });
 
     return response;
   } else {
-    return nlp.generateSentence("I'm not sure I understand. ", query, 15) + " Can you please rephrase your question?";
+    return nlp.generateSentence("I'm not sure I fully understand, but let me try to address your query. ", query, 20) + " Could you please provide more details or rephrase your question?";
   }
 }
 
