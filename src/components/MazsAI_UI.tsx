@@ -28,8 +28,8 @@ const ChatBotUI: React.FC = () => {
   }, [messages, isTyping]);
 
   const scrollToBottom = () => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -81,7 +81,7 @@ const ChatBotUI: React.FC = () => {
 
   return (
     <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''}`}>
-      <div className="flex-1 bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
+      <div className="flex-1 bg-gray-100 dark:bg-gray-900 transition-colors duration-200 overflow-hidden pt-20">
         <div className="max-w-7xl mx-auto p-4 h-full flex flex-col">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
             <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2 sm:mb-0">Mazs AI v1.0 Anatra</h1>
@@ -172,7 +172,7 @@ const ChatBotUI: React.FC = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Type your message..."
-              className="flex-1 p-3 bg-transparent text-gray-800 dark:text-white focus:outline-none resize-none"
+              className="flex-1 p-3 bg-transparent text-gray-800 dark:text-white focus:outline-none resize-none max-h-32"
               rows={1}
             />
             <button
