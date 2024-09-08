@@ -176,7 +176,8 @@ class NaturalLanguageProcessor {
   private wordVectors: Map<string, number[]>;
   private idf: Map<string, number>;
   private documents: string[];
-  private sentenceContext: string[];
+  private contextMemory: string[];
+  private sentimentLexicon: Map<string, number>;
 
   constructor() {
     this.vocabulary = new Set();
@@ -186,7 +187,12 @@ class NaturalLanguageProcessor {
     this.wordVectors = new Map();
     this.idf = new Map();
     this.documents = [];
-    this.sentenceContext = [];
+    this.contextMemory = [];
+    this.sentimentLexicon = new Map([
+      ['good', 1], ['great', 2], ['excellent', 2], ['amazing', 2], ['wonderful', 2],
+      ['bad', -1], ['terrible', -2], ['awful', -2], ['horrible', -2], ['disappointing', -1],
+      ['happy', 1], ['sad', -1], ['angry', -2], ['pleased', 1], ['unhappy', -1]
+    ]);
   }
 
   trainOnText(text: string) {
@@ -274,16 +280,18 @@ class NaturalLanguageProcessor {
     }
   }
 
-  generateSentence(startWord: string, maxLength: number = 20): string {
-    this.sentenceContext = [startWord];
+  generateSentence(startWord: string, userInput: string, maxLength: number = 20): string {
+    this.contextMemory = [startWord];
     let sentence = [startWord];
+    let currentContext = userInput;
 
     for (let i = 1; i < maxLength; i++) {
-      const nextWord = this.predictNextWord(sentence.join(' '));
+      const nextWord = this.predictNextWord(sentence.join(' '), currentContext);
       if (!nextWord) break;
 
       sentence.push(nextWord);
-      this.sentenceContext.push(nextWord);
+      this.contextMemory.push(nextWord);
+      currentContext = `${currentContext} ${nextWord}`;
 
       if (nextWord.endsWith('.') || nextWord.endsWith('!') || nextWord.endsWith('?')) break;
     }
@@ -291,35 +299,32 @@ class NaturalLanguageProcessor {
     return sentence.join(' ');
   }
 
-  private predictNextWord(partialSentence: string): string | null {
+  private predictNextWord(partialSentence: string, context: string): string | null {
     const words = this.tokenize(partialSentence);
-    const context = words.slice(-3);  // Use last 3 words as context
+    const contextWords = this.tokenize(context);
+    const combinedContext = [...words.slice(-3), ...contextWords.slice(-3)];
 
     let candidates = new Map<string, number>();
 
-    // Use trigram if available
-    if (context.length >= 2) {
-      const [w1, w2] = context.slice(-2);
-      if (this.trigramFrequency.has(w1) && this.trigramFrequency.get(w1)!.has(w2)) {
-        candidates = this.trigramFrequency.get(w1)!.get(w2)!;
+    // Use n-grams (up to 4-grams) if available
+    for (let n = 4; n > 0; n--) {
+      if (combinedContext.length >= n - 1) {
+        const ngram = combinedContext.slice(-(n-1)).join(' ');
+        const ngramCandidates = this.getNgramCandidates(ngram, n);
+        if (ngramCandidates.size > 0) {
+          candidates = ngramCandidates;
+          break;
+        }
       }
     }
 
-    // Fallback to bigram if trigram is not available
-    if (candidates.size === 0 && context.length >= 1) {
-      const w = context[context.length - 1];
-      if (this.bigramFrequency.has(w)) {
-        candidates = this.bigramFrequency.get(w)!;
-      }
-    }
-
-    // Fallback to unigram if bigram is not available
+    // If no n-gram candidates, use word frequency
     if (candidates.size === 0) {
       candidates = this.wordFrequency;
     }
 
     // Filter out words already in the context
-    const contextSet = new Set(this.sentenceContext);
+    const contextSet = new Set(this.contextMemory);
     candidates = new Map(Array.from(candidates).filter(([word]) => !contextSet.has(word)));
 
     // Use word embeddings to find semantically similar words
@@ -330,7 +335,41 @@ class NaturalLanguageProcessor {
       }
     });
 
+    // Boost candidates based on context
+    contextWords.forEach(word => {
+      if (candidates.has(word)) {
+        candidates.set(word, candidates.get(word)! * 1.5);
+      }
+    });
+
+    // Consider sentiment
+    const sentiment = this.analyzeSentiment(context);
+    candidates.forEach((score, word) => {
+      const wordSentiment = this.sentimentLexicon.get(word) || 0;
+      if (Math.sign(sentiment.score) === Math.sign(wordSentiment)) {
+        candidates.set(word, score * 1.2);
+      }
+    });
+
     return this.selectNextWord(candidates);
+  }
+
+  private getNgramCandidates(ngram: string, n: number): Map<string, number> {
+    const ngramMap = n === 2 ? this.bigramFrequency :
+                     n === 3 ? this.trigramFrequency :
+                     n === 4 ? new Map() : // Implement 4-gram if needed
+                     new Map();
+    
+    let current = ngramMap;
+    const words = ngram.split(' ');
+    for (let i = 0; i < words.length; i++) {
+      if (current instanceof Map && current.has(words[i])) {
+        current = current.get(words[i])!;
+      } else {
+        return new Map();
+      }
+    }
+    return current instanceof Map ? current : new Map();
   }
 
   private selectNextWord(candidates: Map<string, number>): string {
@@ -347,18 +386,12 @@ class NaturalLanguageProcessor {
 
   analyzeSentiment(text: string): { score: number, explanation: string } {
     const words = this.tokenize(text);
-    const sentimentLexicon = new Map([
-      ['good', 1], ['great', 2], ['excellent', 2], ['amazing', 2], ['wonderful', 2],
-      ['bad', -1], ['terrible', -2], ['awful', -2], ['horrible', -2], ['disappointing', -1],
-      ['happy', 1], ['sad', -1], ['angry', -2], ['pleased', 1], ['unhappy', -1]
-    ]);
-
     let totalScore = 0;
     let explanation: string[] = [];
 
     words.forEach(word => {
-      if (sentimentLexicon.has(word)) {
-        const score = sentimentLexicon.get(word)!;
+      if (this.sentimentLexicon.has(word)) {
+        const score = this.sentimentLexicon.get(word)!;
         totalScore += score;
         explanation.push(`"${word}" contributes ${score > 0 ? '+' : ''}${score}`);
       }
@@ -372,7 +405,7 @@ class NaturalLanguageProcessor {
     };
   }
 
-  understandQuery(query: string): { intent: string, entities: { [key: string]: string }, keywords: string[], analysis: string } {
+  understandQuery(query: string): { intent: string, entities: { [key: string]: string }, keywords: string[], analysis: string, sentiment: { score: number, explanation: string } } {
     const words = this.tokenize(query);
     const queryVector = this.getTfIdfVector(words);
     
@@ -397,7 +430,7 @@ class NaturalLanguageProcessor {
                      `Keywords: ${keywords.join(', ')}\n` +
                      `Sentiment: ${sentiment.score.toFixed(2)} - ${sentiment.explanation}`;
 
-    return { intent: bestIntent, entities, keywords, analysis };
+    return { intent: bestIntent, entities, keywords, analysis, sentiment };
   }
 
   private getTfIdfVector(words: string[]): Map<string, number> {
@@ -461,12 +494,12 @@ class NaturalLanguageProcessor {
       });
       
       // Enhance response with keywords
-      const keywordSentence = this.generateSentence(keywords[0] || "Additionally", 10);
+      const keywordSentence = this.generateSentence(keywords[0] || "Additionally", "", 10);
       response += " " + keywordSentence;
 
       return response;
     }
-    return this.generateSentence("I'm not sure I understand. ", 15) + " Can you please rephrase your question?";
+    return this.generateSentence("I'm not sure I understand. ", "", 15) + " Can you please rephrase your question?";
   }
 
   findMostSimilarIntent(query: string, intents: Intent[]): Intent | null {
@@ -487,9 +520,7 @@ class NaturalLanguageProcessor {
   }
 }
 
-// Update processChatbotQuery function
-export function processChatbotQuery(query: string): string {
-  const { intent, entities, keywords, analysis } = nlp.understandQuery(query);
+export function processChatbotQuery(query: string): string {  const { intent, entities, keywords, analysis, sentiment } = nlp.understandQuery(query);
   console.log("Query Analysis:", analysis);
 
   const matchedIntent = intents.find(i => i.patterns.includes(intent));
@@ -497,16 +528,24 @@ export function processChatbotQuery(query: string): string {
     let response = nlp.generateResponse(intent, entities, keywords);
     
     // Generate additional context-aware sentence
-    const contextSentence = nlp.generateSentence(keywords[0] || response.split(' ')[0], 10);
+    const contextSentence = nlp.generateSentence(keywords[0] || response.split(' ')[0], query, 15);
     response += " " + contextSentence;
+
+    // Adjust response based on sentiment
+    if (sentiment.score < -0.5) {
+      response += " I apologize if I've misunderstood. Can you please provide more details?";
+    } else if (sentiment.score > 0.5) {
+      response += " I'm glad I could help! Is there anything else you'd like to know?";
+    }
 
     return response;
   } else {
-    return nlp.generateSentence("I'm not sure I understand. ", 15) + " Can you please rephrase your question?";
+    return nlp.generateSentence("I'm not sure I understand. ", query, 15) + " Can you please rephrase your question?";
   }
 }
 
-console.log("Mazs AI v2.1 with enhanced NLP capabilities initialized!");
+console.log("Mazs AI v1.1 with advanced NLP and contextual analysis capabilities initialized!");
+
 
 const intents: Intent[] = [
   {
@@ -651,4 +690,4 @@ export const debouncedHandleUserInput = debounce(handleUserInput, 300);
 // Train the network when the module is loaded
 trainNetwork();
 
-console.log("Mazs AI v2.0 with NLP capabilities initialized!");
+console.log("Mazs AI v1.1 with advanced NLP and contextual analysis capabilities initialized!");
