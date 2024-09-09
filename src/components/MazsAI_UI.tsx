@@ -20,6 +20,7 @@ const ChatBotUI: React.FC = () => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [currentTypingIndex, setCurrentTypingIndex] = useState(0);
   const typingSpeed = 30; // milliseconds per character
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     setSuggestions(getConversationSuggestions());
@@ -45,24 +46,33 @@ const ChatBotUI: React.FC = () => {
   };
 
   const handleSend = async () => {
-    if (input.trim()) {
-      const userMessage: Message = { text: input, isUser: true };
-      setMessages((prevMessages) => [...prevMessages, userMessage]);
-      setInput('');
-      setIsTyping(true);
+    if (isGenerating || !input.trim()) {
+      return; // Don't proceed if already generating or input is empty
+    }
 
-      try {
-        const botResponse = await debouncedHandleUserInput(input);
-        const botMessage: Message = { text: botResponse, isUser: false, isTyping: true };
-        setMessages((prevMessages) => [...prevMessages, botMessage]);
-        setCurrentTypingIndex(0);
-      } catch (error) {
-        console.error("Error processing message:", error);
-        const errorMessage: Message = { text: "I'm sorry, I encountered an error. Please try again.", isUser: false };
-        setMessages((prevMessages) => [...prevMessages, errorMessage]);
-      } finally {
-        setIsTyping(false);
-      }
+    setIsGenerating(true);
+    const userMessage: Message = { text: input, isUser: true };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setInput('');
+
+    try {
+      const botResponse = await debouncedHandleUserInput(input);
+      const botMessage: Message = { text: botResponse, isUser: false, isTyping: true };
+      setMessages((prevMessages) => [...prevMessages, botMessage]);
+      setCurrentTypingIndex(0);
+    } catch (error) {
+      console.error("Error processing message:", error);
+      const errorMessage: Message = { text: "I'm sorry, I encountered an error. Please try again.", isUser: false };
+      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
   };
 
@@ -83,13 +93,6 @@ const ChatBotUI: React.FC = () => {
       }
     }
   }, [messages, currentTypingIndex]);
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -195,7 +198,12 @@ const ChatBotUI: React.FC = () => {
                 />
                 <button
                   onClick={handleSend}
-                  className="p-3 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200"
+                  className={`p-3 transition-colors duration-200 ${
+                    isGenerating
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+                  }`}
+                  disabled={isGenerating}
                 >
                   <FiSend size={24} />
                 </button>
