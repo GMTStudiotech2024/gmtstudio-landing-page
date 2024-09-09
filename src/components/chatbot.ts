@@ -192,6 +192,7 @@ class NaturalLanguageProcessor {
   private contextWindow: string[] = [];
   private maxContextWindowSize: number = 10;
   private topicKeywords: Set<string> = new Set();
+  private wordProbabilities: Map<string, Map<string, number>>;
 
   constructor() {
     this.vocabulary = new Set();
@@ -208,6 +209,7 @@ class NaturalLanguageProcessor {
     this.decoder = new MultilayerPerceptron([32, 64, 100]); // Output size may vary
     this.gan = new GAN();
     this.rlAgent = new RLAgent();
+    this.wordProbabilities = new Map();
     
     // Expand sentiment lexicon
     this.sentimentLexicon = new Map([
@@ -850,6 +852,74 @@ class NaturalLanguageProcessor {
     const similarity = this.cosineSimilarity(queryVector, contextVector);
     return `Similarity to context: ${similarity.toFixed(2)}`;
   }
+
+  private updateWordProbabilities(sentence: string) {
+    const words = this.tokenize(sentence);
+    for (let i = 0; i < words.length - 1; i++) {
+      const currentWord = words[i];
+      const nextWord = words[i + 1];
+      if (!this.wordProbabilities.has(currentWord)) {
+        this.wordProbabilities.set(currentWord, new Map());
+      }
+      const nextWordProbs = this.wordProbabilities.get(currentWord)!;
+      nextWordProbs.set(nextWord, (nextWordProbs.get(nextWord) || 0) + 1);
+    }
+  }
+
+  private getNextWordProbability(currentWord: string, nextWord: string): number {
+    if (!this.wordProbabilities.has(currentWord)) return 0;
+    const nextWordProbs = this.wordProbabilities.get(currentWord)!;
+    const totalOccurrences = Array.from(nextWordProbs.values()).reduce((sum, count) => sum + count, 0);
+    return (nextWordProbs.get(nextWord) || 0) / totalOccurrences;
+  }
+
+  generateComplexSentence(startWord: string, userInput: string, maxLength: number = 20): string {
+    let sentence = [startWord];
+    this.updateContextWindow(userInput);
+    let currentContext = this.getContextRepresentation();
+    let meaningVector = this.encodeToMeaningSpace(currentContext);
+
+    this.extractTopicKeywords(userInput);
+
+    for (let i = 1; i < maxLength; i++) {
+      const nextWordVector = this.decoder.predict(meaningVector);
+      const nextWord = this.findClosestWord(nextWordVector);
+      
+      const topicAdherentWord = this.enforceTopicAdherence(nextWord);
+      
+      // Calculate probability based on user input
+      const userInputWords = this.tokenize(userInput);
+      let probability = 1;
+      for (const word of userInputWords) {
+        probability *= this.getNextWordProbability(sentence[sentence.length - 1], word);
+      }
+      
+      // Adjust the word based on probability
+      const adjustedWord = probability > 0.1 ? userInputWords[Math.floor(Math.random() * userInputWords.length)] : topicAdherentWord;
+      
+      sentence.push(adjustedWord);
+
+      this.updateContextWindow(adjustedWord);
+      currentContext = this.getContextRepresentation();
+
+      const { sentiment, topics } = this.analyzeContext(currentContext);
+      const adjustedNextWord = this.adjustWordBasedOnAnalysis(adjustedWord, sentiment, topics);
+      sentence[sentence.length - 1] = adjustedNextWord;
+
+      if (adjustedNextWord.endsWith('.') || adjustedNextWord.endsWith('!') || adjustedNextWord.endsWith('?')) break;
+
+      meaningVector = this.encodeToMeaningSpace(currentContext);
+      meaningVector = this.gan.refine(meaningVector);
+      meaningVector = this.rlAgent.improve(meaningVector, this.analyzeContext(currentContext));
+
+      // Update word probabilities
+      this.updateWordProbabilities(sentence.join(' '));
+    }
+
+    const generatedSentence = sentence.join(' ');
+    this.updateContextWindow(generatedSentence);
+    return generatedSentence;
+  }
 }
 
 class GAN {
@@ -894,32 +964,30 @@ export function processChatbotQuery(query: string): string {
   if (matchedIntent) {
     let response = nlp.generateResponse(intent, entities, keywords, topics);
     
-    // Only add context-aware sentence for non-greeting intents
     if (!['hello', 'hi', 'hey', 'bye', 'goodbye', 'see you'].includes(intent)) {
-      const contextSentence = nlp.generateSentence(keywords[0] || response.split(' ')[0], query, 15);
+      const contextSentence = nlp.generateComplexSentence(keywords[0] || response.split(' ')[0], query, 15);
       response += " " + contextSentence;
     }
 
-    // Only add sentiment-based responses for longer queries
     if (query.split(' ').length > 3) {
       if (sentiment.score < -0.5) {
-        response += " I sense some frustration. Can you tell me more about your concerns?";
+        response += " " + nlp.generateComplexSentence("I sense", "frustration concerns", 10);
       } else if (sentiment.score > 0.5) {
-        response += " I'm glad you're feeling positive! Is there anything specific you'd like to discuss?";
+        response += " " + nlp.generateComplexSentence("I'm glad", "positive specific discuss", 10);
       }
     }
 
-    // Only add knowledge base information if directly relevant
     const relevantTopics = topics.filter(topic => query.toLowerCase().includes(topic));
     relevantTopics.forEach(topic => {
       if (nlp.knowledgeBase.has(topic)) {
-        response += " " + nlp.knowledgeBase.get(topic);
+        const knowledgeResponse = nlp.generateComplexSentence(topic, nlp.knowledgeBase.get(topic)!, 15);
+        response += " " + knowledgeResponse;
       }
     });
 
     return response;
   } else {
-    return "I'm not sure I understand. Could you please rephrase your question or ask about something specific?";
+    return nlp.generateComplexSentence("I'm not sure I understand", "rephrase question ask specific", 20);
   }
 }
 
