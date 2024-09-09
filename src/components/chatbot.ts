@@ -1292,20 +1292,147 @@ export async function processAttachedFile(file: File): Promise<string> {
 }
 
 async function processTextFile(content: string): Promise<string> {
-  // Process the text file content
   const words = content.split(/\s+/).length;
   const lines = content.split('\n').length;
   const characters = content.length;
+  const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const sentenceCount = sentences.length;
 
-  // Use the NLP model to generate a response
-  const summary = nlp.generateComplexSentence("The text file contains", `${words} words, ${lines} lines, and ${characters} characters`, 50);
+  // Calculate average word length
+  const avgWordLength = characters / words;
 
-  return `I've analyzed the text file. ${summary}`;
+  // Find the most common words (excluding stop words)
+  const wordFrequency = new Map<string, number>();
+  const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'should', 'could', 'can']);
+  content.toLowerCase().split(/\s+/).forEach(word => {
+    if (!stopWords.has(word)) {
+      wordFrequency.set(word, (wordFrequency.get(word) || 0) + 1);
+    }
+  });
+  const commonWords = Array.from(wordFrequency.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(entry => entry[0]);
+
+  // Estimate reading time (assuming average reading speed of 200 words per minute)
+  const readingTimeMinutes = Math.ceil(words / 200);
+
+  // Basic text summarization
+  function summarizeText(text: string, numSentences: number = 3): string {
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    const wordFrequency = new Map<string, number>();
+    
+    sentences.forEach(sentence => {
+      sentence.toLowerCase().split(/\s+/).forEach(word => {
+        if (!stopWords.has(word)) {
+          wordFrequency.set(word, (wordFrequency.get(word) || 0) + 1);
+        }
+      });
+    });
+
+    const sentenceScores = sentences.map(sentence => {
+      const words = sentence.toLowerCase().split(/\s+/);
+      const score = words.reduce((sum, word) => sum + (wordFrequency.get(word) || 0), 0) / words.length;
+      return { sentence, score };
+    });
+
+    const topSentences = sentenceScores
+      .sort((a, b) => b.score - a.score)
+      .slice(0, numSentences)
+      .sort((a, b) => sentences.indexOf(a.sentence) - sentences.indexOf(b.sentence))
+      .map(item => item.sentence);
+
+    return topSentences.join(' ');
+  }
+
+  const summary = summarizeText(content, 3);
+
+  // Calculate sentiment
+  function calculateSentiment(text: string): string {
+    const positiveWords = new Set(['good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'happy', 'joy', 'love', 'like', 'best']);
+    const negativeWords = new Set(['bad', 'terrible', 'awful', 'horrible', 'disappointing', 'sad', 'angry', 'hate', 'dislike', 'worst']);
+    
+    let positiveCount = 0;
+    let negativeCount = 0;
+    
+    text.toLowerCase().split(/\s+/).forEach(word => {
+      if (positiveWords.has(word)) positiveCount++;
+      if (negativeWords.has(word)) negativeCount++;
+    });
+    
+    if (positiveCount > negativeCount) return "positive";
+    if (negativeCount > positiveCount) return "negative";
+    return "neutral";
+  }
+
+  const sentiment = calculateSentiment(content);
+
+  // Generate a summary using the NLP model
+  const nlpSummary = nlp.generateComplexSentence(
+    "The text file analysis reveals",
+    `${words} words, ${sentenceCount} sentences, ${lines} lines, ${characters} characters, common words, ${sentiment} sentiment`,
+    50
+  );
+
+  return `I've analyzed the text file. Here's what I found:
+
+1. Word count: ${words}
+2. Sentence count: ${sentenceCount}
+3. Line count: ${lines}
+4. Character count: ${characters}
+5. Average word length: ${avgWordLength.toFixed(2)} characters
+6. Most common words: ${commonWords.join(', ')}
+7. Estimated reading time: ${readingTimeMinutes} minute${readingTimeMinutes > 1 ? 's' : ''}
+8. Overall sentiment: ${sentiment}
+
+Summary:
+${summary}
+
+${nlpSummary}
+
+Would you like me to perform any specific analysis on this text?`;
 }
 
 async function processExcelFile(content: ArrayBuffer): Promise<string> {
-  // You'll need to add a library like 'xlsx' to process Excel files
-  // This is a placeholder implementation
+  // Function to process Excel file
+  async function processExcelFile(content: ArrayBuffer): Promise<string> {
+    // Note: This is a basic implementation without using external libraries
+    // It may not handle all Excel file formats and complex structures
+
+    try {
+      // Convert ArrayBuffer to string
+      const data = new Uint8Array(content);
+      let result = '';
+      for (let i = 0; i < data.length; i++) {
+        result += String.fromCharCode(data[i]);
+      }
+
+      // Simple parsing (assumes CSV-like structure)
+      const rows = result.split('\n');
+      const rowCount = rows.length;
+      const columnCount = rows[0].split(',').length;
+
+      // Generate a summary
+      const summary = nlp.generateComplexSentence(
+        "The Excel file analysis reveals",
+        `approximately ${rowCount} rows and ${columnCount} columns`,
+        50
+      );
+
+      return `I've analyzed the Excel file. Here's a basic overview:
+
+1. Approximate number of rows: ${rowCount}
+2. Approximate number of columns: ${columnCount}
+
+${summary}
+
+Please note that this is a simplified analysis and may not be accurate for complex Excel files. For a more detailed analysis, we would need to use a specialized Excel parsing library.
+
+Would you like me to explain any specific part of this data?`;
+    } catch (error) {
+      return "I encountered an error while processing the Excel file. Please make sure it's a valid Excel file in a simple format.";
+    }
+  }
   return "I've received an Excel file. To process this, we'd need to implement Excel parsing logic.";
 }
 

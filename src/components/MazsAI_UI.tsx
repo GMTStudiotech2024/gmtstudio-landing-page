@@ -19,7 +19,7 @@ const ChatBotUI: React.FC = () => {
   const [showInfo, setShowInfo] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [currentTypingIndex, setCurrentTypingIndex] = useState(0);
-  const typingSpeed = 30; // milliseconds per character
+  const typingSpeed = 25; // milliseconds per character
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
