@@ -9,11 +9,11 @@ import GMTStudio from '../assets/images/GMTStudio_a.png'
 const blogPosts = [
   {
     image:GMTStudio,
-    title:"Introducing Mazs AI v1.0 anatra powered website generator",
-    excerpt:"We are excited to announce the integration of Mazs AI into our official website. you can not only now use our AI to search for anything in this website, but also ask any questions.",
+    title:"Mazs AI update and migration the AI service to GMTStudio official website",
+    excerpt:"New AI model has several new features and capabilities.",
     author:"Alston Chang",
     date:"August 15, 2024",
-    link:"/news15",
+    link:"/news16",
     category:"Development Log",
     views:100,
     readTime:"1 min"

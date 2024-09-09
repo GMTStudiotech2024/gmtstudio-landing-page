@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import blogImage2 from '../assets/GMTStudio_p.png';
 
-const NEWS14: React.FC = () => {
+const NEWS15: React.FC = () => {
   const navigate = useNavigate();
 
   const handleBackToBlog = () => {
@@ -62,4 +62,4 @@ const NEWS14: React.FC = () => {
   );
 }
 
-export default NEWS14;
+export default NEWS15;

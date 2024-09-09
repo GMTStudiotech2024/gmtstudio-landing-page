@@ -11,9 +11,10 @@ const Hero: React.FC = () => {
   );
   const [currentSlide, setCurrentSlide] = useState(0);
   const slides = [
-    "Enhanced tools and applications to power up your efficiency.",
+    "AI is included in this website. ",
     "The tech company that builds the future.",
-    "Great, Marvelous, and Terrific."
+    "Great, Marvelous, and Terrific.",
+    "The size of this website is 2.6 GB ! "
   ];
 
   const handleScroll = useCallback(() => {
