@@ -39,7 +39,7 @@ const ChatBotUI: React.FC = () => {
 
   const addWelcomeMessage = () => {
     const welcomeMessage: Message = {
-      text: "Hello! I'm Mazs AI v1.0 Anatra. How can I assist you today?",
+      text: "Hello! I'm Mazs AI v1.1 Anatra. I can help you with some basic tasks. How can I assist you today? although my Nerual network structure is not yet the well designed, but i will try my best to help you  ",
       isUser: false
     };
     setMessages([welcomeMessage]);
