@@ -14,7 +14,7 @@ const products = [
     image: projectImage1,
     icon: FaRocket,
     category: "AI",
-    link: "https://gmt-studio-ai-workspace.vercel.app/",
+    link: "/mazsai",
     status: "beta",
   },
   {
