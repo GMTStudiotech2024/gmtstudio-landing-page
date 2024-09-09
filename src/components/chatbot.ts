@@ -188,6 +188,10 @@ class NaturalLanguageProcessor {
   private decoder: MultilayerPerceptron;
   private gan: GAN;
   private rlAgent: RLAgent;
+  private conversationContext: string = '';
+  private contextWindow: string[] = [];
+  private maxContextWindowSize: number = 10;
+  private topicKeywords: Set<string> = new Set();
 
   constructor() {
     this.vocabulary = new Set();
@@ -404,18 +408,27 @@ class NaturalLanguageProcessor {
 
   generateSentence(startWord: string, userInput: string, maxLength: number = 20): string {
     let sentence = [startWord];
-    let currentContext = `${this.contextMemory.join(' ')} ${userInput}`.trim();
+    this.updateContextWindow(userInput);
+    let currentContext = this.getContextRepresentation();
     let meaningVector = this.encodeToMeaningSpace(currentContext);
+
+    // Extract topic keywords from user input
+    this.extractTopicKeywords(userInput);
 
     for (let i = 1; i < maxLength; i++) {
       const nextWordVector = this.decoder.predict(meaningVector);
       const nextWord = this.findClosestWord(nextWordVector);
-      sentence.push(nextWord);
+      
+      // Apply topic adherence
+      const topicAdherentWord = this.enforceTopicAdherence(nextWord);
+      sentence.push(topicAdherentWord);
 
-      // Update context and re-encode
-      currentContext = `${currentContext} ${nextWord}`;
+      // Update context window
+      this.updateContextWindow(topicAdherentWord);
+      currentContext = this.getContextRepresentation();
+
       const { sentiment, topics } = this.analyzeContext(currentContext);
-      const adjustedNextWord = this.adjustWordBasedOnAnalysis(nextWord, sentiment, topics);
+      const adjustedNextWord = this.adjustWordBasedOnAnalysis(topicAdherentWord, sentiment, topics);
       sentence[sentence.length - 1] = adjustedNextWord;
 
       if (adjustedNextWord.endsWith('.') || adjustedNextWord.endsWith('!') || adjustedNextWord.endsWith('?')) break;
@@ -426,9 +439,42 @@ class NaturalLanguageProcessor {
       // Apply GAN and RL for better generation
       meaningVector = this.gan.refine(meaningVector);
       meaningVector = this.rlAgent.improve(meaningVector, this.analyzeContext(currentContext));
-    }    this.updateContextMemory(sentence.join(' '));
-    return sentence.join(' ');
+    }
+
+    const generatedSentence = sentence.join(' ');
+    this.updateContextWindow(generatedSentence);
+    return generatedSentence;
   }
+
+  private updateContextWindow(text: string) {
+    const words = this.tokenize(text);
+    this.contextWindow.push(...words);
+    while (this.contextWindow.length > this.maxContextWindowSize) {
+      this.contextWindow.shift();
+    }
+  }
+
+  private getContextRepresentation(): string {
+    return this.contextWindow.join(' ');
+  }
+
+  private extractTopicKeywords(text: string) {
+    const words = this.tokenize(text);
+    const importantWords = words.filter(word => 
+      !['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for'].includes(word)
+    );
+    importantWords.forEach(word => this.topicKeywords.add(word));
+  }
+
+  private enforceTopicAdherence(word: string): string {
+    if (this.topicKeywords.size === 0) return word;
+
+    const similarWords = this.findSimilarWords(word, 10);
+    const topicRelatedWord = similarWords.find(w => this.topicKeywords.has(w));
+    return topicRelatedWord || word;
+  }
+
+
 
   private textToVector(text: string): number[] {
     // Implement text to vector conversion (e.g., using word embeddings)
@@ -695,57 +741,35 @@ class NaturalLanguageProcessor {
     }
   }
 
-  generateResponse(intent: string, entities: { [key: string]: string }, keywords: string[], topics: string[]): string {
-    // Check learning memory first
-    const queryKey = keywords.join(' ').toLowerCase();
-    if (this.learningMemory.has(queryKey)) {
-      const learned = this.learningMemory.get(queryKey)!;
-      if (learned.feedback > this.feedbackThreshold) {
-        return learned.response;
-      }
-    }
-
-    const matchedIntent = intents.find(i => i.patterns.includes(intent));
-    if (matchedIntent) {
-      let response = matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)];
-      Object.entries(entities).forEach(([key, value]) => {
-        response = response.replace(`{${key}}`, value);
-      });
-      
-      // Enhance response with keywords and topics
-      const keywordSentence = this.generateSentence(keywords[0] || "Additionally", "", 10);
-      response += " " + keywordSentence;
-
-      // Add information from knowledge base
-      topics.forEach(topic => {
-        if (this.knowledgeBase.has(topic)) {
-          response += " " + this.knowledgeBase.get(topic);
-        }
-      });
-
-      // Add a human-like touch with AI responses
-      const aiResponseType = this.getAIResponseType(intent, keywords);
-      if (this.aiResponses.has(aiResponseType)) {
-        const aiResponses = this.aiResponses.get(aiResponseType)!;
-        response += " " + aiResponses[Math.floor(Math.random() * aiResponses.length)];
-      }
-
-      // Enhance response with context memory
-      const contextMemoryAnalysis = this.analyzeContext(this.contextMemory.join(' '));
-      const contextSentence = this.generateSentence(contextMemoryAnalysis.keywords[0] || "Furthermore", "", 10);
-      response += " " + contextSentence;
-
-      return response;
-    }
-    return this.generateSentence("I'm not sure I understand. ", "", 15) + " " + this.aiResponses.get('confusion')![Math.floor(Math.random() * this.aiResponses.get('confusion')!.length)];
+  updateContext(query: string) {
+    this.conversationContext = query;
   }
 
-  private getAIResponseType(intent: string, keywords: string[]): string {
-    if (intent.includes('hello') || intent.includes('hi')) return 'greeting';
-    if (intent.includes('bye') || intent.includes('goodbye')) return 'farewell';
-    if (keywords.some(word => ['thanks', 'thank', 'appreciate'].includes(word))) return 'thanks';
-    if (keywords.some(word => ['what', 'how', 'why', 'when', 'where'].includes(word))) return 'curiosity';
-    return 'confusion';
+  generateResponse(intent: string, entities: { [key: string]: string }, keywords: string[], topics: string[]): string {
+    // Check if it's a simple greeting or farewell
+    if (['hello', 'hi', 'hey', 'bye', 'goodbye', 'see you'].includes(intent)) {
+      const matchedIntent = intents.find(i => i.patterns.includes(intent));
+      return matchedIntent ? matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)] : '';
+    }
+
+    // For other intents, generate a more complex response
+    let response = '';
+    const matchedIntent = intents.find(i => i.patterns.includes(intent));
+    if (matchedIntent) {
+      response = matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)];
+    } else {
+      response = this.generateSentence(keywords[0] || "I understand you're asking about", this.conversationContext, 15);
+    }
+
+    // Add relevant information from knowledge base
+    const relevantTopics = topics.filter(topic => this.conversationContext.toLowerCase().includes(topic));
+    relevantTopics.forEach(topic => {
+      if (this.knowledgeBase.has(topic)) {
+        response += " " + this.knowledgeBase.get(topic);
+      }
+    });
+
+    return response;
   }
 
   findMostSimilarIntent(query: string, intents: Intent[]): Intent | null {
@@ -826,33 +850,32 @@ export function processChatbotQuery(query: string): string {
   if (matchedIntent) {
     let response = nlp.generateResponse(intent, entities, keywords, topics);
     
-    // Generate additional context-aware sentence
-    const contextSentence = nlp.generateSentence(keywords[0] || response.split(' ')[0], query, 15);
-    response += " " + contextSentence;
-
-    // Adjust response based on sentiment
-    if (sentiment.score < -0.5) {
-      response += " I sense some frustration. Can you tell me more about your concerns?";
-    } else if (sentiment.score > 0.5) {
-      response += " I'm glad you're feeling positive! Is there anything specific you'd like to explore further?";
+    // Only add context-aware sentence for non-greeting intents
+    if (!['hello', 'hi', 'hey', 'bye', 'goodbye', 'see you'].includes(intent)) {
+      const contextSentence = nlp.generateSentence(keywords[0] || response.split(' ')[0], query, 15);
+      response += " " + contextSentence;
     }
 
-    // Add relevant information from knowledge base
-    topics.forEach(topic => {
+    // Only add sentiment-based responses for longer queries
+    if (query.split(' ').length > 3) {
+      if (sentiment.score < -0.5) {
+        response += " I sense some frustration. Can you tell me more about your concerns?";
+      } else if (sentiment.score > 0.5) {
+        response += " I'm glad you're feeling positive! Is there anything specific you'd like to discuss?";
+      }
+    }
+
+    // Only add knowledge base information if directly relevant
+    const relevantTopics = topics.filter(topic => query.toLowerCase().includes(topic));
+    relevantTopics.forEach(topic => {
       if (nlp.knowledgeBase.has(topic)) {
         response += " " + nlp.knowledgeBase.get(topic);
       }
     });
 
-    // Consider entities in the response
-    Object.entries(entities).forEach(([entityType, entityValue]) => {
-      response += ` Regarding the ${entityType} "${entityValue}", `;
-      response += nlp.generateSentence(entityValue, query, 10);
-    });
-
     return response;
   } else {
-    return nlp.generateSentence("I'm not sure I fully understand, but let me try to address your query. ", query, 20) + " Could you please provide more details or rephrase your question?";
+    return "I'm not sure I understand. Could you please rephrase your question or ask about something specific?";
   }
 }
 
@@ -862,11 +885,11 @@ console.log("Mazs AI v1.1 with advanced NLP and contextual analysis capabilities
 const intents: Intent[] = [
   {
     patterns: ['hello', 'hi', 'hey'],
-    responses: ['Hello! How can I help you today?', 'Hi there! What can I do for you?'],
+    responses: ['Hello! How can I help you today?', 'Hi there! What can I do for you?', 'Greetings! How may I assist you?'],
   },
   {
     patterns: ['bye', 'goodbye', 'see you'],
-    responses: ['Goodbye! Have a great day!', 'See you later! Take care!'],
+    responses: ['Goodbye! Have a great day!', 'See you later! Take care!', 'Farewell! Feel free to return if you have more questions.'],
   },
   {
     patterns: ['what is gmtstudio', 'tell me about gmtstudio'],
@@ -920,12 +943,20 @@ const intents: Intent[] = [
     patterns: ['is there a mobile app', 'gmtstudio on mobile'],
     responses: ['Yes, GMTStudio offers mobile apps for both iOS and Android, allowing you to access certain features on the go. The Theta platform is fully mobile-compatible.'],
   },
+  {
+    patterns: ['how are you', 'how\'s it going'],
+    responses: ['I\'m doing well, thank you! How about you?', 'I\'m fine, thanks for asking! How can I help you today?'],
+  },
+  {
+    patterns: ['what\'s the weather like', 'weather forecast'],
+    responses: ['I\'m sorry, I don\'t have real-time weather information. You might want to check a weather app or website for that.'],
+  },
 ];
 
 const network = new MultilayerPerceptron([10, 16, 8, intents.length]);
 
 function trainNetwork() {
-  const epochs = 2500;
+  const epochs = 5000;
   const learningRate = 0.1;
 
   for (let epoch = 0; epoch < epochs; epoch++) {
@@ -970,6 +1001,7 @@ intents.forEach(intent => {
 
 export function handleUserInput(userInput: string): Promise<string> {
   console.log("User:", userInput);
+  nlp.updateContext(userInput);
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(processChatbotQuery(userInput));
