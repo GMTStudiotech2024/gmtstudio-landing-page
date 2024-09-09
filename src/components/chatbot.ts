@@ -1144,12 +1144,42 @@ intents.forEach(intent => {
   intent.responses.forEach(response => nlp.trainOnText(response));
 });
 
+// Add this near the top of the file
+let typingSpeed = 10; // Default typing speed in milliseconds
+
+// Add this function to allow changing the typing speed
+export function setTypingSpeed(speed: number) {
+  typingSpeed = speed;
+}
+
+// Modify the getTypedResponse function to use the configurable typing speed
+export function getTypedResponse(response: string): Promise<string> {
+  return new Promise((resolve) => {
+    let typedResponse = '';
+    let index = 0;
+
+    function typeChar() {
+      if (index < response.length) {
+        typedResponse += response[index];
+        index++;
+        setTimeout(typeChar, typingSpeed);
+      } else {
+        resolve(typedResponse);
+      }
+    }
+
+    typeChar();
+  });
+}
+
+// Modify the existing handleUserInput function to use getTypedResponse
 export function handleUserInput(userInput: string): Promise<string> {
   console.log("User:", userInput);
   nlp.updateContext(userInput);
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(processChatbotQuery(userInput));
+      const response = processChatbotQuery(userInput);
+      getTypedResponse(response).then(resolve);
     }, 1000); // Simulate a delay in processing
   });
 }
