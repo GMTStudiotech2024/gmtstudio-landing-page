@@ -909,9 +909,9 @@ class NaturalLanguageProcessor {
   }
 
   generateComplexSentence(startWord: string, userInput: string, maxLength: number = 500): string {
-    let sentence = [];
+    let sentence = [startWord];
     let currentContext = userInput + ' ' + startWord;
-    let wordCount = 0;
+    let wordCount = 1;
 
     while (wordCount < maxLength) {
       const meaningVector = this.encodeToMeaningSpace(currentContext);
@@ -996,12 +996,11 @@ export function processChatbotQuery(query: string): string {
 
   const matchedIntent = intents.find(i => i.patterns.includes(intent));
   if (matchedIntent) {
-    let response = '';
+    let response = nlp.generateResponse(intent, entities, keywords, topics);
     
-    if (['hello', 'hi', 'hey', 'bye', 'goodbye', 'see you'].includes(intent)) {
-      response = nlp.generateResponse(intent, entities, keywords, topics);
-    } else {
-      response = nlp.generateComplexSentence(keywords[0] || "I understand", query, 500);
+    if (!['hello', 'hi', 'hey', 'bye', 'goodbye', 'see you'].includes(intent)) {
+      const contextSentence = nlp.generateComplexSentence(keywords[0] || response.split(' ')[0], query, 500);
+      response += " " + contextSentence;
     }
 
     if (query.split(' ').length > 3) {
@@ -1221,9 +1220,7 @@ export function handleUserInput(userInput: string): Promise<string> {
     }, 100); // Simulate a delay in processing
   });
 }
-export function provideFeedback(query: string, response: string, feedback: number) {
-  nlp.learnFromInteraction(query, response, feedback);
-}
+
 export function getConversationSuggestions(): string[] {
   return [
     "Tell me about GMTStudio",
