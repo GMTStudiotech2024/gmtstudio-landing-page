@@ -551,7 +551,7 @@ class NaturalLanguageProcessor {
     importantWords.forEach(word => this.topicKeywords.add(word));
   }
 
-  private enforceTopicAdherence(word: string): string {
+  private enforceTopicAdherence(word: string, currentTopic: string): string {
     if (this.topicKeywords.size === 0) return word;
 
     const similarWords = this.findSimilarWords(word, 10);
@@ -912,47 +912,126 @@ class NaturalLanguageProcessor {
     let sentence = [startWord];
     let currentContext = userInput + ' ' + startWord;
     let wordCount = 1;
+    let topicStack: string[] = [];
+    let sentimentHistory: number[] = [];
+
+    // Initialize topic and sentiment
+    const initialAnalysis = this.analyzeContext(currentContext);
+    topicStack.push(...initialAnalysis.topics);
+    sentimentHistory.push(initialAnalysis.sentiment.score);
 
     while (wordCount < maxLength) {
+      // Encode current context
       const meaningVector = this.encodeToMeaningSpace(currentContext);
-      const nextWordVector = this.decoder.predict(meaningVector);
+      
+      // Apply GAN refinement
+      const refinedVector = this.gan.refine(meaningVector);
+      
+      // Apply RL improvement
+      const improvedVector = this.rlAgent.improve(refinedVector, {
+        topicStack,
+        sentimentHistory,
+        wordCount,
+        maxLength
+      });
+      
+      // Predict next word
+      const nextWordVector = this.decoder.predict(improvedVector);
       const nextWord = this.findClosestWord(nextWordVector);
       
-      const topicAdherentWord = this.enforceTopicAdherence(nextWord);
+      // Enforce topic adherence
+      const topicAdherentWord = this.enforceTopicAdherence(nextWord, topicStack[topicStack.length - 1]);
       
-      const { sentiment, topics } = this.analyzeContext(currentContext);
+      // Analyze context
+      const { sentiment, topics } = this.analyzeContext(currentContext + ' ' + topicAdherentWord);
+      
+      // Adjust word based on analysis
       const adjustedNextWord = this.adjustWordBasedOnAnalysis(topicAdherentWord, sentiment, topics);
       
+      // Apply coherence check
+      if (!this.isCoherent(sentence, adjustedNextWord)) {
+        continue; // Skip this word and try again
+      }
+      
+      // Add word to sentence
       sentence.push(adjustedNextWord);
       currentContext += ' ' + adjustedNextWord;
       wordCount++;
 
-      // Check if the sentence should end
-      if (this.shouldEndSentence(adjustedNextWord, wordCount, maxLength)) {
+      // Update topic stack and sentiment history
+      if (topics.length > 0 && topics[0] !== topicStack[topicStack.length - 1]) {
+        topicStack.push(topics[0]);
+      }
+      sentimentHistory.push(sentiment.score);
+
+      // Check for sentence end
+      if (this.shouldEndSentence(adjustedNextWord, wordCount, maxLength, topicStack, sentimentHistory)) {
         break;
       }
 
       // Update word probabilities
       this.updateWordProbabilities(sentence.join(' '));
+      
+      // Periodic context refresh
+      if (wordCount % 10 === 0) {
+        currentContext = this.refreshContext(sentence, userInput);
+      }
     }
 
-    return sentence.join(' ');
+    return this.postProcessSentence(sentence.join(' '));
   }
 
-  private shouldEndSentence(word: string, currentLength: number, maxLength: number): boolean {
-    // End if the word has ending punctuation
+  private isCoherent(sentence: string[], nextWord: string): boolean {
+    // Implement coherence check (e.g., using n-grams or semantic similarity)
+    // Return true if the next word is coherent with the existing sentence
+    // This is a placeholder implementation
+    return true;
+  }
+
+  private refreshContext(sentence: string[], userInput: string): string {
+    // Implement logic to refresh the context, possibly incorporating
+    // the original user input to maintain relevance
+    return userInput + ' ' + sentence.slice(-5).join(' ');
+  }
+
+  private postProcessSentence(sentence: string): string {
+    // Implement post-processing logic (e.g., fixing grammar, ensuring proper capitalization)
+    // This is a placeholder implementation
+    return sentence.charAt(0).toUpperCase() + sentence.slice(1) + '.';
+  }
+
+  private shouldEndSentence(word: string, currentLength: number, maxLength: number, topicStack: string[], sentimentHistory: number[]): boolean {
+    // Enhanced logic for ending the sentence
     if (word.endsWith('.') || word.endsWith('!') || word.endsWith('?')) {
       return true;
     }
 
-    // End if we're close to the max length
     if (currentLength >= maxLength - 5) {
       return true;
     }
 
-    // Randomly end with decreasing probability as length increases
+    // End if topic has changed multiple times
+    if (topicStack.length > 3) {
+      return true;
+    }
+
+    // End if sentiment has fluctuated significantly
+    if (sentimentHistory.length > 5) {
+      const recentSentiments = sentimentHistory.slice(-5);
+      const sentimentVariance = this.calculateVariance(recentSentiments);
+      if (sentimentVariance > 0.5) {
+        return true;
+      }
+    }
+
     const endProbability = Math.min(0.1, currentLength / maxLength);
     return Math.random() < endProbability;
+  }
+
+  private calculateVariance(numbers: number[]): number {
+    const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
+    const squareDiffs = numbers.map(num => Math.pow(num - mean, 2));
+    return squareDiffs.reduce((sum, sqDiff) => sum + sqDiff, 0) / numbers.length;
   }
 }
 
@@ -993,6 +1072,15 @@ class RLAgent {
 export function processChatbotQuery(query: string): string {
   const { intent, entities, keywords, analysis, sentiment, topics } = nlp.understandQuery(query);
   console.log("Query Analysis:", analysis);
+
+  // Extract confidence from the analysis
+  const confidenceMatch = analysis.match(/confidence: ([\d.]+)/);
+  const confidence = confidenceMatch ? parseFloat(confidenceMatch[1]) : 0;
+
+  // If confidence is very low, return an "I'm not sure" response
+  if (confidence < 0.1) {
+    return nlp.generateComplexSentence("I'm not sure I understand", "uncertain response", 20);
+  }
 
   const matchedIntent = intents.find(i => i.patterns.includes(intent));
   if (matchedIntent) {
