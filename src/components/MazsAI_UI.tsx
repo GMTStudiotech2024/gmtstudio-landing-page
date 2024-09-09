@@ -109,7 +109,7 @@ const ChatBotUI: React.FC = () => {
       <div className="flex-1 bg-gray-100 dark:bg-gray-900 transition-colors duration-200 overflow-hidden pt-20">
         <div className="max-w-7xl mx-auto p-4 h-full flex flex-col">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-            <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2 sm:mb-0">Mazs AI v1.1 Anatra</h1>
+            <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2 sm:mb-0">Mazs AI Lab</h1>
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setShowInfo(!showInfo)}
@@ -133,7 +133,7 @@ const ChatBotUI: React.FC = () => {
           </div>
           {showInfo && (
             <div className="mb-4 p-4 bg-blue-100 dark:bg-blue-900 rounded-lg text-blue-800 dark:text-blue-200">
-              <p>Mazs AI v1.0 Anatra is an advanced chatbot powered by natural language processing and machine learning. It can assist you with information about GMTStudio, Theta platform, and AI WorkSpace.</p>
+              <p>Mazs AI v1.1 Anatra is an advanced chatbot powered by natural language processing and machine learning. It can assist you with information about GMTStudio, Theta platform, and AI WorkSpace.</p>
             </div>
           )}
           <div className="flex-1 flex flex-col overflow-hidden">
