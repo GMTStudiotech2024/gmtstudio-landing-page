@@ -956,7 +956,7 @@ const intents: Intent[] = [
 const network = new MultilayerPerceptron([10, 16, 8, intents.length]);
 
 function trainNetwork() {
-  const epochs = 5000;
+  const epochs = 3000;
   const learningRate = 0.1;
 
   for (let epoch = 0; epoch < epochs; epoch++) {
