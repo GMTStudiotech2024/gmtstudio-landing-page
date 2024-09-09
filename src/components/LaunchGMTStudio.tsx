@@ -30,7 +30,7 @@ const LaunchGMTStudio: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <motion.a
-                href="https://gmt-studio-ai-workspace.vercel.app/"
+                href="/mazsai"
                 className="px-8 py-4 bg-blue-500 dark:bg-blue-600 text-white text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition duration-300 ease-in-out flex items-center justify-center group"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.98 }}
