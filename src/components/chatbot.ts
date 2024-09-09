@@ -7,54 +7,86 @@ class MultilayerPerceptron {
   private layers: number[];
   private weights: number[][][];
   private biases: number[][];
+  private activations: ((x: number) => number)[];
+  private activationDerivatives: ((x: number) => number)[];
 
-  constructor(layers: number[]) {
+  constructor(layers: number[], activations: string[] = []) {
     this.layers = layers;
     this.weights = [];
     this.biases = [];
+    this.activations = [];
+    this.activationDerivatives = [];
 
     for (let i = 1; i < layers.length; i++) {
       this.weights.push(Array(layers[i]).fill(0).map(() => 
-        Array(layers[i-1]).fill(0).map(() => Math.random() - 0.5)
+        Array(layers[i-1]).fill(0).map(() => this.initializeWeight())
       ));
-      this.biases.push(Array(layers[i]).fill(0).map(() => Math.random() - 0.5));
+      this.biases.push(Array(layers[i]).fill(0).map(() => this.initializeWeight()));
+      
+      const activation = activations[i - 1] || 'sigmoid';
+      this.activations.push(this.getActivationFunction(activation));
+      this.activationDerivatives.push(this.getActivationDerivative(activation));
     }
   }
 
-  private sigmoid(x: number): number {
-    return 1 / (1 + Math.exp(-x));
+  private initializeWeight(): number {
+    // Xavier/Glorot initialization
+    const limit = Math.sqrt(6 / (this.layers[0] + this.layers[this.layers.length - 1]));
+    return Math.random() * 2 * limit - limit;
   }
 
-  private sigmoidDerivative(x: number): number {
-    return x * (1 - x);
+  private getActivationFunction(name: string): (x: number) => number {
+    switch (name) {
+      case 'sigmoid': return (x: number) => 1 / (1 + Math.exp(-x));
+      case 'relu': return (x: number) => Math.max(0, x);
+      case 'tanh': return (x: number) => Math.tanh(x);
+      case 'leaky_relu': return (x: number) => x > 0 ? x : 0.01 * x;
+      default: return (x: number) => 1 / (1 + Math.exp(-x)); // default to sigmoid
+    }
+  }
+
+  private getActivationDerivative(name: string): (x: number) => number {
+    switch (name) {
+      case 'sigmoid': return (x: number) => {
+        const s = 1 / (1 + Math.exp(-x));
+        return s * (1 - s);
+      };
+      case 'relu': return (x: number) => x > 0 ? 1 : 0;
+      case 'tanh': return (x: number) => 1 - Math.pow(Math.tanh(x), 2);
+      case 'leaky_relu': return (x: number) => x > 0 ? 1 : 0.01;
+      default: return (x: number) => {
+        const s = 1 / (1 + Math.exp(-x));
+        return s * (1 - s);
+      };
+    }
   }
 
   predict(input: number[]): number[] {
     let activation = input;
     for (let i = 0; i < this.weights.length; i++) {
-      const currentActivation = activation; // Create a local copy
+      const currentActivation = activation;
       let newActivation = [];
       for (let j = 0; j < this.weights[i].length; j++) {
         const sum = this.weights[i][j].reduce((sum, weight, k) => sum + weight * currentActivation[k], 0) + this.biases[i][j];
-        newActivation.push(this.sigmoid(sum));
+        newActivation.push(this.activations[i](sum));
       }
       activation = newActivation;
     }
     return activation;
   }
 
-  train(input: number[], target: number[], learningRate: number = 0.1) {
+  train(input: number[], target: number[], learningRate: number = 0.1, momentum: number = 0.9) {
     // Forward pass
-    let activations = [input];
-    let weightedSums = [];
+    let activations: number[][] = [input];
+    let weightedSums: number[][] = [];
 
     for (let i = 0; i < this.weights.length; i++) {
-      let newActivation = [];
-      let newWeightedSum = [];
+      let newActivation: number[] = [];
+      let newWeightedSum: number[] = [];
       for (let j = 0; j < this.weights[i].length; j++) {
         const sum = this.weights[i][j].reduce((sum, weight, k) => sum + weight * activations[i][k], 0) + this.biases[i][j];
         newWeightedSum.push(sum);
-        newActivation.push(this.sigmoid(sum));
+        newActivation.push(this.activations[i](sum));
       }
       weightedSums.push(newWeightedSum);
       activations.push(newActivation);
@@ -62,25 +94,32 @@ class MultilayerPerceptron {
 
     // Backward pass
     let deltas = [activations[activations.length - 1].map((output, i) => 
-      (output - target[i]) * this.sigmoidDerivative(output)
+      (output - target[i]) * this.activationDerivatives[this.activationDerivatives.length - 1](weightedSums[weightedSums.length - 1][i])
     )];
 
     for (let i = this.weights.length - 1; i > 0; i--) {
       let layerDelta = [];
       for (let j = 0; j < this.weights[i-1].length; j++) {
         const error = this.weights[i].reduce((sum, neuronWeights, k) => sum + neuronWeights[j] * deltas[0][k], 0);
-        layerDelta.push(error * this.sigmoidDerivative(activations[i][j]));
+        layerDelta.push(error * this.activationDerivatives[i-1](weightedSums[i-1][j]));
       }
       deltas.unshift(layerDelta);
     }
 
-    // Update weights and biases
+    // Update weights and biases with momentum
+    let previousWeightChanges: number[][][] = this.weights.map(layer => layer.map(neuron => neuron.map(() => 0)));
+    let previousBiasChanges: number[][] = this.biases.map(layer => layer.map(() => 0));
+
     for (let i = 0; i < this.weights.length; i++) {
       for (let j = 0; j < this.weights[i].length; j++) {
         for (let k = 0; k < this.weights[i][j].length; k++) {
-          this.weights[i][j][k] -= learningRate * deltas[i][j] * activations[i][k];
+          const weightChange = learningRate * deltas[i][j] * activations[i][k] + momentum * previousWeightChanges[i][j][k];
+          this.weights[i][j][k] -= weightChange;
+          previousWeightChanges[i][j][k] = weightChange;
         }
-        this.biases[i][j] -= learningRate * deltas[i][j];
+        const biasChange = learningRate * deltas[i][j] + momentum * previousBiasChanges[i][j];
+        this.biases[i][j] -= biasChange;
+        previousBiasChanges[i][j] = biasChange;
       }
     }
   }
@@ -125,16 +164,16 @@ class MultilayerPerceptron {
   // Helper method for backpropagation
   private backpropagate(input: number[], target: number[]): [number[][][], number[][]] {
     // Forward pass
-    let activations = [input];
-    let weightedSums = [];
+    let activations: number[][] = [input];
+    let weightedSums: number[][] = [];
 
     for (let i = 0; i < this.weights.length; i++) {
-      let newActivation = [];
-      let newWeightedSum = [];
+      let newActivation: number[] = [];
+      let newWeightedSum: number[] = [];
       for (let j = 0; j < this.weights[i].length; j++) {
         const sum = this.weights[i][j].reduce((sum, weight, k) => sum + weight * activations[i][k], 0) + this.biases[i][j];
         newWeightedSum.push(sum);
-        newActivation.push(this.sigmoid(sum));
+        newActivation.push(this.activations[i](sum));
       }
       weightedSums.push(newWeightedSum);
       activations.push(newActivation);
@@ -142,14 +181,14 @@ class MultilayerPerceptron {
 
     // Backward pass
     let deltas = [activations[activations.length - 1].map((output, i) => 
-      (output - target[i]) * this.sigmoidDerivative(output)
+      (output - target[i]) * this.activationDerivatives[this.activationDerivatives.length - 1](weightedSums[weightedSums.length - 1][i])
     )];
 
     for (let i = this.weights.length - 1; i > 0; i--) {
       let layerDelta = [];
       for (let j = 0; j < this.weights[i-1].length; j++) {
         const error = this.weights[i].reduce((sum, neuronWeights, k) => sum + neuronWeights[j] * deltas[0][k], 0);
-        layerDelta.push(error * this.sigmoidDerivative(activations[i][j]));
+        layerDelta.push(error * this.activationDerivatives[i-1](weightedSums[i-1][j]));
       }
       deltas.unshift(layerDelta);
     }
@@ -205,8 +244,8 @@ class NaturalLanguageProcessor {
     this.contextMemory = [];
     this.learningMemory = new Map();
     this.meaningSpace = new Map();
-    this.encoder = new MultilayerPerceptron([100, 64, 32]); // Input size may vary
-    this.decoder = new MultilayerPerceptron([32, 64, 100]); // Output size may vary
+    this.encoder = new MultilayerPerceptron([100, 32, 64, 32, 100], ['relu', 'relu', 'relu', 'sigmoid']);
+    this.decoder = new MultilayerPerceptron([100, 32, 64, 32, 100], ['relu', 'relu', 'relu', 'sigmoid']);
     this.gan = new GAN();
     this.rlAgent = new RLAgent();
     this.wordProbabilities = new Map();
@@ -231,6 +270,7 @@ class NaturalLanguageProcessor {
 
     // Expand knowledge base
     this.knowledgeBase = new Map([
+      ['ai', 'Artificial intelligence (AI) refers to the simulation of human intelligence in machines.'],
       ['artificial intelligence', 'AI is the simulation of human intelligence in machines.'],
       ['machine learning', 'ML is a subset of AI that enables systems to learn and improve from experience.'],
       ['deep learning', 'Deep learning is a subset of ML using neural networks with multiple layers.'],
@@ -452,44 +492,43 @@ class NaturalLanguageProcessor {
     return this.vectorToText(outputVector);
   }
 
-  generateSentence(startWord: string, userInput: string, maxLength: number = 20): string {
+  generateSentence(startWord: string, maxLength: number = 20): string {
     let sentence = [startWord];
-    this.updateContextWindow(userInput);
-    let currentContext = this.getContextRepresentation();
-    let meaningVector = this.encodeToMeaningSpace(currentContext);
-
-    // Extract topic keywords from user input
-    this.extractTopicKeywords(userInput);
+    let currentContext = startWord;
 
     for (let i = 1; i < maxLength; i++) {
+      const meaningVector = this.encodeToMeaningSpace(currentContext);
       const nextWordVector = this.decoder.predict(meaningVector);
       const nextWord = this.findClosestWord(nextWordVector);
       
-      // Apply topic adherence
-      const topicAdherentWord = this.enforceTopicAdherence(nextWord);
-      sentence.push(topicAdherentWord);
+      sentence.push(nextWord);
+      currentContext = sentence.join(' ');
 
-      // Update context window
-      this.updateContextWindow(topicAdherentWord);
-      currentContext = this.getContextRepresentation();
-
-      const { sentiment, topics } = this.analyzeContext(currentContext);
-      const adjustedNextWord = this.adjustWordBasedOnAnalysis(topicAdherentWord, sentiment, topics);
-      sentence[sentence.length - 1] = adjustedNextWord;
-
-      if (adjustedNextWord.endsWith('.') || adjustedNextWord.endsWith('!') || adjustedNextWord.endsWith('?')) break;
-
-      // Re-encode the updated context
-      meaningVector = this.encodeToMeaningSpace(currentContext);
-
-      // Apply GAN and RL for better generation
-      meaningVector = this.gan.refine(meaningVector);
-      meaningVector = this.rlAgent.improve(meaningVector, this.analyzeContext(currentContext));
+      if (nextWord.endsWith('.') || nextWord.endsWith('!') || nextWord.endsWith('?')) break;
     }
 
-    const generatedSentence = sentence.join(' ');
-    this.updateContextWindow(generatedSentence);
-    return generatedSentence;
+    return sentence.join(' ');
+  }
+
+  // Helper method to find the closest word to a given vector
+  private findClosestWord(vector: number[]): string {
+    let closestWord = '';
+    let closestDistance = Infinity;
+
+    this.wordVectors.forEach((wordVector, word) => {
+      const distance = this.euclideanDistance(vector, wordVector);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestWord = word;
+      }
+    });
+
+    return closestWord;
+  }
+
+  // Helper method to calculate Euclidean distance between two vectors
+  private euclideanDistance(vec1: number[], vec2: number[]): number {
+    return Math.sqrt(vec1.reduce((sum, val, i) => sum + Math.pow(val - vec2[i], 2), 0));
   }
 
   private updateContextWindow(text: string) {
@@ -534,11 +573,7 @@ class NaturalLanguageProcessor {
     return String.fromCharCode(...vector.map(v => Math.round(v * 255)));
   }
 
-  private findClosestWord(vector: number[]): string {
-    // Find the word with the closest vector in the vocabulary
-    // This is a placeholder implementation
-    return Array.from(this.vocabulary)[Math.floor(Math.random() * this.vocabulary.size)];
-  }
+
 
   private analyzeContext(context: string): { sentiment: { score: number, explanation: string }, topics: string[], entities: { [key: string]: string }, keywords: string[] } {
     const sentiment = this.analyzeSentiment(context);
@@ -804,7 +839,7 @@ class NaturalLanguageProcessor {
     if (matchedIntent) {
       response = matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)];
     } else {
-      response = this.generateSentence(keywords[0] || "I understand you're asking about", this.conversationContext, 15);
+      response = this.generateSentence(keywords[0] || "I understand you're asking about", 15);
     }
 
     // Add relevant information from knowledge base
@@ -873,52 +908,51 @@ class NaturalLanguageProcessor {
     return (nextWordProbs.get(nextWord) || 0) / totalOccurrences;
   }
 
-  generateComplexSentence(startWord: string, userInput: string, maxLength: number = 20): string {
-    let sentence = [startWord];
-    this.updateContextWindow(userInput);
-    let currentContext = this.getContextRepresentation();
-    let meaningVector = this.encodeToMeaningSpace(currentContext);
+  generateComplexSentence(startWord: string, userInput: string, maxLength: number = 500): string {
+    let sentence = [];
+    let currentContext = userInput + ' ' + startWord;
+    let wordCount = 0;
 
-    this.extractTopicKeywords(userInput);
-
-    for (let i = 1; i < maxLength; i++) {
+    while (wordCount < maxLength) {
+      const meaningVector = this.encodeToMeaningSpace(currentContext);
       const nextWordVector = this.decoder.predict(meaningVector);
       const nextWord = this.findClosestWord(nextWordVector);
       
       const topicAdherentWord = this.enforceTopicAdherence(nextWord);
       
-      // Calculate probability based on user input
-      const userInputWords = this.tokenize(userInput);
-      let probability = 1;
-      for (const word of userInputWords) {
-        probability *= this.getNextWordProbability(sentence[sentence.length - 1], word);
-      }
-      
-      // Adjust the word based on probability
-      const adjustedWord = probability > 0.1 ? userInputWords[Math.floor(Math.random() * userInputWords.length)] : topicAdherentWord;
-      
-      sentence.push(adjustedWord);
-
-      this.updateContextWindow(adjustedWord);
-      currentContext = this.getContextRepresentation();
-
       const { sentiment, topics } = this.analyzeContext(currentContext);
-      const adjustedNextWord = this.adjustWordBasedOnAnalysis(adjustedWord, sentiment, topics);
-      sentence[sentence.length - 1] = adjustedNextWord;
+      const adjustedNextWord = this.adjustWordBasedOnAnalysis(topicAdherentWord, sentiment, topics);
+      
+      sentence.push(adjustedNextWord);
+      currentContext += ' ' + adjustedNextWord;
+      wordCount++;
 
-      if (adjustedNextWord.endsWith('.') || adjustedNextWord.endsWith('!') || adjustedNextWord.endsWith('?')) break;
-
-      meaningVector = this.encodeToMeaningSpace(currentContext);
-      meaningVector = this.gan.refine(meaningVector);
-      meaningVector = this.rlAgent.improve(meaningVector, this.analyzeContext(currentContext));
+      // Check if the sentence should end
+      if (this.shouldEndSentence(adjustedNextWord, wordCount, maxLength)) {
+        break;
+      }
 
       // Update word probabilities
       this.updateWordProbabilities(sentence.join(' '));
     }
 
-    const generatedSentence = sentence.join(' ');
-    this.updateContextWindow(generatedSentence);
-    return generatedSentence;
+    return sentence.join(' ');
+  }
+
+  private shouldEndSentence(word: string, currentLength: number, maxLength: number): boolean {
+    // End if the word has ending punctuation
+    if (word.endsWith('.') || word.endsWith('!') || word.endsWith('?')) {
+      return true;
+    }
+
+    // End if we're close to the max length
+    if (currentLength >= maxLength - 5) {
+      return true;
+    }
+
+    // Randomly end with decreasing probability as length increases
+    const endProbability = Math.min(0.1, currentLength / maxLength);
+    return Math.random() < endProbability;
   }
 }
 
@@ -962,11 +996,12 @@ export function processChatbotQuery(query: string): string {
 
   const matchedIntent = intents.find(i => i.patterns.includes(intent));
   if (matchedIntent) {
-    let response = nlp.generateResponse(intent, entities, keywords, topics);
+    let response = '';
     
-    if (!['hello', 'hi', 'hey', 'bye', 'goodbye', 'see you'].includes(intent)) {
-      const contextSentence = nlp.generateComplexSentence(keywords[0] || response.split(' ')[0], query, 15);
-      response += " " + contextSentence;
+    if (['hello', 'hi', 'hey', 'bye', 'goodbye', 'see you'].includes(intent)) {
+      response = nlp.generateResponse(intent, entities, keywords, topics);
+    } else {
+      response = nlp.generateComplexSentence(keywords[0] || "I understand", query, 500);
     }
 
     if (query.split(' ').length > 3) {
@@ -987,7 +1022,7 @@ export function processChatbotQuery(query: string): string {
 
     return response;
   } else {
-    return nlp.generateComplexSentence("I'm not sure I understand", "rephrase question ask specific", 20);
+    return nlp.generateComplexSentence("I'm not sure I understand", query, 500);
   }
 }
 
@@ -1094,11 +1129,14 @@ const intents: Intent[] = [
   {
     patterns: ['who are you ', 'what is your name', "you are who "],
     responses: ["I'm an AI assistant created by GMTStudio, Which they named me Mazs AI, It's nice to meet you!"],
+  },
+  {
+    patterns: ['Artificial intelligence', 'Artificial intelligent',"AI"],
+    responses: ["Artificial intelligence (AI) refers to the simulation of human intelligence in machines that are programmed to think and learn like humans."],
   }
-
 ];
 
-const network = new MultilayerPerceptron([10, 16, 8, intents.length]);
+const network = new MultilayerPerceptron([10, 32, 64, 32, intents.length], ['relu', 'relu', 'relu', 'sigmoid']);
 
 function trainNetwork() {
   const epochs = 100;
@@ -1180,10 +1218,12 @@ export function handleUserInput(userInput: string): Promise<string> {
     setTimeout(() => {
       const response = processChatbotQuery(userInput);
       getTypedResponse(response).then(resolve);
-    }, 1000); // Simulate a delay in processing
+    }, 100); // Simulate a delay in processing
   });
 }
-
+export function provideFeedback(query: string, response: string, feedback: number) {
+  nlp.learnFromInteraction(query, response, feedback);
+}
 export function getConversationSuggestions(): string[] {
   return [
     "Tell me about GMTStudio",

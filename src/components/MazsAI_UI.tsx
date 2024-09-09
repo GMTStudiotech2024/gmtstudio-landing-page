@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { debouncedHandleUserInput, getConversationSuggestions } from './chatbot';
+import { debouncedHandleUserInput, getConversationSuggestions ,} from './chatbot';
 
 interface Message {
   text: string;
