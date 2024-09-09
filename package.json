@@ -24,6 +24,7 @@
     "@vercel/speed-insights": "^1.0.12",
     "aos": "^2.3.4",
     "appwrite": "^15.0.0",
+    "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
     "chart.js": "^4.4.3",
     "file-saver": "^2.0.5",

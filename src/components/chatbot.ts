@@ -1251,3 +1251,71 @@ export const debouncedHandleUserInput = debounce(handleUserInput, 300);
 trainNetwork();
 
 console.log("Mazs AI v1.1 with advanced NLP and contextual analysis capabilities initialized!");
+
+export async function processAttachedFile(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = async (event) => {
+      try {
+        let response = '';
+        switch (file.type) {
+          case 'text/plain':
+            response = await processTextFile(event.target?.result as string);
+            break;
+          case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+          case 'application/vnd.ms-excel':
+            response = await processExcelFile(event.target?.result as ArrayBuffer);
+            break;
+          case 'application/json':
+            response = await processJsonFile(event.target?.result as string);
+            break;
+          default:
+            response = "I'm sorry, I can't process this file type.";
+        }
+        resolve(response);
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    reader.onerror = () => {
+      reject(new Error('Error reading file'));
+    };
+
+    if (file.type === 'text/plain') {
+      reader.readAsText(file);
+    } else {
+      reader.readAsArrayBuffer(file);
+    }
+  });
+}
+
+async function processTextFile(content: string): Promise<string> {
+  // Process the text file content
+  const words = content.split(/\s+/).length;
+  const lines = content.split('\n').length;
+  const characters = content.length;
+
+  // Use the NLP model to generate a response
+  const summary = nlp.generateComplexSentence("The text file contains", `${words} words, ${lines} lines, and ${characters} characters`, 50);
+
+  return `I've analyzed the text file. ${summary}`;
+}
+
+async function processExcelFile(content: ArrayBuffer): Promise<string> {
+  // You'll need to add a library like 'xlsx' to process Excel files
+  // This is a placeholder implementation
+  return "I've received an Excel file. To process this, we'd need to implement Excel parsing logic.";
+}
+
+async function processJsonFile(content: string): Promise<string> {
+  try {
+    const jsonData = JSON.parse(content);
+    const keys = Object.keys(jsonData);
+    const summary = nlp.generateComplexSentence("The JSON file contains", `${keys.length} top-level keys: ${keys.join(', ')}`, 50);
+    return `I've analyzed the JSON file. ${summary}`;
+  } catch (error) {
+    return "I encountered an error while parsing the JSON file. Please make sure it's valid JSON.";
+  }
+}
