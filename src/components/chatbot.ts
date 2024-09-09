@@ -268,7 +268,51 @@ class NaturalLanguageProcessor {
       ['genetic engineering applications', 'Genetic engineering has applications in agriculture, medicine, and environmental conservation.'],
       ['nanotechnology innovations', 'Nanotechnology innovations include advanced materials, targeted drug delivery systems, and more efficient solar cells.'],
       ['autonomous vehicles challenges', 'Challenges for autonomous vehicles include navigating complex traffic scenarios, ethical decision-making, and regulatory hurdles.'],
-      ['3d printing applications', '3D printing has applications in manufacturing, medicine, architecture, and even food production.']
+      ['3d printing applications', '3D printing has applications in manufacturing, medicine, architecture, and even food production.'],
+      ["climate change", "Climate change refers to long-term shifts in global or regional climate patterns, often attributed to human activities increasing atmospheric CO2."],
+      ['biodiversity', 'Biodiversity is the variety of life on Earth at all levels, from genes to ecosystems, encompassing the evolutionary, ecological, and cultural processes that sustain life.'],
+      ['sustainable development', 'Sustainable development is an approach to economic growth that protects the environment and ensures social equity for present and future generations.'],
+      ['global health', 'Global health focuses on improving health and achieving health equity for all people worldwide, addressing both medical and social determinants of health.'],
+      ['cultural anthropology', 'Cultural anthropology is the study of human cultures, their beliefs, practices, values, ideas, technologies, economies and other domains of social and cognitive organization.'],
+      ['behavioral economics', 'Behavioral economics combines insights from psychology, judgment, decision making, and economics to generate a more accurate understanding of human behavior.'],
+      ['urban planning', 'Urban planning is a technical and political process concerned with the development and design of land use and the built environment in urban areas.'],
+      ['comparative literature', 'Comparative literature is an academic field dealing with the study of literature and cultural expression across linguistic, national, and disciplinary boundaries.'],
+      ['marine biology', 'Marine biology is the scientific study of organisms in the ocean or other marine bodies of water, including their behaviors and interactions with the environment.'],
+      ['geopolitics', "Geopolitics is the study of the effects of Earth's geography on politics and international relations, particularly with respect to foreign policy of different states."],
+      ['art history', 'Art history is the study of objects of art in their historical development and stylistic contexts, including genre, design, format, and style.'],
+      ['philosophy of science', 'Philosophy of science is a branch of philosophy concerned with the foundations, methods, and implications of science, including the natural sciences and social sciences.'],
+      ['linguistics', 'Linguistics is the scientific study of language, including its structure, evolution, and relationship to human behavior and the human brain.'],
+      ['public health', 'Public health is the science of protecting and improving the health of people and their communities through education, policy making and research for disease and injury prevention.'],
+      ['international relations', 'International relations is the study of the interactions among various actors in the international system, including states, international organizations, NGOs, and multinational corporations.'],
+      ["world history", "World history encompasses the study of human societies and their development across time and space, from ancient civilizations to modern globalization."],
+      ["economics", "Economics is the social science that studies the production, distribution, and consumption of goods and services."],
+      ["psychology", "Psychology is the scientific study of the mind and behavior, exploring how people think, feel, and act."],
+      ["sociology", "Sociology is the study of human society, social relationships, and institutions, examining how they shape and are shaped by individuals."],
+      ["political science", "Political science focuses on systems of government, political behavior, and the analysis of political issues and policies."],
+      ["environmental science", "Environmental science is an interdisciplinary field that integrates physical, biological, and information sciences to study and address environmental issues."],
+      ["astronomy", "Astronomy is the study of celestial objects, space, and the physical universe as a whole."],
+      ["geology", "Geology is the science that deals with the Earth's physical structure and substance, its history, and the processes that act on it."],
+      ["oceanography", "Oceanography is the study of the physical and biological aspects of the ocean."],
+      ["meteorology", "Meteorology is the scientific study of the atmosphere and weather patterns."],
+      ["nutrition", "Nutrition is the study of nutrients in food, how the body uses them, and the relationship between diet, health, and disease."],
+      ["archaeology", "Archaeology is the study of human history and prehistory through the excavation and analysis of artifacts and physical remains."],
+      ["music theory", "Music theory is the study of the fundamental elements of music including rhythm, harmony, and form."],
+      ["film studies", "Film studies involves the critical analysis of cinema, including its history, theory, and social impact."],
+      ["fashion design", "Fashion design is the art of applying design, aesthetics, and natural beauty to clothing and accessories."],
+      ["architecture", "Architecture is the art and science of designing and constructing buildings and other physical structures."],
+      ["game theory", "Game theory is the study of strategic decision-making in competitive scenarios."],
+      ["criminology", "Criminology is the scientific study of crime, including its causes, consequences, and control."],
+      ["epistemology", "Epistemology is the branch of philosophy concerned with the theory of knowledge."],
+      ["ethics", "Ethics is the branch of philosophy that involves systematizing, defending, and recommending concepts of right and wrong behavior."],
+      ["philosophy", "Philosophy is the study of the fundamental nature of reality, existence, knowledge, logic, and ethics."],
+      ["psychology", "Psychology is the scientific study of the mind and behavior, exploring how people think, feel, and act."],
+      ["sociology", "Sociology is the study of human society, social relationships, and institutions, examining how they shape and are shaped by individuals."],
+      ["political science", "Political science focuses on systems of government, political behavior, and the analysis of political issues and policies."],
+      ["environmental science", "Environmental science is an interdisciplinary field that integrates physical, biological, and information sciences to study and address environmental issues."],
+      ["astronomy", "Astronomy is the study of celestial objects, space, and the physical universe as a whole."],
+      ["economics", "Economics is the social science that studies the production, distribution, and consumption of goods and services."],
+      ["statistics", "Statistics is the study of the collection, analysis, interpretation, presentation, and organization of data."],
+
     ]);
 
     // Add basic AI responses
@@ -951,13 +995,46 @@ const intents: Intent[] = [
     patterns: ['what\'s the weather like', 'weather forecast'],
     responses: ['I\'m sorry, I don\'t have real-time weather information. You might want to check a weather app or website for that.'],
   },
+  {
+    patterns: ['tell me a joke', 'say something funny'],
+    responses: ["Why don't scientists trust atoms? Because they make up everything!", 'What do you call a fake noodle? An impasta!'],
+  },
+  {
+    patterns: ['what can you do', 'what are your capabilities'],
+    responses: ['I can answer questions about GMTStudio, provide information on various topics, and even tell jokes! How can I assist you today?'],
+  },
+  {
+    patterns: ['favorite color', 'what color do you like'],
+    responses: ["As an AI, I don't have personal preferences, but I find all colors fascinating in their own way!"],
+  },
+  {
+    patterns: ['do you sleep', 'are you always awake'],
+    responses: ["I don't sleep as humans do. I'm always here and ready to help whenever you need me!"],
+  },
+  {
+    patterns: ["what's your name', 'who are you"],
+    responses: ["I'm an AI assistant created by GMTStudio. It's nice to meet you!"],
+  },
+  {
+    patterns: ['thank you', 'thanks'],
+    responses: ["You're welcome! I'm glad I could help.", "It's my pleasure to assist you!"],
+  },
+  {
+    patterns: ['goodbye', 'bye', 'see you later'],
+    responses: ['Goodbye! Feel free to chat with me again anytime.', "Take care! I'll be here if you need anything else."],
+  },
+  {
+    patterns: ['who are you ', 'what is your name', "you are who "],
+    responses: ["I'm an AI assistant created by GMTStudio, Which they named me Mazs AI, It's nice to meet you!"],
+  }
+
 ];
 
 const network = new MultilayerPerceptron([10, 16, 8, intents.length]);
 
 function trainNetwork() {
   const epochs = 3000;
-  const learningRate = 0.1;
+  const learningRate = 0.5;
 
   for (let epoch = 0; epoch < epochs; epoch++) {
     let totalLoss = 0;
