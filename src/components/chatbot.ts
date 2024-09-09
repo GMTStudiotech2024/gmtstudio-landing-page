@@ -910,7 +910,7 @@ class NaturalLanguageProcessor {
 
   generateComplexSentence(startWord: string, userInput: string, maxLength: number = 500): string {
     let sentence = [startWord];
-    let currentContext = userInput + ' ' + startWord;
+    let currentContext = userInput;
     let wordCount = 1;
     let topicStack: string[] = [];
     let sentimentHistory: number[] = [];
@@ -921,8 +921,11 @@ class NaturalLanguageProcessor {
     sentimentHistory.push(initialAnalysis.sentiment.score);
 
     while (wordCount < maxLength) {
-      // Encode current context
-      const meaningVector = this.encodeToMeaningSpace(currentContext);
+      // Combine current sentence with original user input for context
+      const combinedContext = `${userInput} ${sentence.join(' ')}`;
+      
+      // Encode combined context
+      const meaningVector = this.encodeToMeaningSpace(combinedContext);
       
       // Apply GAN refinement
       const refinedVector = this.gan.refine(meaningVector);
@@ -932,7 +935,8 @@ class NaturalLanguageProcessor {
         topicStack,
         sentimentHistory,
         wordCount,
-        maxLength
+        maxLength,
+        userInput
       });
       
       // Predict next word
@@ -942,20 +946,20 @@ class NaturalLanguageProcessor {
       // Enforce topic adherence
       const topicAdherentWord = this.enforceTopicAdherence(nextWord, topicStack[topicStack.length - 1]);
       
-      // Analyze context
-      const { sentiment, topics } = this.analyzeContext(currentContext + ' ' + topicAdherentWord);
+      // Analyze context including the potential next word
+      const { sentiment, topics } = this.analyzeContext(`${combinedContext} ${topicAdherentWord}`);
       
       // Adjust word based on analysis
       const adjustedNextWord = this.adjustWordBasedOnAnalysis(topicAdherentWord, sentiment, topics);
       
       // Apply coherence check
-      if (!this.isCoherent(sentence, adjustedNextWord)) {
+      if (!this.isCoherent(sentence, adjustedNextWord, userInput)) {
         continue; // Skip this word and try again
       }
       
       // Add word to sentence
       sentence.push(adjustedNextWord);
-      currentContext += ' ' + adjustedNextWord;
+      currentContext = `${userInput} ${sentence.join(' ')}`;
       wordCount++;
 
       // Update topic stack and sentiment history
@@ -965,43 +969,50 @@ class NaturalLanguageProcessor {
       sentimentHistory.push(sentiment.score);
 
       // Check for sentence end
-      if (this.shouldEndSentence(adjustedNextWord, wordCount, maxLength, topicStack, sentimentHistory)) {
+      if (this.shouldEndSentence(adjustedNextWord, wordCount, maxLength, topicStack, sentimentHistory, userInput)) {
         break;
       }
 
       // Update word probabilities
-      this.updateWordProbabilities(sentence.join(' '));
+      this.updateWordProbabilities(currentContext);
       
       // Periodic context refresh
-      if (wordCount % 10 === 0) {
+      if (wordCount % 5 === 0) {
         currentContext = this.refreshContext(sentence, userInput);
       }
     }
 
-    return this.postProcessSentence(sentence.join(' '));
+    return this.postProcessSentence(sentence.join(' '), userInput);
   }
 
-  private isCoherent(sentence: string[], nextWord: string): boolean {
-    // Implement coherence check (e.g., using n-grams or semantic similarity)
-    // Return true if the next word is coherent with the existing sentence
-    // This is a placeholder implementation
-    return true;
+  private isCoherent(sentence: string[], nextWord: string, userInput: string): boolean {
+    const context = `${userInput} ${sentence.join(' ')} ${nextWord}`;
+    // Implement a basic coherence check (this is a placeholder)
+    const words = context.toLowerCase().split(' ');
+    const uniqueWords = new Set(words);
+    return uniqueWords.size / words.length > 0.5; // Check for word diversity
   }
 
   private refreshContext(sentence: string[], userInput: string): string {
-    // Implement logic to refresh the context, possibly incorporating
-    // the original user input to maintain relevance
-    return userInput + ' ' + sentence.slice(-5).join(' ');
+    // Implement logic to refresh the context, incorporating the original user input
+    return `${userInput} ${sentence.slice(-10).join(' ')}`;
   }
 
-  private postProcessSentence(sentence: string): string {
-    // Implement post-processing logic (e.g., fixing grammar, ensuring proper capitalization)
-    // This is a placeholder implementation
-    return sentence.charAt(0).toUpperCase() + sentence.slice(1) + '.';
+  private postProcessSentence(sentence: string, userInput: string): string {
+    // Implement post-processing logic, possibly considering the original user input
+    sentence = sentence.charAt(0).toUpperCase() + sentence.slice(1);
+    if (!sentence.endsWith('.') && !sentence.endsWith('!') && !sentence.endsWith('?')) {
+      sentence += '.';
+    }
+    // Ensure the sentence relates back to the user input
+    if (!sentence.toLowerCase().includes(userInput.toLowerCase())) {
+      sentence += ` This relates to your question about ${userInput}.`;
+    }
+    return sentence;
   }
 
-  private shouldEndSentence(word: string, currentLength: number, maxLength: number, topicStack: string[], sentimentHistory: number[]): boolean {
-    // Enhanced logic for ending the sentence
+  private shouldEndSentence(word: string, currentLength: number, maxLength: number, topicStack: string[], sentimentHistory: number[], userInput: string): boolean {
+    // Enhanced logic for ending the sentence, considering user input
     if (word.endsWith('.') || word.endsWith('!') || word.endsWith('?')) {
       return true;
     }
@@ -1022,6 +1033,13 @@ class NaturalLanguageProcessor {
       if (sentimentVariance > 0.5) {
         return true;
       }
+    }
+
+    // End if the sentence has covered the main points of the user input
+    const userInputKeywords = this.extractKeywords(userInput.split(' '));
+    const sentenceKeywords = this.extractKeywords([word]);
+    if (userInputKeywords.every(keyword => sentenceKeywords.includes(keyword))) {
+      return true;
     }
 
     const endProbability = Math.min(0.1, currentLength / maxLength);
