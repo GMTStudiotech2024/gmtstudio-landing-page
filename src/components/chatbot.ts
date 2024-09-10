@@ -1756,3 +1756,24 @@ async function processJsonFile(content: string): Promise<string> {
     return "I encountered an error while parsing the JSON file. Please make sure it's valid JSON.";
   }
 }
+
+// Add this new function to calculate and return the model's internal state
+export function getModelCalculations(userInput: string): string {
+  const { intent, entities, keywords, sentiment, topics } = nlp.understandQuery(userInput);
+  const input = encodeInput(userInput);
+  const prediction = network.predict(input);
+
+  let calculations = `Input: "${userInput}"\n\n`;
+  calculations += `Intent: ${intent}\n`;
+  calculations += `Entities: ${JSON.stringify(entities)}\n`;
+  calculations += `Keywords: ${keywords.join(', ')}\n`;
+  calculations += `Sentiment: ${sentiment.score.toFixed(2)} (${sentiment.explanation})\n`;
+  calculations += `Topics: ${topics.join(', ')}\n\n`;
+  calculations += `Neural Network Prediction:\n`;
+  
+  intents.forEach((intent, index) => {
+    calculations += `  ${intent.patterns[0]}: ${(prediction[index] * 100).toFixed(2)}%\n`;
+  });
+
+  return calculations;
+}
