@@ -294,17 +294,7 @@ const ChatBotUI: React.FC = () => {
     </div>
   );
 
-  const toggleFullScreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-      setIsFullScreen(true);
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-        setIsFullScreen(false);
-      }
-    }
-  };
+
 
   const exportConversation = () => {
     const conversationText = messages
@@ -387,7 +377,6 @@ const ChatBotUI: React.FC = () => {
                 <FiCpu />
               </button>
               <button
-                onClick={toggleFullScreen}
                 className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200"
               >
                 {isFullScreen ? <FiMinimize2 /> : <FiMaximize2 />}
@@ -464,24 +453,6 @@ const ChatBotUI: React.FC = () => {
                     </motion.div>
                   ))}
                 </AnimatePresence>
-                {userTyping && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="mb-4 text-right"
-                  >
-                    <span className="inline-flex items-center p-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">
-                      <span className="text-sm">User is typing</span>
-                      <span className="ml-1 inline-flex">
-                        <span className="animate-bounce" style={{ animationDelay: '0s' }}>.</span>
-                        <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
-                        <span className="animate-bounce" style={{ animationDelay: '0.4s' }}>.</span>
-                      </span>
-                    </span>
-                  </motion.div>
-                )}
                 {isLoading && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -519,87 +490,107 @@ const ChatBotUI: React.FC = () => {
                     </div>
                   </div>
                 )}
-                <div className="flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md">
-                  <div className="flex items-center p-2">
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className="p-2 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full"
+                <div className="relative">
+                  {userTyping && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.3 }}
+                      className="absolute bottom-full left-0 mb-2 z-10"
                     >
-                      <FiPaperclip size={24} className="stroke-current stroke-2" />
-                    </button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      onChange={handleFileAttach}
-                      className="hidden"
-                      multiple
-                    />
-                    <div className="flex-1 flex flex-col bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
-                      <div className="flex items-center overflow-x-auto">
-                        {attachedFiles.length > 0 && (
-                          <div className="flex items-center px-2 space-x-2 flex-shrink-0">
-                            {attachedFiles.map((file, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center bg-gray-100 dark:bg-gray-700 px-2 py-1 text-sm rounded-full"
-                              >
-                                <span className="text-gray-500 dark:text-gray-400 mr-1">
-                                  {getFileIcon(file)}
-                                </span>
-                                <span className="text-gray-600 dark:text-gray-300 truncate max-w-[120px]">
-                                  {file.name}
-                                </span>
-                                <button
-                                  onClick={() => clearAttachedFile(index)}
-                                  className="ml-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-200"
-                                >
-                                  <FiX size={12} />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <textarea
-                        value={input}
-                        onChange={(e) => {
-                          setInput(e.target.value.slice(0, 1000));
-                          setUserTyping(true);
-                          setTimeout(() => setUserTyping(false), 1000);
-                        }}
-                        onKeyPress={handleKeyPress}
-                        placeholder={attachedFiles.length > 0 ? "Add a message or send files..." : "Type your message..."}
-                        className={`flex-1 p-2 bg-transparent text-gray-800 dark:text-white focus:outline-none resize-none max-h-32 min-h-[40px] ${
-                          input.length > 1000 ? 'border-red-500' : ''
-                        }`}
-                        rows={1}
-                      />
-                      <div className="flex justify-between items-center px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
-                        <span className={input.length > 1000 ? 'text-red-500' : ''}>{input.length}/1000 characters</span>
-                      </div>
-                    </div>
-                    <div className="relative">
+                      <span className="inline-flex items-center p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white text-sm">
+                        <span>User is typing</span>
+                        <span className="ml-1 inline-flex">
+                          <span className="animate-bounce" style={{ animationDelay: '0s' }}>.</span>
+                          <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
+                          <span className="animate-bounce" style={{ animationDelay: '0.4s' }}>.</span>
+                        </span>
+                      </span>
+                    </motion.div>
+                  )}
+                  <div className="flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                    <div className="flex items-center p-2">
                       <button
-                        onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
-                        className={`p-2 mr-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
-                          isRecording ? 'text-red-500' : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
-                        }`}
+                        onClick={() => fileInputRef.current?.click()}
+                        className="p-2 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full"
                       >
-                        <FiMic size={24} className="stroke-current stroke-2" />
+                        <FiPaperclip size={24} className="stroke-current stroke-2" />
                       </button>
-                      {showVoiceRecorder && renderVoiceRecorder()}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        onChange={handleFileAttach}
+                        className="hidden"
+                        multiple
+                      />
+                      <div className="flex-1 flex flex-col bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+                        <div className="flex items-center overflow-x-auto">
+                          {attachedFiles.length > 0 && (
+                            <div className="flex items-center px-2 space-x-2 flex-shrink-0">
+                              {attachedFiles.map((file, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center bg-gray-100 dark:bg-gray-700 px-2 py-1 text-sm rounded-full"
+                                >
+                                  <span className="text-gray-500 dark:text-gray-400 mr-1">
+                                    {getFileIcon(file)}
+                                  </span>
+                                  <span className="text-gray-600 dark:text-gray-300 truncate max-w-[120px]">
+                                    {file.name}
+                                  </span>
+                                  <button
+                                    onClick={() => clearAttachedFile(index)}
+                                    className="ml-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-200"
+                                  >
+                                    <FiX size={12} />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <textarea
+                          value={input}
+                          onChange={(e) => {
+                            setInput(e.target.value.slice(0, 1000));
+                            setUserTyping(true);
+                            setTimeout(() => setUserTyping(false), 1000);
+                          }}
+                          onKeyPress={handleKeyPress}
+                          placeholder={attachedFiles.length > 0 ? "Add a message or send files..." : "Type your message..."}
+                          className={`flex-1 p-2 bg-transparent text-gray-800 dark:text-white focus:outline-none resize-none max-h-32 min-h-[40px] ${
+                            input.length > 1000 ? 'border-red-500' : ''
+                          }`}
+                          rows={1}
+                        />
+                        <div className="flex justify-between items-center px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
+                          <span className={input.length > 1000 ? 'text-red-500' : ''}>{input.length}/1000 characters</span>
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
+                          className={`p-2 mr-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
+                            isRecording ? 'text-red-500' : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+                          }`}
+                        >
+                          <FiMic size={24} className="stroke-current stroke-2" />
+                        </button>
+                        {showVoiceRecorder && renderVoiceRecorder()}
+                      </div>
+                      <button
+                        onClick={handleSend}
+                        className={`p-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
+                          isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000
+                            ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                            : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+                        }`}
+                        disabled={isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000}
+                      >
+                        <FiSend size={24} className="stroke-current stroke-2" />
+                      </button>
                     </div>
-                    <button
-                      onClick={handleSend}
-                      className={`p-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
-                        isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000
-                          ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
-                          : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
-                      }`}
-                      disabled={isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000}
-                    >
-                      <FiSend size={24} className="stroke-current stroke-2" />
-                    </button>
                   </div>
                 </div>
               </div>
