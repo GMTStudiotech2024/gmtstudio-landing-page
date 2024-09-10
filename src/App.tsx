@@ -14,7 +14,6 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Analytics } from '@vercel/analytics/react';
 import './components/st.css';
-import CustomCursor from './components/CustomCursor';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import Sidebar from './components/Sidebar';
 import SignUp from './components/SignUp';
@@ -43,6 +42,7 @@ import SystemStatus from './components/SystemStatus';
 import AdvancedSearch from './components/AdvancedSearch';
 import Login from './components/Login';
 import AIWebsiteGenerator from './components/AIWebsiteGenerator';
+import CustomCursor from './components/CustomCursor';
 const AppContent: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -73,7 +73,7 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="App bg-gray-900 min-h-screen flex flex-col">
-      <CustomCursor />
+      <CustomCursor isDarkMode={true} />
       <Navbar onSearchClick={toggleSearch} />
       {!isHomePage && (
         <Sidebar 

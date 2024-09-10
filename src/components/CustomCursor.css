@@ -12,6 +12,7 @@
   left: -6px;
   top: -6px;
   backdrop-filter: blur(2px);
+  cursor: none;
 }
 
 .custom-cursor::after {

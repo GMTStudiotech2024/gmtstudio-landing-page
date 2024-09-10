@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import './CustomCursor.css';
 
-const CustomCursor: React.FC = () => {
+interface CustomCursorProps {
+  isDarkMode: boolean;
+}
+
+const CustomCursor: React.FC<CustomCursorProps> = ({ isDarkMode }) => {
   const [cursorState, setCursorState] = useState({
     click: false,
     hover: false,
@@ -9,7 +13,7 @@ const CustomCursor: React.FC = () => {
     cursorButton: false,
   });
   const cursorRef = useRef<HTMLDivElement>(null);
-
+  
   const updateCursorState = useCallback((newState: Partial<typeof cursorState>) => {
     setCursorState(prevState => ({ ...prevState, ...newState }));
   }, []);
@@ -45,6 +49,10 @@ const CustomCursor: React.FC = () => {
     };
   }, [moveCursor, handleMouseInteraction, updateCursorState]);
 
+  const cursorColor = isDarkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)';
+  const cursorBorderColor = isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)';
+  
+
   const cursorClasses = [
     'custom-cursor',
     cursorState.click && 'click',
@@ -53,7 +61,17 @@ const CustomCursor: React.FC = () => {
     cursorState.cursorButton && 'cursor-button',
   ].filter(Boolean).join(' ');
 
-  return <div ref={cursorRef} className={cursorClasses} style={{ pointerEvents: 'none' }} />;
+  return (
+    <div 
+      ref={cursorRef} 
+      className={cursorClasses} 
+      style={{ 
+        pointerEvents: 'none',
+        backgroundColor: cursorColor,
+        borderColor: cursorBorderColor
+      }} 
+    />
+  );
 };
 
 export default CustomCursor;
