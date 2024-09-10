@@ -49,9 +49,9 @@ const CustomCursor: React.FC<CustomCursorProps> = ({ isDarkMode }) => {
     };
   }, [moveCursor, handleMouseInteraction, updateCursorState]);
 
-  const cursorColor = isDarkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)';
+  const cursorColor = isDarkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' ;
   const cursorBorderColor = isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)';
-  
+
 
   const cursorClasses = [
     'custom-cursor',
