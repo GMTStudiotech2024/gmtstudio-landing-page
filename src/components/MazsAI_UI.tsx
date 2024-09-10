@@ -371,7 +371,7 @@ const ChatBotUI: React.FC = () => {
               <div className="w-1/3 ml-4 flex flex-col">
                 <div className="flex-1 overflow-hidden mb-4 rounded-lg bg-gray-900 shadow-inner transition-all duration-200">
                   <div className="flex items-center justify-between bg-gray-800 px-4 py-2">
-                    <h2 className="text-lg font-semibold text-white">Model Calculations</h2>
+                    <h2 className="text-lg font-semibold text-white">Neural Network Calculations</h2>
                     <button
                       onClick={() => setShowCalculations(false)}
                       className="text-gray-400 hover:text-white transition-colors duration-200"
