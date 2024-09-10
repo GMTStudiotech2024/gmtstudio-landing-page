@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiCpu, FiRepeat } from 'react-icons/fi';
+import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiCpu, FiRepeat, FiMic, FiCopy, FiArrowDown, FiMinimize2, FiMaximize2, FiDownload, FiUpload } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, getModelCalculations, regenerateResponse } from './chatbot';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -29,6 +29,13 @@ const ChatBotUI: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showCalculations, setShowCalculations] = useState(false);
   const [calculations, setCalculations] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const [userTyping, setUserTyping] = useState(false);
+  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(true);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [selectedMessageIndex, setSelectedMessageIndex] = useState<number | null>(null);
 
   useEffect(() => {
     setSuggestions(getConversationSuggestions());
@@ -53,6 +60,25 @@ const ChatBotUI: React.FC = () => {
     }
   };
 
+  const handleScroll = () => {
+    if (chatContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+      setIsScrolledToBottom(scrollHeight - scrollTop === clientHeight);
+    }
+  };
+
+  useEffect(() => {
+    const chatContainer = chatContainerRef.current;
+    if (chatContainer) {
+      chatContainer.addEventListener('scroll', handleScroll);
+    }
+    return () => {
+      if (chatContainer) {
+        chatContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);
+
   const addWelcomeMessage = () => {
     const welcomeMessage: Message = {
       text: "Hello! I'm Mazs AI v1.1 Anatra. I can help you with some basic tasks. How can I assist you today? although my Nerual network structure is not yet well designed, but i will try my best to help you  ",
@@ -63,7 +89,7 @@ const ChatBotUI: React.FC = () => {
   };
 
   const handleSend = async () => {
-    if (isGenerating || (!input.trim() && attachedFiles.length === 0)) {
+    if (isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000) {
       return;
     }
 
@@ -229,6 +255,106 @@ const ChatBotUI: React.FC = () => {
     }).join('\n');
   };
 
+  const handleVoiceInput = () => {
+    setIsRecording(!isRecording);
+    // Implement voice recognition logic here
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    // Optionally, show a toast notification
+  };
+
+  const scrollToBottomButton = () => (
+    <button
+      onClick={scrollToBottom}
+      className={`fixed bottom-24 right-8 p-2 bg-blue-500 text-white rounded-full shadow-lg transition-opacity duration-300 ${
+        isScrolledToBottom ? 'opacity-0' : 'opacity-100'
+      }`}
+    >
+      <FiArrowDown size={24} />
+    </button>
+  );
+
+  const renderVoiceRecorder = () => (
+    <div className="absolute bottom-full mb-2 bg-white dark:bg-gray-700 rounded-lg shadow-lg p-4">
+      <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+        {isRecording ? 'Recording...' : 'Click to start recording'}
+      </p>
+      <button
+        onClick={handleVoiceInput}
+        className={`p-4 rounded-full ${
+          isRecording
+            ? 'bg-red-500 animate-pulse'
+            : 'bg-blue-500 hover:bg-blue-600'
+        } text-white transition-colors duration-200`}
+      >
+        <FiMic size={24} />
+      </button>
+    </div>
+  );
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullScreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        setIsFullScreen(false);
+      }
+    }
+  };
+
+  const exportConversation = () => {
+    const conversationText = messages
+      .map((msg) => `${msg.isUser ? 'User' : 'AI'}: ${msg.text}`)
+      .join('\n\n');
+    const blob = new Blob([conversationText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'conversation.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importConversation = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        const importedMessages = content.split('\n\n').map((msg) => {
+          const [sender, text] = msg.split(': ');
+          return {
+            text,
+            isUser: sender === 'User',
+            timestamp: new Date(),
+          };
+        });
+        setMessages(importedMessages);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleMessageContextMenu = (event: React.MouseEvent, index: number) => {
+    event.preventDefault();
+    setSelectedMessageIndex(index);
+    setShowContextMenu(true);
+  };
+
+  const closeContextMenu = () => {
+    setShowContextMenu(false);
+    setSelectedMessageIndex(null);
+  };
+
+  const deleteMessage = (index: number) => {
+    setMessages((prevMessages) => prevMessages.filter((_, i) => i !== index));
+    closeContextMenu();
+  };
+
   return (
     <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''}`}>
       <div className="flex-1 bg-gray-100 dark:bg-gray-900 transition-colors duration-200 overflow-hidden pt-20">
@@ -260,6 +386,22 @@ const ChatBotUI: React.FC = () => {
               >
                 <FiCpu />
               </button>
+              <button
+                onClick={toggleFullScreen}
+                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200"
+              >
+                {isFullScreen ? <FiMinimize2 /> : <FiMaximize2 />}
+              </button>
+              <button
+                onClick={exportConversation}
+                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200"
+              >
+                <FiDownload />
+              </button>
+              <label className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 cursor-pointer">
+                <FiUpload />
+                <input type="file" className="hidden" onChange={importConversation} accept=".txt" />
+              </label>
             </div>
           </div>
           {showInfo && (
@@ -282,6 +424,7 @@ const ChatBotUI: React.FC = () => {
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.3 }}
                       className={`mb-4 ${message.isUser ? 'text-right' : 'text-left'}`}
+                      onContextMenu={(e) => handleMessageContextMenu(e, index)}
                     >
                       <div className={`inline-block max-w-[80%] sm:max-w-[70%] md:max-w-[60%]`}>
                         <div className={`p-3 rounded-lg ${
@@ -292,46 +435,72 @@ const ChatBotUI: React.FC = () => {
                           {message.isUser || !message.isTyping
                             ? message.text
                             : message.text.slice(0, currentTypingIndex)}
-                          {!message.isUser && message.isTyping && (
-                            <span className="inline-block w-1 h-4 ml-1 bg-gray-800 dark:bg-white animate-blink"></span>
-                          )}
+                          {!message.isUser && message.isTyping &&                            <span className="inline-block w-1 h-4 ml-1 bg-gray-800 dark:bg-white animate-blink"></span>
+                          }
                         </div>
                         <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-center justify-between">
                           <span>{message.timestamp.toLocaleTimeString()}</span>
                           {!message.isUser && (
-                            <button
-                              onClick={() => regenerateResponseHandler(index)}
-                              className="ml-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
-                              title="Regenerate response"
-                              disabled={isGenerating}
-                            >
-                              <FiRepeat size={12} className={isGenerating ? 'animate-spin' : ''} />
-                            </button>
+                            <div className="flex items-center">
+                              <button
+                                onClick={() => copyToClipboard(message.text)}
+                                className="mr-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                                title="Copy to clipboard"
+                              >
+                                <FiCopy size={12} />
+                              </button>
+                              <button
+                                onClick={() => regenerateResponseHandler(index)}
+                                className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                                title="Regenerate response"
+                                disabled={isGenerating}
+                              >
+                                <FiRepeat size={12} className={isGenerating ? 'animate-spin' : ''} />
+                              </button>
+                            </div>
                           )}
                         </div>
                       </div>
                     </motion.div>
                   ))}
-                  {isLoading && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.3 }}
-                      className="mb-4 text-left"
-                    >
-                      <span className="inline-flex items-center p-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">
-                        <FiLoader className="animate-spin mr-2" />
-                        <span className="text-sm">Mazs AI v1.1 Anatra is thinking</span>
-                        <span className="ml-1 inline-flex">
-                          <span className="animate-bounce" style={{ animationDelay: '0s' }}>.</span>
-                          <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
-                          <span className="animate-bounce" style={{ animationDelay: '0.4s' }}>.</span>
-                        </span>
-                      </span>
-                    </motion.div>
-                  )}
                 </AnimatePresence>
+                {userTyping && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="mb-4 text-right"
+                  >
+                    <span className="inline-flex items-center p-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">
+                      <span className="text-sm">User is typing</span>
+                      <span className="ml-1 inline-flex">
+                        <span className="animate-bounce" style={{ animationDelay: '0s' }}>.</span>
+                        <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
+                        <span className="animate-bounce" style={{ animationDelay: '0.4s' }}>.</span>
+                      </span>
+                    </span>
+                  </motion.div>
+                )}
+                {isLoading && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="mb-4 text-left"
+                  >
+                    <span className="inline-flex items-center p-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">
+                      <FiLoader className="animate-spin mr-2" />
+                      <span className="text-sm">Mazs AI v1.1 Anatra is thinking</span>
+                      <span className="ml-1 inline-flex">
+                        <span className="animate-bounce" style={{ animationDelay: '0s' }}>.</span>
+                        <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
+                        <span className="animate-bounce" style={{ animationDelay: '0.4s' }}>.</span>
+                      </span>
+                    </span>
+                  </motion.div>
+                )}
               </div>
               <div className="mt-auto">
                 {suggestions.length > 0 && messages.length === 1 && (
@@ -365,47 +534,69 @@ const ChatBotUI: React.FC = () => {
                       className="hidden"
                       multiple
                     />
-                    <div className="flex-1 flex items-center bg-white dark:bg-gray-800 rounded-lg overflow-x-auto">
-                      {attachedFiles.length > 0 && (
-                        <div className="flex items-center px-2 space-x-2 flex-shrink-0">
-                          {attachedFiles.map((file, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center bg-gray-100 dark:bg-gray-700 px-2 py-1 text-sm"
-                            >
-                              <span className="text-gray-500 dark:text-gray-400 mr-1">
-                                {getFileIcon(file)}
-                              </span>
-                              <span className="text-gray-600 dark:text-gray-300 truncate max-w-[120px]">
-                                {file.name}
-                              </span>
-                              <button
-                                onClick={() => clearAttachedFile(index)}
-                                className="ml-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-200"
+                    <div className="flex-1 flex flex-col bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+                      <div className="flex items-center overflow-x-auto">
+                        {attachedFiles.length > 0 && (
+                          <div className="flex items-center px-2 space-x-2 flex-shrink-0">
+                            {attachedFiles.map((file, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center bg-gray-100 dark:bg-gray-700 px-2 py-1 text-sm rounded-full"
                               >
-                                <FiX size={12} />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                                <span className="text-gray-500 dark:text-gray-400 mr-1">
+                                  {getFileIcon(file)}
+                                </span>
+                                <span className="text-gray-600 dark:text-gray-300 truncate max-w-[120px]">
+                                  {file.name}
+                                </span>
+                                <button
+                                  onClick={() => clearAttachedFile(index)}
+                                  className="ml-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-200"
+                                >
+                                  <FiX size={12} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                       <textarea
                         value={input}
-                        onChange={(e) => setInput(e.target.value)}
+                        onChange={(e) => {
+                          setInput(e.target.value.slice(0, 1000));
+                          setUserTyping(true);
+                          setTimeout(() => setUserTyping(false), 1000);
+                        }}
                         onKeyPress={handleKeyPress}
                         placeholder={attachedFiles.length > 0 ? "Add a message or send files..." : "Type your message..."}
-                        className="flex-1 p-2 bg-transparent text-gray-800 dark:text-white focus:outline-none resize-none max-h-32 min-h-[40px]"
+                        className={`flex-1 p-2 bg-transparent text-gray-800 dark:text-white focus:outline-none resize-none max-h-32 min-h-[40px] ${
+                          input.length > 1000 ? 'border-red-500' : ''
+                        }`}
                         rows={1}
                       />
+                      <div className="flex justify-between items-center px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
+                        <span className={input.length > 1000 ? 'text-red-500' : ''}>{input.length}/1000 characters</span>
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
+                        className={`p-2 mr-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
+                          isRecording ? 'text-red-500' : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+                        }`}
+                      >
+                        <FiMic size={24} className="stroke-current stroke-2" />
+                      </button>
+                      {showVoiceRecorder && renderVoiceRecorder()}
                     </div>
                     <button
                       onClick={handleSend}
                       className={`p-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
-                        isGenerating || (!input.trim() && attachedFiles.length === 0)
+                        isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000
                           ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
                           : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
                       }`}
-                      disabled={isGenerating || (!input.trim() && attachedFiles.length === 0)}
+                      disabled={isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000}
                     >
                       <FiSend size={24} className="stroke-current stroke-2" />
                     </button>
@@ -445,6 +636,26 @@ const ChatBotUI: React.FC = () => {
           </div>
         </div>
       </div>
+      {scrollToBottomButton()}
+      {showContextMenu && selectedMessageIndex !== null && (
+        <div
+          className="fixed bg-white dark:bg-gray-800 shadow-lg rounded-lg p-2"
+          style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+        >
+          <button
+            onClick={() => deleteMessage(selectedMessageIndex)}
+            className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            Delete Message
+          </button>
+          <button
+            onClick={closeContextMenu}
+            className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
 };
