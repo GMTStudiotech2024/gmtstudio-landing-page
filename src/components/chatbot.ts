@@ -61,8 +61,16 @@ class MultilayerPerceptron {
     }
   }
 
+  // Add a method for batch normalization
+  private batchNormalize(layer: number[]): number[] {
+    const mean = layer.reduce((sum, val) => sum + val, 0) / layer.length;
+    const variance = layer.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / layer.length;
+    return layer.map(val => (val - mean) / Math.sqrt(variance + 1e-8));
+  }
+
+  // Modify the predict method to include batch normalization
   predict(input: number[]): number[] {
-    let activation = input;
+    let activation = this.batchNormalize(input);
     for (let i = 0; i < this.weights.length; i++) {
       const currentActivation = activation;
       let newActivation = [];
@@ -70,12 +78,18 @@ class MultilayerPerceptron {
         const sum = this.weights[i][j].reduce((sum, weight, k) => sum + weight * currentActivation[k], 0) + this.biases[i][j];
         newActivation.push(this.activations[i](sum));
       }
-      activation = newActivation;
+      activation = this.batchNormalize(newActivation);
     }
     return activation;
   }
 
-  train(input: number[], target: number[], learningRate: number = 0.1, momentum: number = 0.9) {
+  // Add a method for dropout regularization
+  private applyDropout(layer: number[], rate: number): number[] {
+    return layer.map(val => Math.random() > rate ? val / (1 - rate) : 0);
+  }
+
+  // Modify the train method to include dropout
+  train(input: number[], target: number[], learningRate: number = 0.1, momentum: number = 0.9, dropoutRate: number = 0.2) {
     // Forward pass
     let activations: number[][] = [input];
     let weightedSums: number[][] = [];
@@ -111,6 +125,7 @@ class MultilayerPerceptron {
     let previousBiasChanges: number[][] = this.biases.map(layer => layer.map(() => 0));
 
     for (let i = 0; i < this.weights.length; i++) {
+      activations[i] = this.applyDropout(activations[i], dropoutRate);
       for (let j = 0; j < this.weights[i].length; j++) {
         for (let k = 0; k < this.weights[i][j].length; k++) {
           const weightChange = learningRate * deltas[i][j] * activations[i][k] + momentum * previousWeightChanges[i][j][k];
@@ -124,8 +139,17 @@ class MultilayerPerceptron {
     }
   }
 
-  // Add a new method for batch training
-  batchTrain(inputs: number[][], targets: number[][], learningRate: number = 0.1, batchSize: number = 32) {
+  // Add a method for L2 regularization
+  private applyL2Regularization(weights: number[][][], lambda: number, learningRate: number): number[][][] {
+    return weights.map(layer => 
+      layer.map(neuron => 
+        neuron.map(weight => weight * (1 - lambda * learningRate))
+      )
+    );
+  }
+
+  // Modify the batchTrain method to include L2 regularization
+  batchTrain(inputs: number[][], targets: number[][], learningRate: number = 0.1, batchSize: number = 32, lambda: number = 0.01) {
     for (let i = 0; i < inputs.length; i += batchSize) {
       const batchInputs = inputs.slice(i, i + batchSize);
       const batchTargets = targets.slice(i, i + batchSize);
@@ -159,6 +183,8 @@ class MultilayerPerceptron {
         layer.map((bias, n) => bias - batchLearningRate * biasGradients[l][n])
       );
     }
+
+    this.weights = this.applyL2Regularization(this.weights, lambda, learningRate);
   }
 
   // Helper method for backpropagation
@@ -225,15 +251,15 @@ class NaturalLanguageProcessor {
   private meaningSpace: Map<string, number[]>;
   private encoder: MultilayerPerceptron;
   private decoder: MultilayerPerceptron;
-  private gan: GAN;
-  private rlAgent: RLAgent;
+  public gan: GAN;
+  public rlAgent: RLAgent;
   private conversationContext: string = '';
   private contextWindow: string[] = [];
   private maxContextWindowSize: number = 10;
   private topicKeywords: Set<string> = new Set();
   private wordProbabilities: Map<string, Map<string, number>>;
 
-  constructor() {
+  constructor(trainingData?: number[][]) {
     this.vocabulary = new Set();
     this.wordFrequency = new Map();
     this.bigramFrequency = new Map();
@@ -246,7 +272,7 @@ class NaturalLanguageProcessor {
     this.meaningSpace = new Map();
     this.encoder = new MultilayerPerceptron([100, 32, 64, 32, 100], ['relu', 'relu', 'relu', 'sigmoid']);
     this.decoder = new MultilayerPerceptron([100, 32, 64, 32, 100], ['relu', 'relu', 'relu', 'sigmoid']);
-    this.gan = new GAN();
+    this.gan = new GAN(trainingData || this.generateDummyData());
     this.rlAgent = new RLAgent();
     this.wordProbabilities = new Map();
     
@@ -395,6 +421,10 @@ class NaturalLanguageProcessor {
         "That's a thought-provoking question! I'd love to discuss it in more detail."
       ]]
     ]);
+  }
+
+  private generateDummyData(): number[][] {
+    return Array.from({ length: 100 }, () => Array.from({ length: 100 }, () => Math.random()));
   }
 
   trainOnText(text: string) {
@@ -1056,35 +1086,122 @@ class NaturalLanguageProcessor {
 class GAN {
   private generator: MultilayerPerceptron;
   private discriminator: MultilayerPerceptron;
+  private latentDim: number = 100;
+  private realData: number[][];
 
-  constructor() {
-    this.generator = new MultilayerPerceptron([32, 64, 32]);
-    this.discriminator = new MultilayerPerceptron([32, 64, 1]);
+  constructor(realData: number[][]) {
+    this.realData = realData;
+    this.generator = new MultilayerPerceptron([this.latentDim, 256, 512, 256, 100], ['relu', 'relu', 'relu', 'tanh']);
+    this.discriminator = new MultilayerPerceptron([100, 256, 512, 256, 1], ['relu', 'relu', 'relu', 'sigmoid']);
   }
 
   refine(meaningVector: number[]): number[] {
-    // Implement GAN refinement logic
-    // This is a placeholder implementation
-    return this.generator.predict(meaningVector);
+    const noise = Array.from({ length: this.latentDim }, () => Math.random() * 2 - 1);
+    const generatedVector = this.generator.predict([...noise, ...meaningVector]);
+    return generatedVector;
   }
 
-  // Add methods for training the GAN
+  train(realData: number[][], epochs: number = 100, batchSize: number = 32) {
+    for (let epoch = 0; epoch < epochs; epoch++) {
+      // Train discriminator
+      const realBatch = this.getBatch(realData, batchSize);
+      const fakeBatch = this.generateFakeBatch(batchSize);
+      
+      realBatch.forEach(real => {
+        this.discriminator.train(real, [1], 0.0002);
+      });
+      
+      fakeBatch.forEach(fake => {
+        this.discriminator.train(fake, [0], 0.0002);
+      });
+
+      // Train generator
+      const noise = this.generateNoise(batchSize);
+      noise.forEach(n => {
+        const fake = this.generator.predict(n);
+        this.generator.train(n, this.discriminator.predict(fake), 0.0002);
+      });
+
+      if (epoch % 10 === 0) {
+        console.log(`GAN Epoch ${epoch}: G Loss: ${this.generatorLoss()}, D Loss: ${this.discriminatorLoss()}`);
+      }
+    }
+  }
+
+  private getBatch(data: number[][], batchSize: number): number[][] {
+    const batch = [];
+    for (let i = 0; i < batchSize; i++) {
+      const index = Math.floor(Math.random() * data.length);
+      batch.push(data[index]);
+    }
+    return batch;
+  }
+
+  private generateFakeBatch(batchSize: number): number[][] {
+    return this.generateNoise(batchSize).map(noise => this.generator.predict(noise));
+  }
+
+  private generateNoise(batchSize: number): number[][] {
+    return Array.from({ length: batchSize }, () => 
+      Array.from({ length: this.latentDim }, () => Math.random() * 2 - 1)
+    );
+  }
+
+  private generatorLoss(): number {
+    const fakeBatch = this.generateFakeBatch(32);
+    return fakeBatch.reduce((loss, fake) => {
+      const discriminatorOutput = this.discriminator.predict(fake)[0];
+      return loss - Math.log(discriminatorOutput);
+    }, 0) / 32;
+  }
+
+  private discriminatorLoss(): number {
+    const realBatch = this.getBatch(this.realData, 32);
+    const fakeBatch = this.generateFakeBatch(32);
+    
+    const realLoss = realBatch.reduce((loss, real) => {
+      const discriminatorOutput = this.discriminator.predict(real)[0];
+      return loss - Math.log(discriminatorOutput);
+    }, 0) / 32;
+
+    const fakeLoss = fakeBatch.reduce((loss, fake) => {
+      const discriminatorOutput = this.discriminator.predict(fake)[0];
+      return loss - Math.log(1 - discriminatorOutput);
+    }, 0) / 32;
+
+    return (realLoss + fakeLoss) / 2;
+  }
 }
 
 class RLAgent {
   private policy: MultilayerPerceptron;
+  private valueNetwork: MultilayerPerceptron;
+  private gamma: number = 0.99;
+  private epsilon: number = 0.1;
 
   constructor() {
-    this.policy = new MultilayerPerceptron([32, 64, 32]);
+    this.policy = new MultilayerPerceptron([100, 256, 512, 256, 100], ['relu', 'relu', 'relu', 'tanh']);
+    this.valueNetwork = new MultilayerPerceptron([100, 256, 512, 256, 1], ['relu', 'relu', 'relu', 'linear']);
   }
 
-  improve(meaningVector: number[], context: any): number[] {
-    // Implement RL improvement logic
-    // This is a placeholder implementation
-    return this.policy.predict(meaningVector);
+  improve(state: number[], context: any): number[] {
+    if (Math.random() < this.epsilon) {
+      return state.map(() => Math.random() * 2 - 1);
+    } else {
+      return this.policy.predict(state);
+    }
   }
 
-  // Add methods for training the RL agent
+  train(experiences: { state: number[], action: number[], reward: number, nextState: number[] }[]) {
+    experiences.forEach(exp => {
+      const targetValue = exp.reward + this.gamma * this.valueNetwork.predict(exp.nextState)[0];
+      const currentValue = this.valueNetwork.predict(exp.state)[0];
+      const advantage = targetValue - currentValue;
+
+      this.valueNetwork.train(exp.state, [targetValue], 0.001);
+      this.policy.train(exp.state, exp.action.map(a => a * advantage), 0.001);
+    });
+  }
 }
 
 export function processChatbotQuery(query: string): string {
@@ -1108,6 +1225,24 @@ export function processChatbotQuery(query: string): string {
       const contextSentence = nlp.generateComplexSentence(keywords[0] || response.split(' ')[0], query, 500);
       response += " " + contextSentence;
     }
+
+    // Use GAN to refine the response
+    const responseVector = nlp.encodeToMeaningSpace(response);
+    const refinedVector = nlp.gan.refine(responseVector);
+    const refinedResponse = nlp.decodeFromMeaningSpace(refinedVector);
+
+    // Use RL agent to improve the response
+    const improvedVector = nlp.rlAgent.improve(refinedVector, {
+      intent,
+      entities,
+      keywords,
+      sentiment,
+      topics
+    });
+    const improvedResponse = nlp.decodeFromMeaningSpace(improvedVector);
+
+    // Combine the original, refined, and improved responses
+    response = `${response} ${refinedResponse} ${improvedResponse}`;
 
     if (query.split(' ').length > 3) {
       if (sentiment.score < -0.5) {
