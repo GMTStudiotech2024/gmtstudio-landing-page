@@ -9,13 +9,21 @@ class MultilayerPerceptron {
   private biases: number[][];
   private activations: ((x: number) => number)[];
   private activationDerivatives: ((x: number) => number)[];
+  private optimizer: Optimizer;
+  private learningRate: number;
+  private batchSize: number;
+  private epochs: number;
 
-  constructor(layers: number[], activations: string[] = []) {
+  constructor(layers: number[], activations: string[] = [], learningRate: number = 0.001, batchSize: number = 32, epochs: number = 100) {
     this.layers = layers;
     this.weights = [];
     this.biases = [];
     this.activations = [];
     this.activationDerivatives = [];
+    this.learningRate = learningRate;
+    this.batchSize = batchSize;
+    this.epochs = epochs;
+    this.optimizer = new AdamOptimizer(learningRate);
 
     for (let i = 1; i < layers.length; i++) {
       this.weights.push(Array(layers[i]).fill(0).map(() => 
@@ -23,7 +31,7 @@ class MultilayerPerceptron {
       ));
       this.biases.push(Array(layers[i]).fill(0).map(() => this.initializeWeight()));
       
-      const activation = activations[i - 1] || 'sigmoid';
+      const activation = activations[i - 1] || 'relu';
       this.activations.push(this.getActivationFunction(activation));
       this.activationDerivatives.push(this.getActivationDerivative(activation));
     }
@@ -41,7 +49,7 @@ class MultilayerPerceptron {
       case 'relu': return (x: number) => Math.max(0, x);
       case 'tanh': return (x: number) => Math.tanh(x);
       case 'leaky_relu': return (x: number) => x > 0 ? x : 0.01 * x;
-      default: return (x: number) => 1 / (1 + Math.exp(-x)); // default to sigmoid
+      default: return (x: number) => Math.max(0, x); // default to relu
     }
   }
 
@@ -54,10 +62,7 @@ class MultilayerPerceptron {
       case 'relu': return (x: number) => x > 0 ? 1 : 0;
       case 'tanh': return (x: number) => 1 - Math.pow(Math.tanh(x), 2);
       case 'leaky_relu': return (x: number) => x > 0 ? 1 : 0.01;
-      default: return (x: number) => {
-        const s = 1 / (1 + Math.exp(-x));
-        return s * (1 - s);
-      };
+      default: return (x: number) => x > 0 ? 1 : 0; // default to relu
     }
   }
 
@@ -66,6 +71,11 @@ class MultilayerPerceptron {
     const mean = layer.reduce((sum, val) => sum + val, 0) / layer.length;
     const variance = layer.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / layer.length;
     return layer.map(val => (val - mean) / Math.sqrt(variance + 1e-8));
+  }
+
+  // Add a method for dropout regularization
+  private applyDropout(layer: number[], rate: number): number[] {
+    return layer.map(val => Math.random() > rate ? val / (1 - rate) : 0);
   }
 
   // Modify the predict method to include batch normalization
@@ -83,13 +93,8 @@ class MultilayerPerceptron {
     return activation;
   }
 
-  // Add a method for dropout regularization
-  private applyDropout(layer: number[], rate: number): number[] {
-    return layer.map(val => Math.random() > rate ? val / (1 - rate) : 0);
-  }
-
-  // Modify the train method to include dropout
-  train(input: number[], target: number[], learningRate: number = 0.1, momentum: number = 0.9, dropoutRate: number = 0.2) {
+  // Modify the train method to include dropout and advanced optimizers
+  train(input: number[], target: number[], learningRate: number = 0.001, momentum: number = 0.9, dropoutRate: number = 0.2) {
     // Forward pass
     let activations: number[][] = [input];
     let weightedSums: number[][] = [];
@@ -120,23 +125,8 @@ class MultilayerPerceptron {
       deltas.unshift(layerDelta);
     }
 
-    // Update weights and biases with momentum
-    let previousWeightChanges: number[][][] = this.weights.map(layer => layer.map(neuron => neuron.map(() => 0)));
-    let previousBiasChanges: number[][] = this.biases.map(layer => layer.map(() => 0));
-
-    for (let i = 0; i < this.weights.length; i++) {
-      activations[i] = this.applyDropout(activations[i], dropoutRate);
-      for (let j = 0; j < this.weights[i].length; j++) {
-        for (let k = 0; k < this.weights[i][j].length; k++) {
-          const weightChange = learningRate * deltas[i][j] * activations[i][k] + momentum * previousWeightChanges[i][j][k];
-          this.weights[i][j][k] -= weightChange;
-          previousWeightChanges[i][j][k] = weightChange;
-        }
-        const biasChange = learningRate * deltas[i][j] + momentum * previousBiasChanges[i][j];
-        this.biases[i][j] -= biasChange;
-        previousBiasChanges[i][j] = biasChange;
-      }
-    }
+    // Update weights and biases with advanced optimizer
+    this.optimizer.update(this.weights, this.biases, activations, deltas, learningRate, momentum, dropoutRate);
   }
 
   // Add a method for L2 regularization
@@ -149,7 +139,7 @@ class MultilayerPerceptron {
   }
 
   // Modify the batchTrain method to include L2 regularization
-  batchTrain(inputs: number[][], targets: number[][], learningRate: number = 0.1, batchSize: number = 32, lambda: number = 0.01) {
+  batchTrain(inputs: number[][], targets: number[][], learningRate: number = 0.001, batchSize: number = 32, lambda: number = 0.01) {
     for (let i = 0; i < inputs.length; i += batchSize) {
       const batchInputs = inputs.slice(i, i + batchSize);
       const batchTargets = targets.slice(i, i + batchSize);
@@ -229,6 +219,57 @@ class MultilayerPerceptron {
     let biasGradients = deltas;
 
     return [gradients, biasGradients];
+  }
+}
+
+// Optimizer classes
+class Optimizer {
+  update(weights: number[][][], biases: number[][], activations: number[][], deltas: number[][], learningRate: number, momentum: number, dropoutRate: number) {
+    throw new Error("Method 'update()' must be implemented.");
+  }
+}
+
+class AdamOptimizer extends Optimizer {
+  private beta1: number;
+  private beta2: number;
+  private epsilon: number;
+  private m: number[][][];
+  private v: number[][][];
+  private t: number;
+
+  constructor(learningRate: number, beta1: number = 0.9, beta2: number = 0.999, epsilon: number = 1e-8) {
+    super();
+    this.beta1 = beta1;
+    this.beta2 = beta2;
+    this.epsilon = epsilon;
+    this.m = [];
+    this.v = [];
+    this.t = 0;
+  }
+
+  update(weights: number[][][], biases: number[][], activations: number[][], deltas: number[][], learningRate: number, momentum: number, dropoutRate: number) {
+    this.t += 1;
+    if (this.m.length === 0) {
+      this.m = weights.map(layer => layer.map(neuron => neuron.map(() => 0)));
+      this.v = weights.map(layer => layer.map(neuron => neuron.map(() => 0)));
+    }
+
+    for (let i = 0; i < weights.length; i++) {
+      activations[i] = activations[i].map(val => Math.random() > dropoutRate ? val / (1 - dropoutRate) : 0);
+      for (let j = 0; j < weights[i].length; j++) {
+        for (let k = 0; k < weights[i][j].length; k++) {
+          const grad = deltas[i][j] * activations[i][k];
+          this.m[i][j][k] = this.beta1 * this.m[i][j][k] + (1 - this.beta1) * grad;
+          this.v[i][j][k] = this.beta2 * this.v[i][j][k] + (1 - this.beta2) * grad * grad;
+
+          const mHat = this.m[i][j][k] / (1 - Math.pow(this.beta1, this.t));
+          const vHat = this.v[i][j][k] / (1 - Math.pow(this.beta2, this.t));
+
+          weights[i][j][k] -= learningRate * mHat / (Math.sqrt(vHat) + this.epsilon);
+        }
+        biases[i][j] -= learningRate * deltas[i][j];
+      }
+    }
   }
 }
 
