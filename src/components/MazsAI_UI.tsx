@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiCpu, FiRepeat, FiMic, FiCopy, FiArrowDown, FiTrash2, FiEdit, FiShare } from 'react-icons/fi';
+import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiCpu, FiRepeat, FiMic, FiCopy, FiArrowDown, FiTrash2, FiEdit, FiShare, FiArchive, FiPlus, FiCheck } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, getModelCalculations, regenerateResponse } from './chatbot';
+import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, getModelCalculations, regenerateResponse, getChatHistories, createChatHistory, renameChatHistory, deleteChatHistory } from './chatbot';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -11,6 +11,11 @@ interface Message {
   isTyping?: boolean;
   attachments?: File[];
   timestamp: Date;
+}
+
+interface ChatHistory {
+  id: string;
+  name: string;
 }
 
 const ChatBotUI: React.FC = () => {
@@ -36,10 +41,17 @@ const ChatBotUI: React.FC = () => {
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [selectedMessageIndex, setSelectedMessageIndex] = useState<number | null>(null);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  const [showChatHistory, setShowChatHistory] = useState(false);
+  const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
+  const [selectedChatHistory, setSelectedChatHistory] = useState<string | null>(null);
+  const [newChatName, setNewChatName] = useState('');
+  const [editingHistoryId, setEditingHistoryId] = useState<string | null>(null);
+  const [editingHistoryName, setEditingHistoryName] = useState('');
 
   useEffect(() => {
     setSuggestions(getConversationSuggestions());
     addWelcomeMessage();
+    loadChatHistories();
   }, []);
 
   useEffect(() => {
@@ -321,6 +333,50 @@ const ChatBotUI: React.FC = () => {
     closeContextMenu();
   };
 
+  const loadChatHistories = async () => {
+    const histories = await getChatHistories();
+    setChatHistories(histories);
+  };
+
+  const handleCreateChatHistory = async () => {
+    if (newChatName.trim()) {
+      await createChatHistory(newChatName.trim());
+      setNewChatName('');
+      loadChatHistories();
+    }
+  };
+
+  const handleRenameChatHistory = async (id: string, newName: string) => {
+    await renameChatHistory(id, newName);
+    loadChatHistories();
+  };
+
+  const handleDeleteChatHistory = async (id: string) => {
+    await deleteChatHistory(id);
+    loadChatHistories();
+  };
+
+  const handleSelectChatHistory = (id: string) => {
+    setSelectedChatHistory(id);
+    setShowChatHistory(false);
+    // Load messages for the selected chat history
+    // You'll need to implement this function in chatbot.ts
+    // loadMessagesForChatHistory(id);
+  };
+
+  const handleStartEditHistory = (history: ChatHistory) => {
+    setEditingHistoryId(history.id);
+    setEditingHistoryName(history.name);
+  };
+
+  const handleFinishEditHistory = async () => {
+    if (editingHistoryId && editingHistoryName.trim()) {
+      await handleRenameChatHistory(editingHistoryId, editingHistoryName.trim());
+      setEditingHistoryId(null);
+      setEditingHistoryName('');
+    }
+  };
+
   return (
     <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''}`}>
       <div className="flex-1 bg-gray-100 dark:bg-gray-900 transition-colors duration-200 overflow-hidden pt-20">
@@ -351,6 +407,12 @@ const ChatBotUI: React.FC = () => {
                 className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
               >
                 <FiCpu />
+              </button>
+              <button
+                onClick={() => setShowChatHistory(!showChatHistory)}
+                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+              >
+                <FiArchive />
               </button>
             </div>
           </div>
@@ -589,6 +651,90 @@ const ChatBotUI: React.FC = () => {
         </div>
       </div>
       {scrollToBottomButton()}
+      {showChatHistory && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-w-full max-h-[90vh] overflow-y-auto shadow-xl">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">Chat Histories</h2>
+              <button
+                onClick={() => setShowChatHistory(false)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
+              >
+                <FiX size={24} />
+              </button>
+            </div>
+            <div className="mb-6">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  value={newChatName}
+                  onChange={(e) => setNewChatName(e.target.value)}
+                  placeholder="New chat name"
+                  className="flex-grow p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  onClick={handleCreateChatHistory}
+                  className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                >
+                  <FiPlus size={24} />
+                </button>
+              </div>
+            </div>
+            <ul className="space-y-3">
+              {chatHistories.map((history) => (
+                <li key={history.id} className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 transition-all duration-200 hover:shadow-md">
+                  {editingHistoryId === history.id ? (
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="text"
+                        value={editingHistoryName}
+                        onChange={(e) => setEditingHistoryName(e.target.value)}
+                        className="flex-grow p-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <button
+                        onClick={handleFinishEditHistory}
+                        className="p-1 text-green-500 hover:text-green-600 transition-colors duration-200"
+                      >
+                        <FiCheck size={20} />
+                      </button>
+                      <button
+                        onClick={() => setEditingHistoryId(null)}
+                        className="p-1 text-red-500 hover:text-red-600 transition-colors duration-200"
+                      >
+                        <FiX size={20} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-800 dark:text-white font-medium">{history.name}</span>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleSelectChatHistory(history.id)}
+                          className="p-1 text-blue-500 hover:text-blue-600 transition-colors duration-200"
+                        >
+                          <FiCheck size={20} />
+                        </button>
+                        <button
+                          onClick={() => handleStartEditHistory(history)}
+                          className="p-1 text-yellow-500 hover:text-yellow-600 transition-colors duration-200"
+                        >
+                          <FiEdit size={20} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteChatHistory(history.id)}
+                          className="p-1 text-red-500 hover:text-red-600 transition-colors duration-200"
+                        >
+                          <FiTrash2 size={20} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
       {showContextMenu && selectedMessageIndex !== null && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

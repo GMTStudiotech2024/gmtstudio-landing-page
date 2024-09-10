@@ -299,6 +299,7 @@ class NaturalLanguageProcessor {
   private maxContextWindowSize: number = 10;
   private topicKeywords: Set<string> = new Set();
   private wordProbabilities: Map<string, Map<string, number>>;
+  private conversationHistory: { role: 'user' | 'ai', content: string }[] = [];
 
   constructor(trainingData?: number[][]) {
     this.vocabulary = new Set();
@@ -1183,6 +1184,58 @@ class NaturalLanguageProcessor {
     const squareDiffs = numbers.map(num => Math.pow(num - mean, 2));
     return squareDiffs.reduce((sum, sqDiff) => sum + sqDiff, 0) / numbers.length;
   }
+
+  updateConversationHistory(role: 'user' | 'ai', content: string) {
+    this.conversationHistory.push({ role, content });
+    if (this.conversationHistory.length > 10) {
+      this.conversationHistory.shift();
+    }
+  }
+
+  recognizeEntities(text: string): { [key: string]: string[] } {
+    const entities: { [key: string]: string[] } = {
+      person: [],
+      organization: [],
+      location: [],
+      date: [],
+    };
+
+    // Simple pattern matching for entity recognition
+    const words = text.split(' ');
+    words.forEach(word => {
+      if (/^[A-Z][a-z]+$/.test(word)) {
+        entities.person.push(word);
+      }
+      if (/^[A-Z]{2,}$/.test(word)) {
+        entities.organization.push(word);
+      }
+      if (/^[A-Z][a-z]+(?:,\s[A-Z]{2})?$/.test(word)) {
+        entities.location.push(word);
+      }
+      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(word)) {
+        entities.date.push(word);
+      }
+    });
+
+    return entities;
+  }
+
+  translateText(text: string, targetLanguage: string): string {
+    // This is a placeholder implementation. In a real-world scenario,
+    // you would integrate with a translation API or use a more sophisticated translation model.
+    const translations: { [key: string]: { [key: string]: string } } = {
+      'hello': { 'es': 'hola', 'fr': 'bonjour', 'de': 'hallo' },
+      'goodbye': { 'es': 'adiós', 'fr': 'au revoir', 'de': 'auf wiedersehen' },
+      'how are you': { 'es': 'cómo estás', 'fr': 'comment allez-vous', 'de': 'wie geht es dir' },
+    };
+
+    return text.split(' ').map(word => {
+      const lowerWord = word.toLowerCase();
+      return translations[lowerWord] && translations[lowerWord][targetLanguage]
+        ? translations[lowerWord][targetLanguage]
+        : word;
+    }).join(' ');
+  }
 }
 
 class GAN {
@@ -1351,6 +1404,13 @@ export function processChatbotQuery(query: string): string {
   const { intent, entities, keywords, analysis, sentiment, topics } = nlp.understandQuery(query);
   console.log("Query Analysis:", analysis);
 
+  // Update conversation history
+  nlp.updateConversationHistory('user', query);
+
+  // Recognize entities in the query
+  const recognizedEntities = nlp.recognizeEntities(query);
+  console.log("Recognized Entities:", recognizedEntities);
+
   // Extract confidence from the analysis
   const confidenceMatch = analysis.match(/confidence: ([\d.]+)/);
   const confidence = confidenceMatch ? parseFloat(confidenceMatch[1]) : 0;
@@ -1402,6 +1462,18 @@ export function processChatbotQuery(query: string): string {
         response += " " + knowledgeResponse;
       }
     });
+
+    // Add entity information to the response if relevant
+    if (Object.values(recognizedEntities).some(arr => arr.length > 0)) {
+      response += " I noticed you mentioned: " + 
+        Object.entries(recognizedEntities)
+          .filter(([, arr]) => arr.length > 0)
+          .map(([type, arr]) => `${type}(s): ${arr.join(', ')}`)
+          .join('; ');
+    }
+
+    // Update conversation history with AI response
+    nlp.updateConversationHistory('ai', response);
 
     return response;
   } else {
@@ -1594,12 +1666,15 @@ export function getTypedResponse(response: string): Promise<string> {
 }
 
 // Keep only one declaration of handleUserInput
-export function handleUserInput(userInput: string): Promise<string> {
+export function handleUserInput(userInput: string, targetLanguage?: string): Promise<string> {
   console.log("User:", userInput);
   nlp.updateContext(userInput);
   return new Promise((resolve) => {
     setTimeout(() => {
-      const response = processChatbotQuery(userInput);
+      let response = processChatbotQuery(userInput);
+      if (targetLanguage) {
+        response = nlp.translateText(response, targetLanguage);
+      }
       getTypedResponse(response).then(resolve);
     }, 100); // Simulate a delay in processing
   });
@@ -1885,4 +1960,57 @@ Estimated processing time: ${(Math.random() * 0.5 + 0.1).toFixed(2)} seconds
   `;
 
   return calculations.trim();
+}
+
+interface ChatHistory {
+  id: string;
+  name: string;
+}
+
+let chatHistories: ChatHistory[] = [];
+
+export function getChatHistories(): Promise<ChatHistory[]> {
+  return new Promise((resolve) => {
+    // Simulating an API call
+    setTimeout(() => {
+      resolve(chatHistories);
+    }, 100);
+  });
+}
+
+export function createChatHistory(name: string): Promise<void> {
+  return new Promise((resolve) => {
+    // Simulating an API call
+    setTimeout(() => {
+      const newHistory: ChatHistory = {
+        id: Date.now().toString(),
+        name,
+      };
+      chatHistories.push(newHistory);
+      resolve();
+    }, 100);
+  });
+}
+
+export function renameChatHistory(id: string, newName: string): Promise<void> {
+  return new Promise((resolve) => {
+    // Simulating an API call
+    setTimeout(() => {
+      const history = chatHistories.find((h) => h.id === id);
+      if (history) {
+        history.name = newName;
+      }
+      resolve();
+    }, 100);
+  });
+}
+
+export function deleteChatHistory(id: string): Promise<void> {
+  return new Promise((resolve) => {
+    // Simulating an API call
+    setTimeout(() => {
+      chatHistories = chatHistories.filter((h) => h.id !== id);
+      resolve();
+    }, 100);
+  });
 }
