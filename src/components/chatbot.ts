@@ -527,9 +527,10 @@ class NaturalLanguageProcessor {
     let currentContext = `${userInput} ${startWord}`;
 
     for (let i = 1; i < maxLength; i++) {
-      const meaningVector = this.encodeToMeaningSpace(currentContext);
+      const contextVector = this.textToVector(currentContext);
+      const meaningVector = this.encoder.predict(contextVector);
       const nextWordVector = this.decoder.predict(meaningVector);
-      const nextWord = this.findClosestWord(nextWordVector);
+      const nextWord = this.vectorToText(nextWordVector).split(' ')[0]; // Take the first word
 
       sentence.push(nextWord);
       currentContext = `${userInput} ${sentence.join(' ')}`;
@@ -592,15 +593,47 @@ class NaturalLanguageProcessor {
 
 
   private textToVector(text: string): number[] {
-    // Implement text to vector conversion (e.g., using word embeddings)
-    // This is a placeholder implementation
-    return text.split('').map(char => char.charCodeAt(0) / 255);
+    const words = this.tokenize(text);
+    const vector: number[] = new Array(100).fill(0); // Assuming 100-dimensional word vectors
+    
+    words.forEach(word => {
+      if (this.wordVectors.has(word)) {
+        const wordVector = this.wordVectors.get(word)!;
+        for (let i = 0; i < vector.length; i++) {
+          vector[i] += wordVector[i];
+        }
+      }
+    });
+
+    // Normalize the vector
+    const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+    return vector.map(val => val / magnitude);
   }
 
   private vectorToText(vector: number[]): string {
-    // Implement vector to text conversion
-    // This is a placeholder implementation
-    return String.fromCharCode(...vector.map(v => Math.round(v * 255)));
+    const words: string[] = [];
+    const vectorEntries = Array.from(this.wordVectors.entries());
+    
+    for (let i = 0; i < 10; i++) { // Get top 10 closest words
+      let closestWord = '';
+      let closestDistance = Infinity;
+      
+      for (const [word, wordVector] of vectorEntries) {
+        const distance = this.euclideanDistance(vector, wordVector);
+        if (distance < closestDistance) {
+          closestWord = word;
+          closestDistance = distance;
+        }
+      }
+      
+      if (closestWord) {
+        words.push(closestWord);
+        // Remove the closest word to avoid repetition
+        vectorEntries.splice(vectorEntries.findIndex(([word]) => word === closestWord), 1);
+      }
+    }
+
+    return words.join(' ');
   }
 
 
