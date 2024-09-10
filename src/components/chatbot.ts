@@ -1101,7 +1101,7 @@ class GAN {
     return generatedVector;
   }
 
-  train(realData: number[][], epochs: number = 100, batchSize: number = 32) {
+  train(realData: number[][], epochs: number = 200, batchSize: number = 32) {
     for (let epoch = 0; epoch < epochs; epoch++) {
       // Train discriminator
       const realBatch = this.getBatch(realData, batchSize);
