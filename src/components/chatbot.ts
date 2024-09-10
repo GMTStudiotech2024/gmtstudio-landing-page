@@ -303,6 +303,8 @@ class NaturalLanguageProcessor {
   private sentimentModel: AdvancedSentimentModel;
   private entityRecognitionModel: EntityRecognitionModel;
   private topicModel: TopicModel;
+  private ngramFrequency: Map<string, number>;
+  private markovChain: Map<string, Map<string, number>>;
 
   constructor(trainingData?: number[][]) {
     this.vocabulary = new Set();
@@ -320,6 +322,8 @@ class NaturalLanguageProcessor {
     this.gan = new GAN(trainingData || this.generateDummyData());
     this.rlAgent = new RLAgent();
     this.wordProbabilities = new Map();
+    this.ngramFrequency = new Map();
+    this.markovChain = new Map();
     
     // Expand sentiment lexicon
     this.sentimentLexicon = new Map([
@@ -515,10 +519,13 @@ class NaturalLanguageProcessor {
 
     this.updateIDF();
     this.generateWordEmbeddings();
+    this.updateNgramFrequency(text, 2);
+    this.updateNgramFrequency(text, 3);
+    this.buildMarkovChain(text);
   }
 
   private tokenize(text: string): string[] {
-    return text.toLowerCase().match(/\b(\w+)\b/g) || [];
+    return text.toLowerCase().match(/\b(\w+|[^\w\s])\b/g) || [];
   }
 
   private updateIDF() {
@@ -577,22 +584,8 @@ class NaturalLanguageProcessor {
   }
 
   generateSentence(startWord: string, userInput: string, maxLength: number = 20): string {
-    let sentence = [startWord];
-    let currentContext = `${userInput} ${startWord}`;
-
-    for (let i = 1; i < maxLength; i++) {
-      const contextVector = this.textToVector(currentContext);
-      const meaningVector = this.encoder.predict(contextVector);
-      const nextWordVector = this.decoder.predict(meaningVector);
-      const nextWord = this.vectorToText(nextWordVector).split(' ')[0]; // Take the first word
-
-      sentence.push(nextWord);
-      currentContext = `${userInput} ${sentence.join(' ')}`;
-
-      if (nextWord.endsWith('.') || nextWord.endsWith('!') || nextWord.endsWith('?')) break;
-    }
-
-    return sentence.join(' ');
+    this.buildMarkovChain(userInput);
+    return this.generateTextUsingMarkovChain(startWord, maxLength);
   }
 
   // Helper method to find the closest word to a given vector
@@ -772,21 +765,13 @@ class NaturalLanguageProcessor {
   }
 
   private getNgramCandidates(ngram: string, n: number): Map<string, number> {
-    const ngramMap = n === 2 ? this.bigramFrequency :
-                     n === 3 ? this.trigramFrequency :
-                     n === 4 ? new Map() : // Implement 4-gram if needed
-                     new Map();
-    
-    let current = ngramMap;
-    const words = ngram.split(' ');
-    for (let i = 0; i < words.length; i++) {
-      if (current instanceof Map && current.has(words[i])) {
-        current = current.get(words[i])!;
-      } else {
-        return new Map();
+    const candidates = new Map<string, number>();
+    this.ngramFrequency.forEach((count, key) => {
+      if (key.startsWith(ngram)) {
+        candidates.set(key, count);
       }
-    }
-    return current instanceof Map ? current : new Map();
+    });
+    return candidates;
   }
 
   private selectNextWord(candidates: Map<string, number>): string {
@@ -1235,7 +1220,7 @@ class NaturalLanguageProcessor {
       if (/^[A-Z][a-z]+(?:,\s[A-Z]{2})?$/.test(word)) {
         entities.location.push(word);
       }
-      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(word)) {
+      if (/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(word)) {
         entities.date.push(word);
       }
     });
@@ -1259,15 +1244,65 @@ class NaturalLanguageProcessor {
         : word;
     }).join(' ');
   }
-}
+
+  private updateNgramFrequency(text: string, n: number) {
+    const words = this.tokenize(text);
+    for (let i = 0; i <= words.length - n; i++) {
+      const ngram = words.slice(i, i + n).join(' ');
+      this.ngramFrequency.set(ngram, (this.ngramFrequency.get(ngram) || 0) + 1);
+    }
+  }
+  private buildMarkovChain(text: string) {
+    const words = this.tokenize(text);
+    for (let i = 0; i < words.length - 1; i++) {
+      const currentWord = words[i];
+      const nextWord = words[i + 1];
+      if (!this.markovChain.has(currentWord)) {
+        this.markovChain.set(currentWord, new Map());
+      }
+      const nextWordMap = this.markovChain.get(currentWord)!;
+      nextWordMap.set(nextWord, (nextWordMap.get(nextWord) || 0) + 1);
+    }
+  }
+
+  private generateTextUsingMarkovChain(startWord: string, maxLength: number = 20): string {
+    let currentWord = startWord;
+    let sentence = [currentWord];
+
+    for (let i = 1; i < maxLength; i++) {
+      const nextWordMap = this.markovChain.get(currentWord);
+      if (!nextWordMap) break;
+
+      const totalFrequency = Array.from(nextWordMap.values()).reduce((sum, freq) => sum + freq, 0);
+      let random = Math.random() * totalFrequency;
+
+      for (const [word, freq] of Array.from(nextWordMap.entries())) {
+        random -= freq;
+        if (random <= 0) {
+          currentWord = word;
+          break;
+        }
+      }
+
+      sentence.push(currentWord);
+      if (currentWord.endsWith('.') || currentWord.endsWith('!') || currentWord.endsWith('?')) break;
+    }
+
+    return sentence.join(' ');
+  }}
 
 // Advanced sentiment analysis model
 class AdvancedSentimentModel {
   analyze(text: string): { score: number, explanation: string } {
     // Implement a more sophisticated sentiment analysis algorithm
-    // This is a placeholder implementation
-    const score = Math.random() * 2 - 1; // Random score between -1 and 1
-    const explanation = `Sentiment score: ${score.toFixed(2)}`;
+    const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'happy', 'joy', 'love', 'like', 'best'];
+    const negativeWords = ['bad', 'terrible', 'awful', 'horrible', 'disappointing', 'sad', 'angry', 'hate', 'dislike', 'worst'];
+    let score = 0;
+    text.toLowerCase().split(/\s+/).forEach(word => {
+      if (positiveWords.includes(word)) score++;
+      if (negativeWords.includes(word)) score--;
+    });
+    const explanation = `Sentiment score: ${score}`;
     return { score, explanation };
   }
 }
@@ -1276,7 +1311,6 @@ class AdvancedSentimentModel {
 class EntityRecognitionModel {
   recognize(text: string): { [key: string]: string } {
     // Implement a more robust entity recognition algorithm
-    // This is a placeholder implementation
     const entities: { [key: string]: string } = {};
     const dateMatch = text.match(/\b(\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{2,4})\b/);
     if (dateMatch) entities['date'] = dateMatch[0];
@@ -1284,6 +1318,8 @@ class EntityRecognitionModel {
     if (nameMatch) entities['name'] = nameMatch[0];
     const emailMatch = text.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/);
     if (emailMatch) entities['email'] = emailMatch[0];
+    const locationMatch = text.match(/\b([A-Z][a-z]+(?: [A-Z][a-z]+)*)\b/);
+    if (locationMatch) entities['location'] = locationMatch[0];
     return entities;
   }
 }
@@ -1546,7 +1582,7 @@ console.log("Mazs AI v1.1 with advanced NLP and contextual analysis capabilities
 
 const intents: Intent[] = [
   {
-    patterns: ['hello', 'hi', 'hey'],
+    patterns: ['hello', 'hi', 'hey','hola','bonjour'],
     responses: ['Hello! How can I help you today?', 'Hi there! What can I do for you?', 'Greetings! How may I assist you?'],
   },
   {
@@ -1648,7 +1684,47 @@ const intents: Intent[] = [
   {
     patterns: ['Artificial intelligence', 'Artificial intelligent',"AI"],
     responses: ["Artificial intelligence (AI) refers to the simulation of human intelligence in machines that are programmed to think and learn like humans."],
-  }
+  },
+  {
+    patterns: ['What is the meaning of life', 'Purpose of existence'],
+    responses: ["The meaning of life is a philosophical question that has been debated for centuries. It's subjective and can vary from person to person."],
+  },
+  {
+    patterns: ['How to be happy', 'Keys to happiness'],
+    responses: ["Happiness often comes from pursuing meaningful goals, maintaining positive relationships, practicing gratitude, and taking care of your physical and mental health."],
+  },
+  {
+    patterns: ['Best way to learn a new language', 'Language learning tips'],
+    responses: ["Some effective ways to learn a new language include immersion, consistent practice, using language learning apps, watching movies or TV shows in that language, and finding a language exchange partner."],
+  },
+  {
+    patterns: ['How to start exercising', 'Beginner workout routine'],
+    responses: ["Start with simple exercises like walking, gradually increase intensity, set realistic goals, find activities you enjoy, and consider consulting with a fitness professional for personalized advice."],
+  },
+  {
+    patterns: ['How to manage stress', 'Stress relief techniques'],
+    responses: ["Effective stress management techniques include regular exercise, meditation, deep breathing exercises, maintaining a healthy diet, getting enough sleep, and seeking support from friends or professionals when needed."],
+  },
+  {
+    patterns: ['Tips for better sleep', 'How to improve sleep quality'],
+    responses: ["To improve sleep quality, maintain a consistent sleep schedule, create a relaxing bedtime routine, avoid screens before bed, ensure your bedroom is dark and cool, and limit caffeine and alcohol intake."],
+  },
+  {
+    patterns: ['How to make friends as an adult', 'Meeting new people'],
+    responses: ["To make friends as an adult, try joining clubs or groups related to your interests, volunteer, attend local events, use social apps, take classes, or participate in sports or fitness activities."],
+  },
+  {
+    patterns: ['How to save money', 'Budgeting tips'],
+    responses: ["To save money, create a budget, track your expenses, cut unnecessary costs, automate your savings, look for deals and discounts, and consider additional sources of income."],
+  },
+  {
+    patterns: ['How to be more productive', 'Increase productivity'],
+    responses: ["To increase productivity, prioritize tasks, use time management techniques like the Pomodoro method, minimize distractions, take regular breaks, and maintain a healthy work-life balance."],
+  },
+  {
+    patterns: ['How to improve communication skills', 'Better communication'],
+    responses: ["To improve communication skills, practice active listening, be clear and concise, pay attention to non-verbal cues, ask questions, show empathy, and seek feedback on your communication style."],
+  },
 ];
 
 const network = new MultilayerPerceptron([10, 32, 64, 32, intents.length], ['relu', 'relu', 'relu', 'sigmoid']);
