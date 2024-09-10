@@ -522,17 +522,17 @@ class NaturalLanguageProcessor {
     return this.vectorToText(outputVector);
   }
 
-  generateSentence(startWord: string, maxLength: number = 20): string {
+  generateSentence(startWord: string, userInput: string, maxLength: number = 20): string {
     let sentence = [startWord];
-    let currentContext = startWord;
+    let currentContext = `${userInput} ${startWord}`;
 
     for (let i = 1; i < maxLength; i++) {
       const meaningVector = this.encodeToMeaningSpace(currentContext);
       const nextWordVector = this.decoder.predict(meaningVector);
       const nextWord = this.findClosestWord(nextWordVector);
-      
+
       sentence.push(nextWord);
-      currentContext = sentence.join(' ');
+      currentContext = `${userInput} ${sentence.join(' ')}`;
 
       if (nextWord.endsWith('.') || nextWord.endsWith('!') || nextWord.endsWith('?')) break;
     }
@@ -856,7 +856,7 @@ class NaturalLanguageProcessor {
     this.conversationContext = query;
   }
 
-  generateResponse(intent: string, entities: { [key: string]: string }, keywords: string[], topics: string[]): string {
+  generateResponse(intent: string, entities: { [key: string]: string }, keywords: string[], topics: string[], userInput: string): string {
     // Check if it's a simple greeting or farewell
     if (['hello', 'hi', 'hey', 'bye', 'goodbye', 'see you'].includes(intent)) {
       const matchedIntent = intents.find(i => i.patterns.includes(intent));
@@ -869,7 +869,7 @@ class NaturalLanguageProcessor {
     if (matchedIntent) {
       response = matchedIntent.responses[Math.floor(Math.random() * matchedIntent.responses.length)];
     } else {
-      response = this.generateSentence(keywords[0] || "I understand you're asking about", 15);
+      response = this.generateSentence(keywords[0] || "I understand you're asking about", userInput, 15);
     }
 
     // Add relevant information from knowledge base
@@ -920,6 +920,7 @@ class NaturalLanguageProcessor {
 
   private updateWordProbabilities(sentence: string) {
     const words = this.tokenize(sentence);
+    const decayFactor = 0.9;
     for (let i = 0; i < words.length - 1; i++) {
       const currentWord = words[i];
       const nextWord = words[i + 1];
@@ -927,7 +928,9 @@ class NaturalLanguageProcessor {
         this.wordProbabilities.set(currentWord, new Map());
       }
       const nextWordProbs = this.wordProbabilities.get(currentWord)!;
-      nextWordProbs.set(nextWord, (nextWordProbs.get(nextWord) || 0) + 1);
+      const currentProb = nextWordProbs.get(nextWord) || 0;
+      const newProb = currentProb * decayFactor + (1 - decayFactor);
+      nextWordProbs.set(nextWord, newProb);
     }
   }
 
@@ -958,7 +961,7 @@ class NaturalLanguageProcessor {
       const meaningVector = this.encodeToMeaningSpace(combinedContext);
       
       // Apply GAN refinement
-      const refinedVector = this.gan.refine(meaningVector);
+      const refinedVector = this.gan.refine(meaningVector, wordCount);
       
       // Apply RL improvement
       const improvedVector = this.rlAgent.improve(refinedVector, {
@@ -966,7 +969,8 @@ class NaturalLanguageProcessor {
         sentimentHistory,
         wordCount,
         maxLength,
-        userInput
+        userInput,
+        previousWords: sentence
       });
       
       // Predict next word
@@ -1017,10 +1021,34 @@ class NaturalLanguageProcessor {
 
   private isCoherent(sentence: string[], nextWord: string, userInput: string): boolean {
     const context = `${userInput} ${sentence.join(' ')} ${nextWord}`;
-    // Implement a basic coherence check (this is a placeholder)
+    
+    // Implement a more sophisticated coherence check
+    // This is a placeholder implementation
     const words = context.toLowerCase().split(' ');
     const uniqueWords = new Set(words);
-    return uniqueWords.size / words.length > 0.5; // Check for word diversity
+    const coherenceScore = uniqueWords.size / words.length;
+    
+    if (coherenceScore <= 0.5) {
+      // If not coherent, try to find a related word from the knowledge base
+      const relatedWord = this.findRelatedWordFromKnowledgeBase(nextWord, sentence[sentence.length - 1]);
+      if (relatedWord) {
+        return true;
+      }
+    }
+    
+    return coherenceScore > 0.5;
+  }
+
+  private findRelatedWordFromKnowledgeBase(word: string, previousWord: string): string | null {
+    for (const [, value] of Array.from(this.knowledgeBase.entries())) {
+      if (value.includes(word) || value.includes(previousWord)) {
+        const relatedWords = value.split(' ').filter((w: string) => w !== word && w !== previousWord);
+        if (relatedWords.length > 0) {
+          return relatedWords[Math.floor(Math.random() * relatedWords.length)];
+        }
+      }
+    }
+    return null;
   }
 
   private refreshContext(sentence: string[], userInput: string): string {
@@ -1095,10 +1123,22 @@ class GAN {
     this.discriminator = new MultilayerPerceptron([100, 256, 512, 256, 1], ['relu', 'relu', 'relu', 'sigmoid']);
   }
 
-  refine(meaningVector: number[]): number[] {
-    const noise = Array.from({ length: this.latentDim }, () => Math.random() * 2 - 1);
+  refine(meaningVector: number[], sentenceLength: number): number[] {
+    const noiseFactor = Math.max(0.1, 1 - sentenceLength / 100);
+    const noise = Array.from({ length: this.latentDim }, () => Math.random() * 2 - 1).map(n => n * noiseFactor);
     const generatedVector = this.generator.predict([...noise, ...meaningVector]);
     return generatedVector;
+  }
+
+  generateText(latentVector: number[]): string {
+    const outputVector = this.generator.predict(latentVector);
+    return this.vectorToText(outputVector);
+  }
+
+  private vectorToText(vector: number[]): string {
+    // Implement logic to convert vector to text
+    // This is a placeholder implementation
+    return vector.map(v => String.fromCharCode(Math.floor(v * 26) + 97)).join('');
   }
 
   train(realData: number[][], epochs: number = 200, batchSize: number = 32) {
@@ -1188,8 +1228,37 @@ class RLAgent {
     if (Math.random() < this.epsilon) {
       return state.map(() => Math.random() * 2 - 1);
     } else {
-      return this.policy.predict(state);
+      const action = this.policy.predict(state);
+      const reward = this.calculateReward(action, context);
+      this.train([{ state, action, reward, nextState: action }]);
+      return action;
     }
+  }
+
+  private calculateReward(action: number[], context: any): number {
+    const coherence = this.assessCoherence(action, context.previousWords);
+    const topicRelevance = this.assessTopicRelevance(action, context.topicStack);
+    const sentimentAlignment = this.assessSentimentAlignment(action, context.sentimentHistory);
+    
+    return coherence * 0.4 + topicRelevance * 0.4 + sentimentAlignment * 0.2;
+  }
+
+  private assessCoherence(action: number[], previousWords: string[]): number {
+    // Implement a more sophisticated coherence check
+    // This is a placeholder implementation
+    return Math.random();
+  }
+
+  private assessTopicRelevance(action: number[], topicStack: string[]): number {
+    // Implement topic relevance assessment
+    // This is a placeholder implementation
+    return Math.random();
+  }
+
+  private assessSentimentAlignment(action: number[], sentimentHistory: number[]): number {
+    // Implement sentiment alignment assessment
+    // This is a placeholder implementation
+    return Math.random();
   }
 
   train(experiences: { state: number[], action: number[], reward: number, nextState: number[] }[]) {
@@ -1219,7 +1288,7 @@ export function processChatbotQuery(query: string): string {
 
   const matchedIntent = intents.find(i => i.patterns.includes(intent));
   if (matchedIntent) {
-    let response = nlp.generateResponse(intent, entities, keywords, topics);
+    let response = nlp.generateResponse(intent, entities, keywords, topics, query);
     
     if (!['hello', 'hi', 'hey', 'bye', 'goodbye', 'see you'].includes(intent)) {
       const contextSentence = nlp.generateComplexSentence(keywords[0] || response.split(' ')[0], query, 500);
@@ -1228,7 +1297,7 @@ export function processChatbotQuery(query: string): string {
 
     // Use GAN to refine the response
     const responseVector = nlp.encodeToMeaningSpace(response);
-    const refinedVector = nlp.gan.refine(responseVector);
+    const refinedVector = nlp.gan.refine(responseVector, response.split(' ').length);
     const refinedResponse = nlp.decodeFromMeaningSpace(refinedVector);
 
     // Use RL agent to improve the response
