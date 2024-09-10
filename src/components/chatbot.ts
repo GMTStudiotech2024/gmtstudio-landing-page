@@ -1519,9 +1519,21 @@ export function getTypedResponse(response: string): Promise<string> {
   });
 }
 
-// Modify the existing handleUserInput function to use getTypedResponse
+// Keep only one declaration of handleUserInput
 export function handleUserInput(userInput: string): Promise<string> {
   console.log("User:", userInput);
+  nlp.updateContext(userInput);
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const response = processChatbotQuery(userInput);
+      getTypedResponse(response).then(resolve);
+    }, 100); // Simulate a delay in processing
+  });
+}
+
+// Add the regenerateResponse function
+export function regenerateResponse(userInput: string): Promise<string> {
+  console.log("Regenerating response for:", userInput);
   nlp.updateContext(userInput);
   return new Promise((resolve) => {
     setTimeout(() => {

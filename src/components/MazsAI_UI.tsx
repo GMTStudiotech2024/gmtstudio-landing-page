@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiCpu } from 'react-icons/fi';
+import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiCpu, FiRepeat } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, getModelCalculations } from './chatbot';
+import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, getModelCalculations, regenerateResponse } from './chatbot';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -10,6 +10,7 @@ interface Message {
   isUser: boolean;
   isTyping?: boolean;
   attachments?: File[];
+  timestamp: Date;
 }
 
 const ChatBotUI: React.FC = () => {
@@ -55,7 +56,8 @@ const ChatBotUI: React.FC = () => {
   const addWelcomeMessage = () => {
     const welcomeMessage: Message = {
       text: "Hello! I'm Mazs AI v1.1 Anatra. I can help you with some basic tasks. How can I assist you today? although my Nerual network structure is not yet well designed, but i will try my best to help you  ",
-      isUser: false
+      isUser: false,
+      timestamp: new Date()
     };
     setMessages([welcomeMessage]);
   };
@@ -71,7 +73,8 @@ const ChatBotUI: React.FC = () => {
     const userMessage: Message = { 
       text: attachedFiles.length > 0 ? `Attached ${attachedFiles.length} file(s)` : input, 
       isUser: true,
-      attachments: attachedFiles
+      attachments: attachedFiles,
+      timestamp: new Date()
     };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
@@ -83,7 +86,7 @@ const ChatBotUI: React.FC = () => {
         await processFiles(attachedFiles);
       } else {
         const botResponse = await debouncedHandleUserInput(input);
-        const botMessage: Message = { text: botResponse, isUser: false, isTyping: true };
+        const botMessage: Message = { text: botResponse, isUser: false, isTyping: true, timestamp: new Date() };
         setMessages((prevMessages) => [...prevMessages, botMessage]);
         setCurrentTypingIndex(0);
 
@@ -93,12 +96,41 @@ const ChatBotUI: React.FC = () => {
       }
     } catch (error) {
       console.error("Error processing message:", error);
-      const errorMessage: Message = { text: "I'm sorry, I encountered an error. Please try again.", isUser: false };
+      const errorMessage: Message = { text: "I'm sorry, I encountered an error. Please try again.", isUser: false, timestamp: new Date() };
       setMessages((prevMessages) => [...prevMessages, errorMessage]);
     } finally {
       setIsGenerating(false);
       setIsLoading(false);
       setAttachedFiles([]);
+    }
+  };
+
+  const regenerateResponseHandler = async (index: number) => {
+    const userMessage = messages[index - 1]; // Assuming the user message is always before the AI response
+    if (userMessage && !userMessage.isUser) {
+      setIsGenerating(true);
+      setIsLoading(true);
+
+      try {
+        const regeneratedResponse = await regenerateResponse(userMessage.text);
+        const newMessage: Message = { 
+          text: regeneratedResponse, 
+          isUser: false, 
+          isTyping: true,
+          timestamp: new Date()
+        };
+        setMessages((prevMessages) => [
+          ...prevMessages.slice(0, index),
+          newMessage,
+          ...prevMessages.slice(index + 1)
+        ]);
+        setCurrentTypingIndex(0);
+      } catch (error) {
+        console.error("Error regenerating response:", error);
+      } finally {
+        setIsGenerating(false);
+        setIsLoading(false);
+      }
     }
   };
 
@@ -156,13 +188,14 @@ const ChatBotUI: React.FC = () => {
         text: responses.join('\n\n'), 
         isUser: false, 
         isTyping: true,
-        attachments: files
+        attachments: files,
+        timestamp: new Date()
       };
       setMessages((prevMessages) => [...prevMessages, botMessage]);
       setCurrentTypingIndex(0);
     } catch (error) {
       console.error("Error processing files:", error);
-      const errorMessage: Message = { text: "I'm sorry, I encountered an error processing the files. Please try again.", isUser: false };
+      const errorMessage: Message = { text: "I'm sorry, I encountered an error processing the files. Please try again.", isUser: false, timestamp: new Date() };
       setMessages((prevMessages) => [...prevMessages, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -250,20 +283,33 @@ const ChatBotUI: React.FC = () => {
                       transition={{ duration: 0.3 }}
                       className={`mb-4 ${message.isUser ? 'text-right' : 'text-left'}`}
                     >
-                      <span
-                        className={`inline-block p-3 rounded-lg ${
+                      <div className={`inline-block max-w-[80%] sm:max-w-[70%] md:max-w-[60%]`}>
+                        <div className={`p-3 rounded-lg ${
                           message.isUser
                             ? 'bg-blue-500 text-white'
                             : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white'
-                        } max-w-[80%] sm:max-w-[70%] md:max-w-[60%] break-words`}
-                      >
-                        {message.isUser || !message.isTyping
-                          ? message.text
-                          : message.text.slice(0, currentTypingIndex)}
-                        {!message.isUser && message.isTyping && (
-                          <span className="inline-block w-1 h-4 ml-1 bg-gray-800 dark:bg-white animate-blink"></span>
-                        )}
-                      </span>
+                        } break-words`}>
+                          {message.isUser || !message.isTyping
+                            ? message.text
+                            : message.text.slice(0, currentTypingIndex)}
+                          {!message.isUser && message.isTyping && (
+                            <span className="inline-block w-1 h-4 ml-1 bg-gray-800 dark:bg-white animate-blink"></span>
+                          )}
+                        </div>
+                        <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-center justify-between">
+                          <span>{message.timestamp.toLocaleTimeString()}</span>
+                          {!message.isUser && (
+                            <button
+                              onClick={() => regenerateResponseHandler(index)}
+                              className="ml-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                              title="Regenerate response"
+                              disabled={isGenerating}
+                            >
+                              <FiRepeat size={12} className={isGenerating ? 'animate-spin' : ''} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </motion.div>
                   ))}
                   {isLoading && (
