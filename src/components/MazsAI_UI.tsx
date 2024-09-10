@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiCpu, FiRepeat, FiMic, FiCopy, FiArrowDown, FiMinimize2, FiMaximize2, FiDownload, FiUpload } from 'react-icons/fi';
+import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiCpu, FiRepeat, FiMic, FiCopy, FiArrowDown, FiTrash2, FiEdit, FiShare } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, getModelCalculations, regenerateResponse } from './chatbot';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -33,9 +33,9 @@ const ChatBotUI: React.FC = () => {
   const [userTyping, setUserTyping] = useState(false);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(true);
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [selectedMessageIndex, setSelectedMessageIndex] = useState<number | null>(null);
+  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     setSuggestions(getConversationSuggestions());
@@ -294,45 +294,11 @@ const ChatBotUI: React.FC = () => {
     </div>
   );
 
-
-
-  const exportConversation = () => {
-    const conversationText = messages
-      .map((msg) => `${msg.isUser ? 'User' : 'AI'}: ${msg.text}`)
-      .join('\n\n');
-    const blob = new Blob([conversationText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'conversation.txt';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const importConversation = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target?.result as string;
-        const importedMessages = content.split('\n\n').map((msg) => {
-          const [sender, text] = msg.split(': ');
-          return {
-            text,
-            isUser: sender === 'User',
-            timestamp: new Date(),
-          };
-        });
-        setMessages(importedMessages);
-      };
-      reader.readAsText(file);
-    }
-  };
-
   const handleMessageContextMenu = (event: React.MouseEvent, index: number) => {
     event.preventDefault();
     setSelectedMessageIndex(index);
     setShowContextMenu(true);
+    setContextMenuPosition({ x: event.clientX, y: event.clientY });
   };
 
   const closeContextMenu = () => {
@@ -345,6 +311,16 @@ const ChatBotUI: React.FC = () => {
     closeContextMenu();
   };
 
+  const editMessage = (index: number) => {
+    // Implement edit functionality
+    closeContextMenu();
+  };
+
+  const shareMessage = (index: number) => {
+    // Implement share functionality
+    closeContextMenu();
+  };
+
   return (
     <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''}`}>
       <div className="flex-1 bg-gray-100 dark:bg-gray-900 transition-colors duration-200 overflow-hidden pt-20">
@@ -354,43 +330,28 @@ const ChatBotUI: React.FC = () => {
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setShowInfo(!showInfo)}
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200"
+                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
               >
                 <FiInfo />
               </button>
               <button
                 onClick={resetConversation}
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200"
+                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
               >
                 <FiRefreshCw />
               </button>
               <button
                 onClick={toggleDarkMode}
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200"
+                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
               >
                 {isDarkMode ? <FiSun /> : <FiMoon />}
               </button>
               <button
                 onClick={() => setShowCalculations(!showCalculations)}
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200"
+                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
               >
                 <FiCpu />
               </button>
-              <button
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200"
-              >
-                {isFullScreen ? <FiMinimize2 /> : <FiMaximize2 />}
-              </button>
-              <button
-                onClick={exportConversation}
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200"
-              >
-                <FiDownload />
-              </button>
-              <label className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 cursor-pointer">
-                <FiUpload />
-                <input type="file" className="hidden" onChange={importConversation} accept=".txt" />
-              </label>
             </div>
           </div>
           {showInfo && (
@@ -629,23 +590,39 @@ const ChatBotUI: React.FC = () => {
       </div>
       {scrollToBottomButton()}
       {showContextMenu && selectedMessageIndex !== null && (
-        <div
-          className="fixed bg-white dark:bg-gray-800 shadow-lg rounded-lg p-2"
-          style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.1 }}
+          className="fixed bg-white dark:bg-gray-700 shadow-lg rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600"
+          style={{ top: contextMenuPosition.y, left: contextMenuPosition.x }}
         >
           <button
             onClick={() => deleteMessage(selectedMessageIndex)}
-            className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
           >
-            Delete Message
+            <FiTrash2 className="mr-2" /> Delete Message
+          </button>
+          <button
+            onClick={() => editMessage(selectedMessageIndex)}
+            className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
+          >
+            <FiEdit className="mr-2" /> Edit Message
+          </button>
+          <button
+            onClick={() => shareMessage(selectedMessageIndex)}
+            className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
+          >
+            <FiShare className="mr-2" /> Share Message
           </button>
           <button
             onClick={closeContextMenu}
-            className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
           >
-            Cancel
+            <FiX className="mr-2" /> Cancel
           </button>
-        </div>
+        </motion.div>
       )}
     </div>
   );
