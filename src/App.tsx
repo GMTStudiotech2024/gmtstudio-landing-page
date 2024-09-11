@@ -43,6 +43,7 @@ import AdvancedSearch from './components/AI/AdvancedSearch';
 import Login from './components/Pages/Login';
 import AIWebsiteGenerator from './components/AI/AIWebsiteGenerator';
 import CustomCursor from './components/CustomCursor';
+
 const AppContent: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);

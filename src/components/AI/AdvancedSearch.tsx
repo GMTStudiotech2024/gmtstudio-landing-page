@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { processChatbotQuery, getConversationSuggestions } from './MazsAI';
+import { processChatbotQuery, getConversationSuggestions } from './MazsAI_v1-1-0Anatra';
 import { FaSearch, FaLightbulb, FaFilter, FaSort, FaImage, FaHistory, FaTimes, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 

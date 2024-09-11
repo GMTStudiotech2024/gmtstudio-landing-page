@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiRepeat, FiMic, FiCopy, FiArrowDown, FiTrash2, FiEdit, FiShare, FiArchive, FiPlus, FiCheck, FiSettings  } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, regenerateResponse, getChatHistories, createChatHistory, renameChatHistory, deleteChatHistory } from './MazsAI';
+import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, regenerateResponse, getChatHistories, createChatHistory, renameChatHistory, deleteChatHistory } from './MazsAI_v1-1-0Anatra';
 // import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 // import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import * as MazsAI from './MazsAI';
+import * as MazsAI from './MazsAI_v1-1-0Anatra';
+
+
 import EmojiPicker from 'emoji-picker-react';
 interface Message {
   text: string;

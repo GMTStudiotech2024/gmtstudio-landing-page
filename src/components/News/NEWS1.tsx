@@ -10,14 +10,14 @@ const NEWS1: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col">
+    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col ">
       <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-md z-10">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <button onClick={handleBackToBlog} className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition duration-300">
             <ChevronLeft className="mr-2 h-4 w-4" />
             Back to Blog
           </button>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">GMT Studio Blog</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white pt-20">GMT Studio Blog</h1>
         </div>
       </header>
 
