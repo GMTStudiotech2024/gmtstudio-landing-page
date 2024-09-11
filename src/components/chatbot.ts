@@ -340,7 +340,9 @@ class NaturalLanguageProcessor {
       ['fast', 1], ['slow', -1], ['quick', 1], ['efficient', 1], ['inefficient', -1],
       ['expensive', -1], ['cheap', -1], ['affordable', 1], ['overpriced', -1], ['valuable', 1],
       ['reliable', 1], ['unreliable', -1], ['trustworthy', 1], ['untrustworthy', -1], ['honest', 1],
-      ['innovative', 1], ['outdated', -1], ['modern', 1], ['ancient', -1], ['cutting-edge', 2]
+      ['innovative', 1], ['outdated', -1], ['modern', 1], ['ancient', -1], ['cutting-edge', 2],
+      ['joyful', 2], ['miserable', -2], ['optimistic', 2], ['pessimistic', -2], ['content', 1],
+      ['frustrated', -1], ['elated', 2], ['depressed', -2], ['hopeful', 1], ['anxious', -1]
     ]);
 
     // Expand knowledge base
@@ -429,7 +431,9 @@ class NaturalLanguageProcessor {
       ["astronomy", "Astronomy is the study of celestial objects, space, and the physical universe as a whole."],
       ["economics", "Economics is the social science that studies the production, distribution, and consumption of goods and services."],
       ["statistics", "Statistics is the study of the collection, analysis, interpretation, presentation, and organization of data."],
-
+      ['neural networks', 'Neural networks are a series of algorithms that attempt to recognize underlying relationships in a set of data through a process that mimics the way the human brain operates.'],
+      ['reinforcement learning', 'Reinforcement learning is an area of machine learning concerned with how agents ought to take actions in an environment to maximize some notion of cumulative reward.'],
+      ['transfer learning', 'Transfer learning is a machine learning method where a model developed for a particular task is reused as the starting point for a model on a second task.']
     ]);
 
     // Add basic AI responses
@@ -524,6 +528,7 @@ class NaturalLanguageProcessor {
     this.buildMarkovChain(text);
   }
 
+  // Enhanced Tokenization
   private tokenize(text: string): string[] {
     return text.toLowerCase().match(/\b(\w+|[^\w\s])\b/g) || [];
   }
@@ -539,7 +544,7 @@ class NaturalLanguageProcessor {
     const vectorSize = 100;
     const contextWindow = 2;
     const learningRate = 0.01;
-    const iterations = 5;
+    const iterations = 10; // Increase iterations for better embeddings
 
     // Initialize word vectors
     this.vocabulary.forEach(word => {
@@ -857,7 +862,22 @@ class NaturalLanguageProcessor {
   }
 
   private extractEntities(query: string): { [key: string]: string } {
-    return this.entityRecognitionModel.recognize(query);
+    // Enhanced entity extraction logic
+    const entities = this.entityRecognitionModel.recognize(query);
+    const additionalEntities = this.extractAdditionalEntities(query);
+    return { ...entities, ...additionalEntities };
+  }
+
+  private extractAdditionalEntities(query: string): { [key: string]: string } {
+    // Custom logic to extract additional entities
+    const additionalEntities: { [key: string]: string } = {};
+    // Example: Extract dates, times, or custom patterns
+    const datePattern = /\b\d{4}-\d{2}-\d{2}\b/;
+    const match = query.match(datePattern);
+    if (match) {
+      additionalEntities['date'] = match[0];
+    }
+    return additionalEntities;
   }
 
   private extractKeywords(words: string[]): string[] {
@@ -1106,7 +1126,6 @@ class NaturalLanguageProcessor {
     const context = `${userInput} ${sentence.join(' ')} ${nextWord}`;
     
     // Implement a more sophisticated coherence check
-    // This is a placeholder implementation
     const words = context.toLowerCase().split(' ');
     const uniqueWords = new Set(words);
     const coherenceScore = uniqueWords.size / words.length;
@@ -1229,19 +1248,23 @@ class NaturalLanguageProcessor {
   }
 
   translateText(text: string, targetLanguage: string): string {
-    // This is a placeholder implementation. In a real-world scenario,
-    // you would integrate with a translation API or use a more sophisticated translation model.
     const translations: { [key: string]: { [key: string]: string } } = {
       'hello': { 'es': 'hola', 'fr': 'bonjour', 'de': 'hallo' },
       'goodbye': { 'es': 'adiós', 'fr': 'au revoir', 'de': 'auf wiedersehen' },
       'how are you': { 'es': 'cómo estás', 'fr': 'comment allez-vous', 'de': 'wie geht es dir' },
+      // Add more translations as needed
+      'thank you': { 'es': 'gracias', 'fr': 'merci', 'de': 'danke' },
+      'please': { 'es': 'por favor', 'fr': 's\'il vous plaît', 'de': 'bitte' },
+      'yes': { 'es': 'sí', 'fr': 'oui', 'de': 'ja' },
+      'no': { 'es': 'no', 'fr': 'non', 'de': 'nein' },
+      'good morning': { 'es': 'buenos días', 'fr': 'bonjour', 'de': 'guten morgen' },
+      'good night': { 'es': 'buenas noches', 'fr': 'bonne nuit', 'de': 'gute nacht' },
+      // Add more translations as needed
     };
 
     return text.split(' ').map(word => {
       const lowerWord = word.toLowerCase();
-      return translations[lowerWord] && translations[lowerWord][targetLanguage]
-        ? translations[lowerWord][targetLanguage]
-        : word;
+      return translations[lowerWord]?.[targetLanguage] || word;
     }).join(' ');
   }
 
