@@ -106,7 +106,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
         </motion.div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-4 lg:space-x-6 items-center text-white dark:text-gray-200">
+        <div className="hidden md:flex space-x-4 lg:space-x-6 items-center text-blue-800 dark:text-gray-200">
           {navItems.map((item) => (
             <NavLink key={item.name} href={item.path} label={item.name} icon={item.icon} isActive={location.pathname === item.path} />
           ))}
@@ -121,7 +121,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
           <SearchButton onSearchClick={onSearchClick} />
           <NotificationButton toggleNotificationMenu={toggleNotificationMenu} isNotificationOpen={isNotificationOpen} notifications={notifications} />
           <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-          <button onClick={toggleMenu} className="text-xl text-white dark:text-white p-2" aria-label="Toggle menu">
+          <button onClick={toggleMenu} className="text-xl text-blue-800 dark:text-white p-2" aria-label="Toggle menu">
             {isOpen ? <FaTimes /> : <FaBars />}
           </button>
         </div>
@@ -141,7 +141,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
               <NavLink key={item.name} href={item.path} label={item.name} icon={item.icon} isActive={location.pathname === item.path} />
             ))}
             <AuthButtons />
-            <Link to="/advanced-search" className="flex px-3 py-2 rounded-md transition-colors duration-300 items-center text-blue-300 dark:text-gray-200 hover:bg-blue-500 hover:text-white dark:hover:bg-yellow-400 dark:hover:text-gray-900">
+            <Link to="/advanced-search" className="flex px-3 py-2 rounded-md transition-colors duration-300 items-center text-blue-500 dark:text-gray-200 hover:bg-blue-300 hover:text-white dark:hover:bg-yellow-400 dark:hover:text-gray-900">
               <FaSearch className="mr-2" /> <span className="ml-2">Advanced Search</span>
             </Link>
           </motion.div>
@@ -234,7 +234,7 @@ const NotificationButton: React.FC<{ toggleNotificationMenu: () => void; isNotif
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <button onClick={toggleNotificationMenu} className="flex p-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 relative">
+    <button onClick={toggleNotificationMenu} className="flex p-2 text-blue-300 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300 relative">
       <FaBell className={`w-5 h-5 ${isNotificationOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
       {unreadCount > 0 && (
         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -336,7 +336,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ isDarkMode, toggleDarkMode })
   return (
     <button
       onClick={toggleDarkMode}
-      className="p-2 text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300"
+      className="p-2 text-blue-900 dark:text-gray-200 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors duration-300"
     >
       {isDarkMode ? (
         <FaSun className="w-5 h-5" />
