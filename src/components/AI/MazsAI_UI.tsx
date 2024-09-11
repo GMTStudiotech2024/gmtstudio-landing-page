@@ -1,23 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiCpu, FiRepeat, FiMic, FiCopy, FiArrowDown, FiTrash2, FiEdit, FiShare, FiArchive, FiPlus, FiCheck } from 'react-icons/fi';
+import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiRepeat, FiMic, FiCopy, FiArrowDown, FiTrash2, FiEdit, FiShare, FiArchive, FiPlus, FiCheck, FiSettings  } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, getModelCalculations, regenerateResponse, getChatHistories, createChatHistory, renameChatHistory, deleteChatHistory } from './MazsAI';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, regenerateResponse, getChatHistories, createChatHistory, renameChatHistory, deleteChatHistory } from './MazsAI';
+// import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+// import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import * as MazsAI from './MazsAI';
+import EmojiPicker from 'emoji-picker-react';
 interface Message {
   text: string;
   isUser: boolean;
   isTyping?: boolean;
   attachments?: File[];
   timestamp: Date;
+  userName?: string;
 }
 
 interface ChatHistory {
   id: string;
   name: string;
 }
-
 const ChatBotUI: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -32,8 +33,6 @@ const ChatBotUI: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [showCalculations, setShowCalculations] = useState(false);
-  const [calculations, setCalculations] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [userTyping, setUserTyping] = useState(false);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
@@ -47,6 +46,17 @@ const ChatBotUI: React.FC = () => {
   const [newChatName, setNewChatName] = useState('');
   const [editingHistoryId, setEditingHistoryId] = useState<string | null>(null);
   const [editingHistoryName, setEditingHistoryName] = useState('');
+  const [userName, setUserName] = useState(() => {
+    // Try to get the userName from localStorage, or use "User" as default
+    return localStorage.getItem('userName') || "User(change it if you want)" ;
+  });
+  const [isEditingUserName, setIsEditingUserName] = useState(false);
+  const botName = "Mazs AI v1.1 Anatra";
+
+  const [showSettings, setShowSettings] = useState(false);
+  const [fontSize, setFontSize] = useState(16);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [userAvatar, setUserAvatar] = useState('👤');
 
   useEffect(() => {
     setSuggestions(getConversationSuggestions());
@@ -112,7 +122,8 @@ const ChatBotUI: React.FC = () => {
       text: attachedFiles.length > 0 ? `Attached ${attachedFiles.length} file(s)` : input, 
       isUser: true,
       attachments: attachedFiles,
-      timestamp: new Date()
+      timestamp: new Date(),
+      userName: userName
     };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
@@ -127,10 +138,6 @@ const ChatBotUI: React.FC = () => {
         const botMessage: Message = { text: botResponse, isUser: false, isTyping: true, timestamp: new Date() };
         setMessages((prevMessages) => [...prevMessages, botMessage]);
         setCurrentTypingIndex(0);
-
-        // Update calculations
-        const newCalculations = getModelCalculations(input);
-        setCalculations(newCalculations);
       }
     } catch (error) {
       console.error("Error processing message:", error);
@@ -257,16 +264,6 @@ const ChatBotUI: React.FC = () => {
     }
   };
 
-  const formatCalculations = (calculations: string) => {
-    return calculations.split('\n').map((line, index) => {
-      if (line.includes(':')) {
-        const [key, value] = line.split(':');
-        return `"${key.trim()}": "${value.trim()}"${index < calculations.split('\n').length - 1 ? ',' : ''}`;
-      }
-      return line;
-    }).join('\n');
-  };
-
   const handleVoiceInput = () => {
     setIsRecording(!isRecording);
     // Implement voice recognition logic here
@@ -387,8 +384,102 @@ const ChatBotUI: React.FC = () => {
     }
   };
 
+  const handleUserNameEdit = () => {
+    setIsEditingUserName(true);
+  };
+
+  const handleUserNameSave = () => {
+    setIsEditingUserName(false);
+    // Save the userName to localStorage
+    localStorage.setItem('userName', userName);
+  };
+
+  const handleUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserName(e.target.value);
+  };
+
+  const handleFontSizeChange = (newSize: number) => {
+    setFontSize(newSize);
+  };
+
+  const checkForUpdates = () => {
+    // Implement version checking logic here
+    console.log("Checking for updates...");
+  };
+
+  const handleEmojiClick = (emojiObject: any) => {
+    setUserAvatar(emojiObject.emoji);
+    setShowEmojiPicker(false);
+  };
+
+  const renderSettings = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-w-full max-h-[90vh] overflow-y-auto shadow-xl">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">Settings</h2>
+          <button
+            onClick={() => setShowSettings(false)}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration "         >
+            <FiX size={24} />
+          </button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Font Size
+            </label>
+            <input
+              type="range"
+              min="12"
+              max="24"
+              value={fontSize}
+              onChange={(e) => handleFontSizeChange(Number(e.target.value))}
+              className="w-full"
+            />
+            <span className="text-sm text-gray-600 dark:text-gray-400">{fontSize}px</span>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              User Avatar
+            </label>
+            <div className="flex items-center space-x-2">
+              <div className="w-10 h-10 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-lg text-2xl">
+                {userAvatar}
+              </div>
+              <button
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200"
+              >
+                Change Avatar
+              </button>
+            </div>
+            {showEmojiPicker && (
+              <div className="mt-2">
+                <EmojiPicker onEmojiClick={handleEmojiClick} />
+              </div>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Version
+            </label>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">v1.1 Anatra</span>
+              <button
+                onClick={checkForUpdates}
+                className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200"
+              >
+                Check for Updates
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''}`}>
+    <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''}`} style={{ fontSize: `${fontSize}px` }}>
       <div className="flex-1 bg-gray-100 dark:bg-gray-900 transition-colors duration-200 overflow-hidden pt-20">
         <div className="max-w-7xl mx-auto p-4 h-full flex flex-col">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
@@ -413,16 +504,16 @@ const ChatBotUI: React.FC = () => {
                 {isDarkMode ? <FiSun /> : <FiMoon />}
               </button>
               <button
-                onClick={() => setShowCalculations(!showCalculations)}
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
-              >
-                <FiCpu />
-              </button>
-              <button
                 onClick={() => setShowChatHistory(!showChatHistory)}
                 className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
               >
                 <FiArchive />
+              </button>
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+              >
+                <FiSettings />
               </button>
             </div>
           </div>
@@ -449,6 +540,40 @@ const ChatBotUI: React.FC = () => {
                       onContextMenu={(e) => handleMessageContextMenu(e, index)}
                     >
                       <div className={`inline-block max-w-[80%] sm:max-w-[70%] md:max-w-[60%]`}>
+                        <div className={`flex items-center mb-1 ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+                          {message.isUser ? (
+                            <>
+                              {!isEditingUserName && (
+                                <button
+                                  onClick={handleUserNameEdit}
+                                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mr-2"
+                                >
+                                  <FiEdit size={12} />
+                                </button>
+                              )}
+                              <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                                {isEditingUserName ? (
+                                  <input
+                                    type="text"
+                                    value={userName}
+                                    onChange={handleUserNameChange}
+                                    onBlur={handleUserNameSave}
+                                    className="bg-transparent border-b border-blue-600 dark:border-blue-400 focus:outline-none text-right"
+                                  />
+                                ) : (
+                                  <>
+                                    <span className="mr-2">{userAvatar}</span>
+                                    {userName}
+                                  </>
+                                )}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                              {botName}
+                            </span>
+                          )}
+                        </div>
                         <div className={`p-3 rounded-lg ${
                           message.isUser
                             ? 'bg-blue-500 text-white'
@@ -457,13 +582,14 @@ const ChatBotUI: React.FC = () => {
                           {message.isUser || !message.isTyping
                             ? message.text
                             : message.text.slice(0, currentTypingIndex)}
-                          {!message.isUser && message.isTyping &&                            <span className="inline-block w-1 h-4 ml-1 bg-gray-800 dark:bg-white animate-blink"></span>
+                          {!message.isUser && message.isTyping &&                           
+                           <span className="inline-block w-1 h-4 ml-1 bg-gray-800 dark:bg-white animate-blink"></span>
                           }
                         </div>
-                        <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-center justify-between">
+                        <div className={`mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-center ${message.isUser ? 'justify-end' : 'justify-between'}`}>
                           <span>{message.timestamp.toLocaleTimeString()}</span>
                           {!message.isUser && (
-                            <div className="flex items-center">
+                            <div className="flex items-center ml-2">
                               <button
                                 onClick={() => copyToClipboard(message.text)}
                                 className="mr-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
@@ -585,7 +711,7 @@ const ChatBotUI: React.FC = () => {
                         </div>
                         <textarea
                           value={input}
-                          onChange={(e) => {
+                                          onChange={(e) => {
                             setInput(e.target.value.slice(0, 1000));
                             setUserTyping(true);
                             setTimeout(() => setUserTyping(false), 1000);
@@ -628,39 +754,11 @@ const ChatBotUI: React.FC = () => {
                 </div>
               </div>
             </div>
-            {showCalculations && (
-              <div className="w-1/3 ml-4 flex flex-col">
-                <div className="flex-1 overflow-hidden mb-4 rounded-lg bg-gray-900 shadow-inner transition-all duration-200">
-                  <div className="flex items-center justify-between bg-gray-800 px-4 py-2">
-                    <h2 className="text-lg font-semibold text-white">Neural Network Calculations</h2>
-                    <button
-                      onClick={() => setShowCalculations(false)}
-                      className="text-gray-400 hover:text-white transition-colors duration-200"
-                    >
-                      <FiX />
-                    </button>
-                  </div>
-                  <div className="overflow-y-auto h-full">
-                    <SyntaxHighlighter
-                      language="json"
-                      style={vscDarkPlus}
-                      customStyle={{
-                        margin: 0,
-                        padding: '1rem',
-                        background: 'transparent',
-                        fontSize: '0.875rem',
-                      }}
-                    >
-                      {formatCalculations(calculations)}
-                    </SyntaxHighlighter>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
       {scrollToBottomButton()}
+      {showSettings && renderSettings()}
       {showChatHistory && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-w-full max-h-[90vh] overflow-y-auto shadow-xl">
