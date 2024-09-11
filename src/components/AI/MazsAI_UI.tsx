@@ -421,7 +421,7 @@ const ChatBotUI: React.FC = () => {
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">Settings</h2>
           <button
             onClick={() => setShowSettings(false)}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
+                        className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
           >
             <FiX size={24} />
           </button>
@@ -727,7 +727,7 @@ const ChatBotUI: React.FC = () => {
               </div>
               <div className="mt-auto">
                 {suggestions.length > 0 && messages.length === 1 && (
-                  <div className="mb-4">
+                  <div className="mb-4 hidden sm:block">
                     <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Suggestions:</h3>
                     <div className="flex flex-wrap gap-2">
                       {suggestions.map((suggestion, index) => (
