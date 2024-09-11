@@ -180,21 +180,21 @@ a, button {
 
 /* Background images */
 .background-custom {
-  background-image: url('../src/assets/images/AAAAA.png');
+  background-image: url('../src/components/assets/images/AAAAA.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .bck-cus {
-  background-image: url('../src/assets/images/CCCC.png');
+  background-image: url('../src/components/assets/images/CCCC.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .bck-cus2 {
-  background-image: url('../src/assets/images/1.png');
+  background-image: url('../src/components/assets/images/1.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -206,7 +206,7 @@ a, button {
 
 /* index.css */
 .light-mode-wallpaper {
-  background-image: url("../src/assets/images/GMTStudio_e.png");
+  background-image: url("../src/components/assets/images/GMTStudio_e.png");
   background-size: cover;
   background-position: center;
   opacity: 0.5;
@@ -214,7 +214,7 @@ a, button {
 }
 
 .dark-mode-wallpaper {
-  background-image: url("../src/assets/images/GMTStudio_d.png");
+  background-image: url("../src/components/assets/images/GMTStudio_d.png");
   background-size: cover;
   background-position: center;
   opacity: 0.5;
@@ -344,7 +344,7 @@ a, button {
   transition: background-position 0.1s ease-out;
 }
 #hero {
-  background-image: url('./assets/images/GMTStudio_d.png'); /* Set your large background image here */
+  background-image: url('../src/components/assets/images/GMTStudio_d.png'); /* Set your large background image here */
   background-size:center;
   background-attachment: fixed; /* Parallax effect */
   background-repeat: no-repeat;

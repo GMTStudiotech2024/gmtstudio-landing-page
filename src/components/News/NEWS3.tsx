@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import blogImage2 from '../assets/GMTStudio_p.png';
+import blogImage2 from '../assetss/GMTStudio_p.png';
 
 const NEWS3: React.FC = () => {
   const navigate = useNavigate();

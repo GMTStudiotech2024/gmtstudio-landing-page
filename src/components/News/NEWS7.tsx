@@ -1,6 +1,6 @@
 import React from 'react';
 
-import blogImage2 from '../assets/GMTStudio_p.png';
+import blogImage2 from '../assetss/GMTStudio_p.png';
 
 const NEWS7: React.FC = () => {
 

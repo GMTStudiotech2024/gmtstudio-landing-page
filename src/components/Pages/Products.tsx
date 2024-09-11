@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaRocket, FaRobot, FaSearch,  FaThLarge, FaList, FaExclamationCircle, FaGlobe, FaCompass,  FaClock, FaFlask, FaLock , FaCode} from 'react-icons/fa';
-import AnimatedItem from './AnimatedItem';
+import AnimatedItem from '../AnimatedItem';
 import projectImage1 from '../assets/images/MazsAiPic.png';
 import projectImage2 from '../assets/images/blog5.png';
 import projectImage3 from '../assets/images/Story.jpg';

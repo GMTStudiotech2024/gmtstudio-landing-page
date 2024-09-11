@@ -5,7 +5,7 @@ import { FaGlobe, FaRobot, FaUsers, FaBell, FaCheckCircle, FaExclamationTriangle
 import { BiRefresh } from 'react-icons/bi';
 import { FaCog, FaHistory, FaInfoCircle, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import Logo from '../assets/images/npc.png';
-import StatusBar from '../components/StatusBar';
+import StatusBar from './StatusBar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
