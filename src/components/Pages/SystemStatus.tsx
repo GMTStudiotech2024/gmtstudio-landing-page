@@ -1,15 +1,13 @@
-
-
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaGlobe, FaRobot, FaUsers, FaBell, FaCheckCircle, FaExclamationTriangle, FaChartBar, FaServer, FaDatabase, FaCloud, FaCalendarAlt } from 'react-icons/fa';
+import { FaGlobe, FaRobot, FaUsers, FaBell, FaCheckCircle, FaExclamationTriangle, FaChartBar, FaServer, FaDatabase, FaCloud, FaCalendarAlt, FaCog, FaHistory, FaInfoCircle, FaArrowUp, FaArrowDown, FaExclamationCircle, FaQuestionCircle, FaTwitter, FaGithub, FaDiscord } from 'react-icons/fa';
 import { BiRefresh } from 'react-icons/bi';
-import { FaCog, FaHistory, FaInfoCircle, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import Logo from '../assets/images/npc.png';
 import StatusBar from './StatusBar';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { Line, Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 interface ServiceStatus {
@@ -36,6 +34,8 @@ const SystemStatus: React.FC = () => {
     'Mazs Artificial Intelligence': ['operational', 'partial', 'operational', 'operational', 'operational', 'operational', 'operational'],
     'Theta Social Media': ['operational', 'operational', 'operational', 'major', 'operational', 'operational', 'operational'],
   });
+
+  const [showLegend, setShowLegend] = useState(false);
 
   const refreshStatus = useCallback(() => {
     setLastRefresh(new Date());
@@ -65,10 +65,10 @@ const SystemStatus: React.FC = () => {
   }, [services, setServices, setOverallStatus, setDailyStatus]);
 
   useEffect(() => {
-    // Simulate periodic refresh
-    const intervalId = setInterval(refreshStatus, 60000); // Refresh every minute
+    const intervalId = setInterval(refreshStatus, 60000);
     return () => clearInterval(intervalId);
   }, [refreshStatus]);
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-4 sm:p-8 pt-16 sm:pt-20">
@@ -84,11 +84,15 @@ const SystemStatus: React.FC = () => {
           <button onClick={refreshStatus} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition duration-300">
             <BiRefresh className="text-lg sm:text-xl" />
           </button>
+          <button onClick={() => setShowLegend(!showLegend)} className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full transition duration-300">
+            <FaQuestionCircle className="text-lg sm:text-xl" />
+          </button>
         </div>
       </header>
 
       <AnimatePresence>
         {showNotifications && <NotificationsPanel />}
+        {showLegend && <LegendPanel />}
       </AnimatePresence>
 
       <StatusBar services={services} />
@@ -99,8 +103,8 @@ const SystemStatus: React.FC = () => {
         transition={{ duration: 0.5 }}
         className="bg-gray-800 rounded-2xl p-6 sm:p-8 mb-8 shadow-lg backdrop-blur-lg bg-opacity-50"
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+          <div className="flex items-center mb-4 sm:mb-0">
             {overallStatus === 'operational' && <FaCheckCircle className="text-green-500 mr-3 text-2xl" />}
             {overallStatus === 'partial' && <FaExclamationTriangle className="text-yellow-500 mr-3 text-2xl" />}
             {overallStatus === 'major' && <FaExclamationTriangle className="text-red-500 mr-3 text-2xl" />}
@@ -110,17 +114,17 @@ const SystemStatus: React.FC = () => {
               {overallStatus === 'major' && 'Major System Outage'}
             </h2>
           </div>
-          <div className="text-gray-400">
+          <div className="text-gray-400 text-sm sm:text-base">
             Last updated: {lastRefresh.toLocaleString()}
           </div>
         </div>
-        <p className="mt-4 text-gray-400 text-lg">
+        <p className="mt-4 text-gray-400 text-base sm:text-lg">
           This is the status of the GMTStudio official website and related services.
         </p>
       </motion.div>
 
       <div className="mb-8 overflow-x-auto">
-        <nav className="flex space-x-4 min-w-max">
+        <nav className="flex space-x-2 sm:space-x-4 min-w-max">
           <TabButton active={activeTab === 'overview'} onClick={() => setActiveTab('overview')}>
             <FaInfoCircle className="mr-2" /> Overview
           </TabButton>
@@ -161,7 +165,10 @@ const SystemStatus: React.FC = () => {
         </motion.div>
       </AnimatePresence>
 
-      <MaintenanceSchedule />
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <MaintenanceSchedule />
+        <SocialMediaFeed />
+      </div>
     </div>
   );
 };
@@ -182,8 +189,8 @@ interface StatusItemProps {
 
 const StatusSection: React.FC<StatusSectionProps> = ({ title, icon, items }) => {
   return (
-    <div className="bg-gray-800 rounded-2xl p-6 shadow-lg backdrop-blur-lg bg-opacity-50">
-      <h2 className="text-xl font-semibold mb-4 flex items-center">
+    <div className="bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-lg backdrop-blur-lg bg-opacity-50">
+      <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center">
         {icon}
         <span className="ml-2">{title}</span>
       </h2>
@@ -198,8 +205,8 @@ const StatusSection: React.FC<StatusSectionProps> = ({ title, icon, items }) => 
 
 const StatusItem: React.FC<StatusItemProps> = ({ name, status, host, uptime, responseTime }) => {
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center mb-2 sm:mb-0">
         <div className={`w-3 h-3 rounded-full ${status === 100 ? 'bg-green-500' : 'bg-yellow-500'} mr-3`}></div>
         <span className="font-medium">{name}</span>
       </div>
@@ -214,7 +221,7 @@ const StatusItem: React.FC<StatusItemProps> = ({ name, status, host, uptime, res
 
 const TabButton: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode }> = ({ active, onClick, children }) => (
   <button
-    className={`flex items-center px-4 py-2 rounded-lg transition-colors duration-200 ${
+    className={`flex items-center px-3 sm:px-4 py-2 rounded-lg transition-colors duration-200 text-sm sm:text-base ${
       active ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
     }`}
     onClick={onClick}
@@ -224,36 +231,6 @@ const TabButton: React.FC<{ active: boolean; onClick: () => void; children: Reac
 );
 
 const PerformanceMetrics: React.FC = () => {
-  return (
-    <div className="mt-8">
-      <h2 className="text-2xl font-semibold mb-6 flex items-center">
-        <FaChartBar className="mr-2" /> Performance Metrics
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <MetricCard title="Average Response Time" value="135ms" change="-5%" />
-        <MetricCard title="Requests per Minute" value="1,240" change="+3%" />
-        <MetricCard title="Error Rate" value="0.02%" change="-0.01%" />
-      </div>
-      <ResponseTimeChart />
-    </div>
-  );
-};
-
-const MetricCard: React.FC<{ title: string; value: string; change: string }> = ({ title, value, change }) => {
-  const isPositive = change.startsWith('+');
-  return (
-    <div className="bg-gray-800 rounded-2xl p-6 shadow-lg backdrop-blur-lg bg-opacity-50">
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      <div className="text-2xl font-bold">{value}</div>
-      <div className={`text-sm flex items-center ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-        {isPositive ? <FaArrowUp className="mr-1" /> : <FaArrowDown className="mr-1" />}
-        {change}
-      </div>
-    </div>
-  );
-};
-
-const ResponseTimeChart: React.FC = () => {
   const data = {
     labels: ['1h ago', '45m ago', '30m ago', '15m ago', 'Now'],
     datasets: [
@@ -269,6 +246,7 @@ const ResponseTimeChart: React.FC = () => {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         display: false,
@@ -293,10 +271,83 @@ const ResponseTimeChart: React.FC = () => {
     },
   };
 
+  const uptimeData = {
+    labels: ['Uptime', 'Downtime'],
+    datasets: [
+      {
+        data: [99.98, 0.02],
+        backgroundColor: ['#10B981', '#EF4444'],
+        hoverBackgroundColor: ['#059669', '#DC2626'],
+      },
+    ],
+  };
+
+  const uptimeOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context: any) {
+            return `${context.label}: ${context.raw}%`;
+          }
+        }
+      }
+    },
+    cutout: '70%',
+  };
+
   return (
-    <div className="bg-gray-800 rounded-2xl p-6 shadow-lg backdrop-blur-lg bg-opacity-50">
-      <h3 className="text-xl font-semibold mb-4">Response Time Trend</h3>
-      <Line data={data} options={options} />
+    <div className="mt-8">
+      <h2 className="text-xl sm:text-2xl font-semibold mb-6 flex items-center">
+        <FaChartBar className="mr-2" /> Performance Metrics
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+        <MetricCard title="Average Response Time" value="135ms" change="-5%" />
+        <MetricCard title="Requests per Minute" value="1,240" change="+3%" />
+        <MetricCard title="Error Rate" value="0.02%" change="-0.01%" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <ResponseTimeChart data={data} options={options} />
+        <div className="bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-lg backdrop-blur-lg bg-opacity-50">
+          <h3 className="text-lg sm:text-xl font-semibold mb-4">System Uptime</h3>
+          <div style={{ height: '300px' }}>
+            <Doughnut data={uptimeData} options={uptimeOptions} />
+          </div>
+          <div className="mt-4 text-center">
+            <span className="text-2xl font-bold">99.98%</span>
+            <span className="text-gray-400 ml-2">Uptime last 30 days</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const MetricCard: React.FC<{ title: string; value: string; change: string }> = ({ title, value, change }) => {
+  const isPositive = change.startsWith('+');
+  return (
+    <div className="bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-lg backdrop-blur-lg bg-opacity-50">
+      <h3 className="text-base sm:text-lg font-semibold mb-2">{title}</h3>
+      <div className="text-xl sm:text-2xl font-bold">{value}</div>
+      <div className={`text-sm flex items-center ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+        {isPositive ? <FaArrowUp className="mr-1" /> : <FaArrowDown className="mr-1" />}
+        {change}
+      </div>
+    </div>
+  );
+};
+
+const ResponseTimeChart: React.FC<{ data: any; options: any }> = ({ data, options }) => {
+  return (
+    <div className="bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-lg backdrop-blur-lg bg-opacity-50">
+      <h3 className="text-lg sm:text-xl font-semibold mb-4">Response Time Trend</h3>
+      <div style={{ height: '300px' }}>
+        <Line data={data} options={options} />
+      </div>
     </div>
   );
 };
@@ -387,6 +438,64 @@ const NotificationsPanel: React.FC = () => {
     </motion.div>
   );
 };
+
+const LegendPanel: React.FC = () => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="bg-gray-800 rounded-2xl p-6 mb-8 shadow-lg backdrop-blur-lg bg-opacity-50"
+    >
+      <h3 className="text-xl font-semibold mb-3">Status Legend</h3>
+      <div className="space-y-2">
+        <div className="flex items-center">
+          <div className="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
+          <span>Operational</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-4 h-4 rounded-full bg-yellow-500 mr-2"></div>
+          <span>Partial Outage</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-4 h-4 rounded-full bg-red-500 mr-2"></div>
+          <span>Major Outage</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+const SocialMediaFeed: React.FC = () => {
+  const posts = [
+    { id: 1, platform: 'Mazs AI ', content: "Mazs AI version 1.1.0 update" },
+    { id: 2, platform: 'GMTStudio official website', content: 'New release v2.0.0 is now available. Check out the changelog for details.' },
+    { id: 3, platform: 'Theta Social Media', content: 'No updates' },
+  ];
+
+  return (
+    <div className="bg-gray-800 rounded-2xl p-6 shadow-lg backdrop-blur-lg bg-opacity-50">
+      <h2 className="text-2xl font-semibold mb-4 flex items-center">
+        <FaBell className="mr-2" /> All projects updates 
+      </h2>
+      <div className="space-y-4">
+        {posts.map((post) => (
+          <div key={post.id} className="bg-gray-700 rounded-lg p-4">
+            <div className="flex items-center mb-2">
+              {post.platform === 'twitter' && <FaTwitter className="text-blue-400 mr-2" />}
+              {post.platform === 'github' && <FaGithub className="text-white mr-2" />}
+              {post.platform === 'discord' && <FaDiscord className="text-indigo-400 mr-2" />}
+              <span className="capitalize">{post.platform}</span>
+            </div>
+            <p>{post.content}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 
 interface DailyStatusBarProps {
   dailyStatus: Record<string, ('operational' | 'partial' | 'major')[]>;

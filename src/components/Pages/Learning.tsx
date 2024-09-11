@@ -710,14 +710,14 @@ const Learning: React.FC = () => {
               placeholder="Search courses..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full sm:w-auto pl-10 pr-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              className="w-full sm:w-auto pl-10 pr-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             />
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="w-full sm:w-auto py-2 px-4 rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            className="w-full sm:w-auto py-2 px-4 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
           >
             <option value="all">All Courses</option>
             <option value="html">HTML</option>
@@ -1083,7 +1083,7 @@ const Learning: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 transition-colors duration-300 ${isDarkMode ? 'dark bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
+    <div className={`min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 transition-colors duration-300 ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
       {renderHeader()}
       <div className="max-w-6xl w-full mt-32 sm:mt-20">
         {renderModeSelection()}

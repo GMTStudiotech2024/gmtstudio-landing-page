@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FaHome, FaNewspaper, FaFlask, FaGraduationCap, FaEnvelope, FaSignInAlt, FaInfoCircle, FaChevronDown, FaChevronUp, FaProjectDiagram, FaRocket, FaRobot, FaDatabase, FaBug, FaExclamationTriangle, FaCode, FaPaintBrush, FaGlobe, FaAtom, FaBrain, FaComments, FaBars, FaSearch, FaChevronLeft, FaChevronRight, FaSun, FaMoon, FaUserCircle } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import ThemeToggle from '../services/ThemeToggle';
 
 interface SidebarProps {
   className?: string;
@@ -13,15 +14,15 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
   const location = useLocation();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   const toggleDropdown = (label: string) => {
     setOpenDropdown(openDropdown === label ? null : label);
   };
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
+  const sidebarVariants = {
+    open: { width: '18rem', transition: { duration: 0.3, ease: 'easeInOut' } },
+    closed: { width: '4rem', transition: { duration: 0.3, ease: 'easeInOut' } },
   };
 
   const links = [
@@ -71,10 +72,10 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
 
   return (
     <motion.div 
-      className={`fixed left-0 top-0 h-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white p-4 z-40 overflow-y-auto transition-all duration-300 ease-in-out pt-20 ${isOpen ? 'w-72' : 'w-16'} ${className} shadow-lg`}
+      className={`fixed left-0 top-0 h-full bg-white dark:bg-gray-900 text-gray-800 dark:text-white p-4 z-40 overflow-y-auto transition-all duration-300 ease-in-out pt-20 ${isOpen ? 'w-72' : 'w-16'} ${className} shadow-lg`}
       initial={false}
-      animate={{ width: isOpen ? '18rem' : '4rem' }}
-      transition={{ duration: 0.3 }}
+      animate={isOpen ? 'open' : 'closed'}
+      variants={sidebarVariants}
     >
       {isOpen && (
         <motion.div 
@@ -84,17 +85,15 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
           transition={{ delay: 0.2 }}
         >
           <h2 className="text-2xl font-semibold text-center text-gray-800 dark:text-white flex items-center">
-            <FaUserCircle className="mr-2" />
+            <FaUserCircle className="mr-2 text-blue-500" />
             Hello, User
           </h2>
-          <button onClick={toggleDarkMode} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors duration-200">
-            {isDarkMode ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-gray-600" />}
-          </button>
+          <ThemeToggle />
         </motion.div>
       )}
       {isOpen && (
         <motion.div 
-          className="mb-4"
+          className="mb-6"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -106,34 +105,44 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
               placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-2 pl-10 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-300 dark:border-gray-700"
+              className="w-full p-2 pl-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-transparent focus:border-blue-500 transition-all duration-200"
             />
           </div>
         </motion.div>
       )}
       <nav>
         <AnimatePresence>
-          <ul className="space-y-1">
+          <ul className="space-y-2">
             {filteredLinks.map((link, index) => (
               <motion.li 
                 key={link.label}
-                initial={{ opacity: 0, x: -20 }}
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ delay: index * 0.05 }}
               >
                 {link.subItems ? (
                   <div>
-                    <button
+                    <motion.button
                       onClick={() => toggleDropdown(link.label)}
-                      className={`flex items-center justify-between w-full p-2 rounded-lg transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-800 ${openDropdown === link.label ? 'bg-gray-200 dark:bg-gray-800' : ''}`}
+                      className={`flex items-center justify-between w-full p-2 rounded-lg transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 ${openDropdown === link.label ? 'bg-blue-50 dark:bg-blue-900' : ''}`}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       <span className="flex items-center">
-                        <link.icon className={`${!isOpen ? 'text-xl mx-auto' : 'mr-3'} text-gray-600 dark:text-gray-400`} />
+                        <link.icon className={`${!isOpen ? 'text-xl mx-auto' : 'mr-3'} text-blue-500`} />
                         {isOpen && <span className="font-medium">{link.label}</span>}
                       </span>
-                      {isOpen && (openDropdown === link.label ? <FaChevronUp className="text-gray-600 dark:text-gray-400" /> : <FaChevronDown className="text-gray-600 dark:text-gray-400" />)}
-                    </button>
+                      {isOpen && (
+                        <motion.div
+                          initial={false}
+                          animate={{ rotate: openDropdown === link.label ? 180 : 0 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <FaChevronDown className="text-gray-600 dark:text-gray-400" />
+                        </motion.div>
+                      )}
+                    </motion.button>
                     <AnimatePresence>
                       {openDropdown === link.label && isOpen && (
                         <motion.ul 
@@ -156,7 +165,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
                                 className={`flex items-center p-2 rounded-lg transition-colors duration-200 ${
                                   location.pathname === subItem.to
                                     ? 'bg-blue-500 text-white'
-                                    : 'hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
+                                    : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                                 }`}
                               >
                                 <subItem.icon className="mr-3 text-sm" />
@@ -174,10 +183,10 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
                     className={`flex items-center p-2 rounded-lg transition-colors duration-200 ${
                       location.pathname === link.to
                         ? 'bg-blue-500 text-white'
-                        : 'hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
+                        : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                     }`}
                   >
-                    <link.icon className={`${!isOpen ? 'text-xl mx-auto' : 'mr-3'} ${location.pathname === link.to ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
+                    <link.icon className={`${!isOpen ? 'text-xl mx-auto' : 'mr-3'} ${location.pathname === link.to ? 'text-white' : 'text-blue-500'}`} />
                     {isOpen && <span className="font-medium">{link.label}</span>}
                   </Link>
                 )}
@@ -188,7 +197,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
       </nav>
       <motion.button
         onClick={onToggle}
-        className="absolute bottom-4 right-4 p-2 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-200"
+        className="absolute bottom-4 right-4 p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 shadow-lg"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
       >
