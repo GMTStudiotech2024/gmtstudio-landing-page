@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { FaSearch, FaTimes, FaHistory, FaInfoCircle, FaExternalLinkAlt, FaChevronDown } from 'react-icons/fa';
-import { processChatbotQuery } from '../components/chatbot';
+import { processChatbotQuery } from './MazsAI';
 
 interface SearchProps {
   onClose: () => void;

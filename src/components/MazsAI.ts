@@ -2173,3 +2173,26 @@ export function deleteChatHistory(id: string): Promise<void> {
     }, 100);
   });
 }
+
+// Add this function to your MazsAI.ts file
+export interface Message {
+  text: string;
+  isUser: boolean;
+  timestamp: Date;
+}
+
+export function getChatHistoryMessages(id: string): Promise<Message[]> {
+  return new Promise((resolve) => {
+    // Simulating an API call to fetch messages for a specific chat history
+    setTimeout(() => {
+      // Replace this with actual logic to fetch messages
+      const messages: Message[] = [
+        { text: "Hello! I'm excited to start our conversation.", isUser: true, timestamp: new Date() },
+        { text: "Hi there! It's great to meet you. I'm Mazs AI, your intelligent assistant. How can I assist you today? Feel free to ask me anything about AI, technology, or any other topic you're curious about.", isUser: false, timestamp: new Date() },
+        { text: "That sounds interesting! Can you tell me more about your capabilities?", isUser: true, timestamp: new Date() },
+        { text: "Certainly! I'm a versatile AI assistant capable of engaging in a wide range of tasks. I can help with information retrieval, answer questions, assist with problem-solving, provide explanations on complex topics, and even engage in creative writing. Is there a specific area you'd like to explore?", isUser: false, timestamp: new Date() }
+      ];
+      resolve(messages);
+    }, 100);
+  });
+}

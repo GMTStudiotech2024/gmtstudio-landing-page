@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiCpu, FiRepeat, FiMic, FiCopy, FiArrowDown, FiTrash2, FiEdit, FiShare, FiArchive, FiPlus, FiCheck } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, getModelCalculations, regenerateResponse, getChatHistories, createChatHistory, renameChatHistory, deleteChatHistory } from './chatbot';
+import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, getModelCalculations, regenerateResponse, getChatHistories, createChatHistory, renameChatHistory, deleteChatHistory } from './MazsAI';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-
+import * as MazsAI from './MazsAI';
 interface Message {
   text: string;
   isUser: boolean;
@@ -93,7 +93,7 @@ const ChatBotUI: React.FC = () => {
 
   const addWelcomeMessage = () => {
     const welcomeMessage: Message = {
-      text: "Hello! I'm Mazs AI v1.1 Anatra. I can help you with some basic tasks. How can I assist you today? although my Nerual network structure is not yet well designed, but i will try my best to help you  ",
+      text: "Hello! I'm Mazs AI v1.1 Anatra. I How can I assist you today? ",
       isUser: false,
       timestamp: new Date()
     };
@@ -356,12 +356,22 @@ const ChatBotUI: React.FC = () => {
     loadChatHistories();
   };
 
-  const handleSelectChatHistory = (id: string) => {
+  const handleSelectChatHistory = async (id: string) => {
     setSelectedChatHistory(id);
     setShowChatHistory(false);
-    // Load messages for the selected chat history
-    // You'll need to implement this function in chatbot.ts
-    // loadMessagesForChatHistory(id);
+    const messages = await loadMessagesForChatHistory(id);
+    setMessages(messages);
+  };
+
+  const loadMessagesForChatHistory = async (id: string): Promise<Message[]> => {
+    // Fetch messages for the selected chat history
+    try {
+      const messages = await MazsAI.getChatHistoryMessages(id);
+      return messages;
+    } catch (error) {
+      console.error("Error loading chat history messages:", error);
+      return [];
+    }
   };
 
   const handleStartEditHistory = (history: ChatHistory) => {
