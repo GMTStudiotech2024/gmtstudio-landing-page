@@ -15,7 +15,7 @@ const ThemeToggle: React.FC = () => {
 
   return (
     <button onClick={toggleTheme} className="text-xl">
-      {theme === 'light' ? <FaMoon className="text-white" /> : <FaSun className="text-yellow-500" />}
+      {theme === 'light' ? <FaMoon className="text-purple-500" /> : <FaSun className="text-yellow-500" />}
     </button>
   );
 }

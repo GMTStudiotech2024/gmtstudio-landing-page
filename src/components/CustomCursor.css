@@ -84,5 +84,16 @@ body, a, button {
   .custom-cursor,
   .custom-cursor::after {
     transition: none;
+  .custom-cursor:dark
+  .custom-cursor:dark::after {
+    transition: none;
   }
+}
+.custom-cursor:dark {
+  background-color: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+}
+.custom-cursor:dark::after {
+  border-color: rgba(0, 0, 0, 0.5);
+}
 }
