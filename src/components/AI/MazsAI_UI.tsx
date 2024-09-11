@@ -56,8 +56,10 @@ const ChatBotUI: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [fontSize, setFontSize] = useState(16);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [userAvatar, setUserAvatar] = useState('👤');
-
+  const [userAvatar, setUserAvatar] = useState(() => {
+    // Try to get the userAvatar from localStorage, or use default emoji
+    return localStorage.getItem('userAvatar') || '👤';
+  });
   useEffect(() => {
     setSuggestions(getConversationSuggestions());
     addWelcomeMessage();
@@ -487,7 +489,11 @@ const ChatBotUI: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Theme
             </label>
-            <select className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+            <select
+              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              onChange={(e) => setIsDarkMode(e.target.value === 'Dark')}
+              value={isDarkMode ? 'Dark' : 'Light'}
+            >
               <option>Light</option>
               <option>Dark</option>
             </select>
