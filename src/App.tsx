@@ -34,6 +34,7 @@ import NEWS13 from './components/News/NEWS13';
 import NEWS14 from './components/News/NEWS14';
 import NEWS15 from './components/News/NEWS15';
 import NEWS16 from './components/News/NEWS16';
+import NEWS17 from './components/News/NEWS17';
 import Products from './components/Pages/Products';
 import Help from './components/Pages/Help';
 import MazsAI from './components/AI/MazsAI_UI'; 
@@ -115,6 +116,7 @@ const AppContent: React.FC = () => {
           <Route path="/news14" element={<NEWS14 />} />
           <Route path="/news15" element={<NEWS15 />} />
           <Route path="/news16" element={<NEWS16 />} />
+          <Route path="/news17" element={<NEWS17 />} />
           <Route path="/research" element={<Research />} />
           <Route path="/learning" element={<Learning />} />
           <Route path="*" element={<Error />} />

@@ -7,7 +7,7 @@ import projectImage2 from '../assets/images/blog5.png';
 import projectImage3 from '../assets/images/Story.jpg';
 import game_ohmypc from '../assets/images/Game_ohmypc.jpg';
 import game_dungeon from '../assets/images/Game_dungeon.jpg';
-import AI from '../assets/images/AI.png'
+import AI from '../assets/images/MazsAI_v1.1.0.png'
 import { faRocket, faExclamationCircle, faGlobe, faCompass } from '@fortawesome/free-solid-svg-icons';
 const projects = [
   {

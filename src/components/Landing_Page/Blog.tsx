@@ -2,24 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { FaChevronDown, FaSearch, FaTags, FaCalendarAlt, FaUser, FaEye, FaShare, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import DEV from '../assets/images/1.png'
-import Beta from '../assets/images/cool_design.png'
-import AI from '../assets/images/AI.png'
-import GMTStudio from '../assets/images/GMTStudio_a.png'
+  import Beta from '../assets/images/cool_design.png'
+  import MazsAI12 from '../assets/images/MazsAI_v1.2.0.png'
+  import MazsAI11 from '../assets/images/MazsAI_v1.1.0.png'
 const blogPosts = [
   {
-    image:GMTStudio,
-    title:"Mazs AI update and migration the AI service to GMTStudio official website",
-    excerpt:"New AI model has several new features and capabilities.",
+    image:MazsAI12,
+    title:"Mazs AI v1.2.0 Anatra update",
+    excerpt:"Mazs AI v1.2.0 Anatra is now update, adding new features and update UI for it.",
     author:"Alston Chang",
-    date:"August 15, 2024",
-    link:"/news16",
+    date:"September 12, 2024",
+    link:"/news17",
     category:"Development Log",
     views:100,
     readTime:"1 min"
   },
   { 
-    image: AI, 
+    image: MazsAI11, 
     title: "Mazs AI: A Technical Deep Dive", 
     excerpt: "Comprehensive analysis of a neural network-powered chatbot, exploring architecture, training, limitations, and future enhancements in conversational AI", 
     author: "Alston Chang", 

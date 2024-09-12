@@ -10,13 +10,34 @@ import WebDev from '../assets/images/1.png'
 import Beta from '../assets/images/cool_design.png'
 import AI from '../assets/images/AI.png'
 import GMTStudio from '../assets/images/GMTStudio_a.png'
+import MazsAI12 from '../assets/images/MazsAI_v1.2.0.png'
+import MazsAI11 from '../assets/images/MazsAI_v1.1.0.png'
 const blogPosts = [
+  {
+    image:MazsAI12,
+    title:"Mazs AI v1.2.0 Anatra update",
+    excerpt:"Mazs AI v1.2.0 Anatra is now update, adding new features and update UI for it.",
+    author:"Alston Chang",
+    date:"September 12, 2024",
+    link:"/news17",
+    category:"AI",
+  },
+  {
+    image:MazsAI11,
+    title:"Mazs AI v1.1.0 Anatra update",
+    excerpt:"Mazs AI v1.1.0 Anatra is now update, we move the AI to official website, and add some new UI for it.",
+    author:"Alston Chang",
+    date:"September 01, 2024",
+    link:"/news16",
+    category:"AI",
+  },
+
   {
     image:AI,
     title:"Mazs AI v1.0 Anatra update",
     excerpt:"Mazs AI v1.0 Anatra is a new AI website generator that is powered by the latest technology and it is the first of its kind.",
     author:"Alston Chang",
-    date:"August 15, 2024",
+    date:"August 19, 2024",
     link:"/news15",
     category:"AI",
   },

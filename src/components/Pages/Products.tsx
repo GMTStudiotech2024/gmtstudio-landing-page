@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaRocket, FaRobot, FaSearch,  FaThLarge, FaList, FaExclamationCircle, FaGlobe, FaCompass,  FaClock, FaFlask, FaLock , FaCode} from 'react-icons/fa';
 import AnimatedItem from '../AnimatedItem';
-import projectImage1 from '../assets/images/MazsAiPic.png';
+import projectImage1 from '../assets/images/MazsAI_v1.2.0.png';
 import projectImage2 from '../assets/images/blog5.png';
 import projectImage3 from '../assets/images/Story.jpg';
 import game_ohmypc from '../assets/images/Game_ohmypc.jpg';
 import game_dungeon from '../assets/images/Game_dungeon.jpg';
+import AI from '../assets/images/AIwebgen.png'
 const products = [
   {
     name: "GMTStudio AI WorkSpace",
@@ -56,7 +57,7 @@ const products = [
   {
     name: "AI Website Generator",
     description: "An AI website generator that allows you to create a website with AI.",
-    image: projectImage1,
+    image: AI,
     icon: FaCode,
     category: "AI",
     link: "/website-builder",
