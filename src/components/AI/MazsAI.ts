@@ -13,6 +13,7 @@ class MultilayerPerceptron {
   private learningRate: number;
   private batchSize: number;
   private epochs: number;
+  
 
   constructor(layers: number[], activations: string[] = [], learningRate: number = 0.001, batchSize: number = 32, epochs: number = 100) {
     this.layers = layers;
