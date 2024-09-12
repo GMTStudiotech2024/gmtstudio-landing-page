@@ -433,7 +433,10 @@ class NaturalLanguageProcessor {
       ["statistics", "Statistics is the study of the collection, analysis, interpretation, presentation, and organization of data."],
       ['neural networks', 'Neural networks are a series of algorithms that attempt to recognize underlying relationships in a set of data through a process that mimics the way the human brain operates.'],
       ['reinforcement learning', 'Reinforcement learning is an area of machine learning concerned with how agents ought to take actions in an environment to maximize some notion of cumulative reward.'],
-      ['transfer learning', 'Transfer learning is a machine learning method where a model developed for a particular task is reused as the starting point for a model on a second task.']
+      ['transfer learning', 'Transfer learning is a machine learning method where a model developed for a particular task is reused as the starting point for a model on a second task.'],
+      ['what is one plus one', 'one plus one is two'],
+      ['what is my purpose', 'you can pass the butter '],
+      ['can you help me with the file I gave you? ', 'absoulutly i cannot, my capabilities are limited, but you can send me txt file and i will analyze it for you'],
     ]);
 
     // Add basic AI responses
@@ -494,6 +497,8 @@ class NaturalLanguageProcessor {
         "Mazs AI is designed to be highly customizable, allowing developers to tailor it to their specific needs.",
         "If you have any questions about Mazs AI or its capabilities, feel free to ask!"
       ]],      
+      ['can you help me with the file I gave you? ', ['absoulutly i cannot, my capabilities are limited, but you can send me txt file and i will analyze it for you']],
+      ['what is the meaning of life', ['the meaning of life is a deep philosophical question that has been debated for centuries. It is a question that is often asked by people who are curious about the purpose of life.']],
     ]);
 
     // Initialize advanced sentiment analysis model
