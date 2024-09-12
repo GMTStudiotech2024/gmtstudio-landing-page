@@ -347,9 +347,9 @@ class NaturalLanguageProcessor {
 
     // Expand knowledge base
     this.knowledgeBase = new Map([
-      ['ai', 'Artificial intelligence (AI) refers to the simulation of human intelligence in machines.'],
-      ['artificial intelligence', 'AI is the simulation of human intelligence in machines.'],
-      ['machine learning', 'ML is a subset of AI that enables systems to learn and improve from experience.'],
+      ['ai', "Artificial Intelligence, or AI, is the result of our efforts to automate tasks normally performed by humans, such as image pattern recognition, document classification, or a computerized chess rival. Artificial Intelligence - Machine Learning - Deep Learning - Symbolic AI  (Fig. 1) AI encompasses various approaches: Symbolic AI, also referred to as good old-fashioned AI (GOFAI), uses explicitly defined rules and symbolic representations for problem-solving. It's similar to traditional programming in the sense that predefined guidelines drive the process, however it's more advanced as it permits inference and adaptation to new situations. Machine Learning (ML) is another AI approach that allows algorithms to learn from data. Deep Learning (DL) is a subset of ML that uses multi-layered, artificial neural networks."],
+      ['artificial intelligence', "Artificial Intelligence, or AI, is the result of our efforts to automate tasks normally performed by humans, such as image pattern recognition, document classification, or a computerized chess rival. Artificial Intelligence - Machine Learning - Deep Learning - Symbolic AI  (Fig. 1) AI encompasses various approaches: Symbolic AI, also referred to as good old-fashioned AI (GOFAI), uses explicitly defined rules and symbolic representations for problem-solving. It's similar to traditional programming in the sense that predefined guidelines drive the process, however it's more advanced as it permits inference and adaptation to new situations. Machine Learning (ML) is another AI approach that allows algorithms to learn from data. Deep Learning (DL) is a subset of ML that uses multi-layered, artificial neural networks."],
+      ['machine learning', "Machine Learning, or ML, focuses on the creation of systems or models that can learn from data and improve their performance in specific tasks, without the need to be explicitly programmed, making them learn from past experiences or examples to make decisions on new data. This differs from traditional programming, where human programmers write rules in code, transforming the input data into desired results Now, I am going to explain the most relevant terms in ML: Model: A model is the representation that explains the observations. The trained model is the result of applying an ML algorithm with a data set. This trained model, now primed with specific patterns and understandings from the dataset, is subsequently used to draw inferences from new observations.  Algorithm: An algorithm is a procedure implemented in code that guides a model in learning from data it's given. There are many machine learning algorithms.  Training: Training is the iterative process of applying the learning algorithm. Consists in: * Applying the model (as is) to the variables of the observations and obtain the results according to the model. * Comparing the model results with the actual values. * Establishing a way to calculate the error between the model and reality. * Using the error as a basis to update the model in order to reduce the error. * Repeating until the model reaches the error levels that we have proposed and is capable of generalizing with observations that it has not seen in training."],
       ['deep learning', 'Deep learning is a subset of ML using neural networks with multiple layers.'],
       ['natural language processing', 'NLP is a branch of AI that helps computers understand and interpret human language.'],
       ['computer vision', 'Computer vision is an AI field that trains computers to interpret and understand visual information.'],
@@ -437,6 +437,16 @@ class NaturalLanguageProcessor {
       ['what is one plus one', 'one plus one is two'],
       ['what is my purpose', 'you can pass the butter '],
       ['can you help me with the file I gave you? ', 'absoulutly i cannot, my capabilities are limited, but you can send me txt file and i will analyze it for you'],
+      ['what is the meaning of life', 'the meaning of life is a deep philosophical question that has been debated for centuries. It is a question that is often asked by people who are curious about the purpose of life.'],
+      ['math', 'math is a subject that deals with numbers and their operations.'],
+      ['science', 'science is a subject that deals with the study of the natural world and its phenomena.'],
+      ['history', 'history is a subject that deals with the study of the past events and their impact on the present.'],
+      ['geography', 'geography is a subject that deals with the study of the Earth and its features.'],
+      ['biology', 'biology is a subject that deals with the study of living organisms and their interactions.'],
+      ['chemistry', 'chemistry is a subject that deals with the study of the properties and behavior of matter.'],
+      ['physics', 'physics is a subject that deals with the study of the fundamental forces and particles that make up the universe.'],
+      ['philosophy', 'philosophy is a subject that deals with the study of the fundamental questions about existence, knowledge, and logic.'],
+      
     ]);
 
     // Add basic AI responses
@@ -499,6 +509,63 @@ class NaturalLanguageProcessor {
       ]],      
       ['can you help me with the file I gave you? ', ['absoulutly i cannot, my capabilities are limited, but you can send me txt file and i will analyze it for you']],
       ['what is the meaning of life', ['the meaning of life is a deep philosophical question that has been debated for centuries. It is a question that is often asked by people who are curious about the purpose of life.']],
+      ['what is my purpose', ['pass the butter' ]],
+      ['weather', [
+        "I'm sorry, I don't have real-time weather information. You might want to check a weather app or website for the most up-to-date forecast.",
+        "While I can't provide current weather data, I can discuss climate patterns and meteorology if you're interested!",
+        "Unfortunately, I don't have access to live weather updates. Is there something else I can help you with?",
+        "I wish I could tell you the weather, but I don't have that capability. Maybe I can help with something else?",
+        "Weather information isn't in my database, but I'd be happy to chat about climate change and its effects if you're curious!"
+      ]],
+      ['time', [
+        "I'm afraid I don't have access to the current time. You might want to check your device's clock.",
+        "Time is a fascinating concept! While I can't tell you the current time, we could discuss the history of timekeeping if you're interested.",
+        "I don't have real-time clock functionality, but I can talk about time zones and their impact on global communication if you'd like.",
+        "Sorry, I can't provide the current time. Is there another way I can assist you?",
+        "While I can't give you the exact time, I can discuss the concept of time in physics if that interests you!"
+      ]],
+      ['jokes', [
+        "Why don't scientists trust atoms? Because they make up everything!",
+        "What do you call a fake noodle? An impasta!",
+        "Why did the scarecrow win an award? He was outstanding in his field!",
+        "Why don't eggs tell jokes? They'd crack each other up!",
+        "What do you call a bear with no teeth? A gummy bear!"
+      ]],
+      ['food recommendations', [
+        "While I can't taste food, I've heard that trying local cuisines is a great way to experience different cultures!",
+        "Food preferences are so personal! What kind of flavors do you usually enjoy?",
+        "I don't eat, but I know many people enjoy exploring fusion cuisines that blend different culinary traditions.",
+        "Have you considered trying a new recipe at home? Cooking can be a fun and rewarding experience!",
+        "While I can't recommend specific restaurants, farm-to-table establishments are popular for their fresh ingredients."
+      ]],
+      ['book recommendations', [
+        "Book preferences vary widely! What genres do you usually enjoy reading?",
+        "While I can't read books, classics like '1984' by George Orwell or 'To Kill a Mockingbird' by Harper Lee are often highly recommended.",
+        "Have you considered joining a book club? It's a great way to discover new books and discuss them with others.",
+        "E-books and audiobooks have made reading more accessible. Have you tried either of these formats?",
+        "Reading is a wonderful hobby! Do you prefer fiction or non-fiction?"
+      ]],
+      ['exercise tips', [
+        "Regular exercise is important for health! Remember to consult with a doctor before starting any new exercise regimen.",
+        "Walking is a simple yet effective form of exercise that most people can do.",
+        "Have you considered trying yoga? It's great for both physical and mental well-being.",
+        "Remember, the best exercise is one you enjoy and can stick with consistently!",
+        "Mixing cardio and strength training can provide a well-rounded fitness routine."
+      ]],
+      ['travel advice', [
+        "Traveling can be a great way to learn about different cultures! Do you have a specific destination in mind?",
+        "Remember to research local customs and etiquette before traveling to a new country.",
+        "Travel insurance can provide peace of mind for unexpected situations during your trip.",
+        "Learning a few basic phrases in the local language can enhance your travel experience.",
+        "Consider off-peak seasons for potentially lower prices and fewer crowds at popular destinations."
+      ]],
+      ['pet care', [
+        "Regular vet check-ups are important for keeping pets healthy.",
+        "Each type of pet has unique care requirements. What kind of pet do you have?",
+        "Proper nutrition is crucial for pets. Have you discussed your pet's diet with a veterinarian?",
+        "Mental stimulation, like toys and play, is important for many pets' well-being.",
+        "Remember, pets are a long-term commitment and responsibility."
+      ]]
     ]);
 
     // Initialize advanced sentiment analysis model
@@ -1546,6 +1613,19 @@ class RLAgent {
 }
 
 export function processChatbotQuery(query: string): string {
+  // Check if the query contains mathematical operations
+  if (/[+\-*/]/.test(query)) {
+    try {
+      // Remove any non-mathematical characters and whitespace
+      const mathExpression = query.replace(/[^\d+\-*/.()**]/g, '');
+      // Use a safer method to evaluate the expression
+      const result = safeEvaluate(mathExpression);
+      return `The result of ${mathExpression} is ${result}.`;
+    } catch (error) {
+      return "I'm sorry, I couldn't calculate that expression. Please make sure it's a valid mathematical operation.";
+    }
+  }
+
   const { intent, entities, keywords, analysis, sentiment, topics } = nlp.understandQuery(query);
   console.log("Query Analysis:", analysis);
 
@@ -2222,3 +2302,7 @@ export function getChatHistoryMessages(id: string): Promise<Message[]> {
     }, 100);
   });
 }
+function safeEvaluate(mathExpression: string) {
+  throw new Error("Function not implemented.");
+}
+
