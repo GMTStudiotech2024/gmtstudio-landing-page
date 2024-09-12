@@ -55,6 +55,7 @@ const AppContent: React.FC = () => {
   }, []);
 
   const isHomePage = location.pathname === '/';
+  const isMazsAIPage = location.pathname === '/mazsai';
 
   const toggleSearch = useCallback(() => {
     setIsSearchOpen(prev => !prev);
@@ -126,8 +127,8 @@ const AppContent: React.FC = () => {
           <Route path="/advanced-search" element={<AdvancedSearch />} />
           <Route path="/mazsai" element={<MazsAI />} />
         </Routes>
+        {!isMazsAIPage && <Footer />}
       </main>
-      <Footer />
       <Analytics />
       <SpeedInsights />
     </div>

@@ -281,9 +281,9 @@ const ChatBotUI: React.FC = () => {
   const scrollToBottomButton = () => (
     <button
       onClick={scrollToBottom}
-      className={`fixed bottom-24 right-8 p-2 bg-blue-500 text-white rounded-full shadow-lg transition-opacity duration-300 ${
+      className={`fixed bottom-20 right-4 sm:bottom-24 sm:right-8 p-2 bg-blue-500 text-white rounded-full shadow-lg transition-opacity duration-300 ${
         isScrolledToBottom ? 'opacity-0' : 'opacity-100'
-      }`}
+      } z-50`}
     >
       <FiArrowDown size={24} />
     </button>
@@ -577,147 +577,199 @@ const ChatBotUI: React.FC = () => {
     <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''}`} style={{ fontSize: `${fontSize}px` }}>
       <div className="flex-1 bg-gray-100 dark:bg-gray-900 transition-colors duration-200 overflow-hidden pt-20">
         <div className="max-w-7xl mx-auto p-4 h-full flex flex-col">
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-            <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2 sm:mb-0">Mazs AI Lab</h1>
-            <div className="flex items-center space-x-2">
+          {/* Header */}
+          <header className="flex justify-between items-center mb-6 sticky top-0 z-10 bg-gray-100 dark:bg-gray-900 py-4">
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Mazs AI Lab</h1>
+            <div className="flex items-center space-x-3">
               <button
                 onClick={() => setShowInfo(!showInfo)}
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+                className="p-2 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md hover:shadow-lg transition-all duration-200"
+                title="Info"
               >
-                <FiInfo />
+                <FiInfo size={20} />
               </button>
               <button
                 onClick={resetConversation}
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+                className="p-2 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md hover:shadow-lg transition-all duration-200"
+                title="Reset Conversation"
               >
-                <FiRefreshCw />
+                <FiRefreshCw size={20} />
               </button>
               <button
                 onClick={toggleDarkMode}
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+                className="p-2 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md hover:shadow-lg transition-all duration-200"
+                title="Toggle Dark Mode"
               >
-                {isDarkMode ? <FiSun /> : <FiMoon />}
+                {isDarkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
               </button>
               <button
                 onClick={() => setShowChatHistory(!showChatHistory)}
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+                className="p-2 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md hover:shadow-lg transition-all duration-200"
+                title="Chat History"
               >
-                <FiArchive />
+                <FiArchive size={20} />
               </button>
               <button
                 onClick={() => setShowSettings(!showSettings)}
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+                className="p-2 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md hover:shadow-lg transition-all duration-200"
+                title="Settings"
               >
-                <FiSettings />
+                <FiSettings size={20} />
               </button>
             </div>
-          </div>
-          {showInfo && (
-            <div className="mb-4 p-4 bg-blue-100 dark:bg-blue-900 rounded-lg text-blue-800 dark:text-blue-200">
-              <p>Mazs AI v1.1 Anatra is an advanced chatbot powered by natural language processing and machine learning. It can assist you with information about GMTStudio, Theta platform, and AI WorkSpace.</p>
-            </div>
-          )}
-          <div className="flex-1 flex overflow-hidden">
-            <div className="flex-1 flex flex-col">
-              <div 
-                ref={chatContainerRef}
-                className="flex-1 overflow-y-auto mb-4 rounded-lg bg-white dark:bg-gray-800 shadow-inner p-4 transition-all duration-200"
+          </header>
+
+          {/* Info Panel */}
+          <AnimatePresence>
+            {showInfo && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mb-6 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg text-blue-800 dark:text-blue-200 shadow-md"
               >
-                <AnimatePresence>
-                  {messages.map((message, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.3 }}
-                      className={`mb-4 ${message.isUser ? 'text-right' : 'text-left'}`}
-                      onContextMenu={(e) => handleMessageContextMenu(e, index)}
-                    >
-                      <div className={`inline-block max-w-[80%] sm:max-w-[70%] md:max-w-[60%]`}>
-                        <div className={`flex items-center mb-1 ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                          {message.isUser ? (
-                            <>
-                              {!isEditingUserName && (
-                                <button
-                                  onClick={handleUserNameEdit}
-                                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mr-2"
-                                >
-                                  <FiEdit size={12} />
-                                </button>
+                <p className="text-sm">Mazs AI v1.1 Anatra is an advanced chatbot powered by natural language processing and machine learning. It can assist you with information about GMTStudio, Theta platform, and AI WorkSpace.</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Chat Container */}
+          <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-800 rounded-lg shadow-xl">
+            <div 
+              ref={chatContainerRef}
+              className="flex-1 overflow-y-auto p-4 space-y-4"
+            >
+              <AnimatePresence>
+                {messages.map((message, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+                    onContextMenu={(e) => handleMessageContextMenu(e, index)}
+                  >
+                    <div className={`max-w-[70%] ${message.isUser ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white'} rounded-lg p-3 shadow-md`}>
+                      <div className="flex items-center mb-1">
+                        {message.isUser ? (
+                          <>
+                            {!isEditingUserName && (
+                              <button
+                                onClick={handleUserNameEdit}
+                                className="text-white hover:text-gray-700 dark:text-white dark:hover:text-gray-200 mr-2"
+                              >
+                                <FiEdit size={12} />
+                              </button>
+                            )}
+                            <span className="text-sm font-semibold text-yellow-300 dark:text-yellow-400">
+                              {isEditingUserName ? (
+                                <input
+                                  type="text"
+                                  value={userName}
+                                  onChange={handleUserNameChange}
+                                  onBlur={handleUserNameSave}
+                                  className="bg-transparent border-b border-blue-600 dark:border-blue-400 focus:outline-none text-right "
+                                />
+                              ) : (
+                                <>
+                                  <span className="mr-2">{userAvatar}</span>
+                                  {userName}
+                                </>
                               )}
-                              <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-                                {isEditingUserName ? (
-                                  <input
-                                    type="text"
-                                    value={userName}
-                                    onChange={handleUserNameChange}
-                                    onBlur={handleUserNameSave}
-                                    className="bg-transparent border-b border-blue-600 dark:border-blue-400 focus:outline-none text-right"
-                                  />
-                                ) : (
-                                  <>
-                                    <span className="mr-2">{userAvatar}</span>
-                                    {userName}
-                                  </>
-                                )}
-                              </span>
-                            </>
-                          ) : (
-                            <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-                              {botName}
                             </span>
-                          )}
-                        </div>
-                        <div className={`p-3 rounded-lg ${
-                          message.isUser
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white'
-                        } break-words`}>
-                          {message.isUser || !message.isTyping
-                            ? message.text
-                            : message.text.slice(0, currentTypingIndex)}
-                          {!message.isUser && message.isTyping &&                           
-                           <span className="inline-block w-1 h-4 ml-1 bg-gray-800 dark:bg-white animate-blink"></span>
-                          }
-                        </div>
-                        <div className={`mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-center ${message.isUser ? 'justify-end' : 'justify-between'}`}>
-                          <span>{message.timestamp.toLocaleTimeString()}</span>
-                          {!message.isUser && (
-                            <div className="flex items-center ml-2">
-                              <button
-                                onClick={() => copyToClipboard(message.text)}
-                                className="mr-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
-                                title="Copy to clipboard"
-                              >
-                                <FiCopy size={12} />
-                              </button>
-                              <button
-                                onClick={() => regenerateResponseHandler(index)}
-                                className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
-                                title="Regenerate response"
-                                disabled={isGenerating}
-                              >
-                                <FiRepeat size={12} className={isGenerating ? 'animate-spin' : ''} />
-                              </button>
-                            </div>
-                          )}
-                        </div>
+                          </>
+                        ) : (
+                          <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                            {botName}
+                          </span>
+                        )}
                       </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-                {isLoading && (
+                      <p className="text-sm break-words">
+                        {message.isUser || !message.isTyping
+                          ? message.text
+                          : message.text.slice(0, currentTypingIndex)}
+                        {!message.isUser && message.isTyping && (
+                          <span className="inline-block w-1 h-4 ml-1 bg-gray-800 dark:bg-white animate-blink"></span>
+                        )}
+                      </p>
+                      <div className="mt-2 text-xs opacity-70 flex justify-between items-center">
+                        <span>{message.timestamp.toLocaleTimeString()}</span>
+                        {!message.isUser && (
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => copyToClipboard(message.text)}
+                              className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                              title="Copy to clipboard"
+                            >
+                              <FiCopy size={12} />
+                            </button>
+                            <button
+                              onClick={() => regenerateResponseHandler(index)}
+                              className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                              title="Regenerate response"
+                              disabled={isGenerating}
+                            >
+                              <FiRepeat size={12} className={isGenerating ? 'animate-spin' : ''} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+              {isLoading && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex justify-start"
+                >
+                  <span className="inline-flex items-center p-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">
+                    <FiLoader className="animate-spin mr-2" />
+                    <span className="text-sm">Mazs AI v1.1 Anatra is thinking</span>
+                    <span className="ml-1 inline-flex">
+                      <span className="animate-bounce" style={{ animationDelay: '0s' }}>.</span>
+                      <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
+                      <span className="animate-bounce" style={{ animationDelay: '0.4s' }}>.</span>
+                    </span>
+                  </span>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Input Area */}
+            <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+              {suggestions.length > 0 && messages.length === 1 && (
+                <div className="mb-4 hidden sm:block">
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Suggestions:</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {suggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
+                        onClick={() => setInput(suggestion)}
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="relative">
+                {userTyping && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
-                    className="mb-4 text-left"
+                    className="absolute bottom-full left-0 mb-2 z-10"
                   >
-                    <span className="inline-flex items-center p-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">
-                      <FiLoader className="animate-spin mr-2" />
-                      <span className="text-sm">Mazs AI v1.1 Anatra is thinking</span>
+                    <span className="inline-flex items-center p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white text-sm">
+                      <span>User is typing</span>
                       <span className="ml-1 inline-flex">
                         <span className="animate-bounce" style={{ animationDelay: '0s' }}>.</span>
                         <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
@@ -726,136 +778,96 @@ const ChatBotUI: React.FC = () => {
                     </span>
                   </motion.div>
                 )}
-              </div>
-              <div className="mt-auto">
-                {suggestions.length > 0 && messages.length === 1 && (
-                  <div className="mb-4 hidden sm:block">
-                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Suggestions:</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {suggestions.map((suggestion, index) => (
-                        <button
-                          key={index}
-                          className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
-                          onClick={() => setInput(suggestion)}
-                        >
-                          {suggestion}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                <div className="relative">
-                  {userTyping && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.3 }}
-                      className="absolute bottom-full left-0 mb-2 z-10"
-                    >
-                      <span className="inline-flex items-center p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white text-sm">
-                        <span>User is typing</span>
-                        <span className="ml-1 inline-flex">
-                          <span className="animate-bounce" style={{ animationDelay: '0s' }}>.</span>
-                          <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
-                          <span className="animate-bounce" style={{ animationDelay: '0.4s' }}>.</span>
-                        </span>
-                      </span>
-                    </motion.div>
-                  )}
-                  <div className="flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md">
-                    <div className="flex items-center p-2">
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className="p-2 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full"
-                      >
-                        <FiPaperclip size={24} className="stroke-current stroke-2" />
-                      </button>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        onChange={handleFileAttach}
-                        className="hidden"
-                        multiple
-                      />
-                      <div className="flex-1 flex flex-col bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
-                        <div className="flex items-center overflow-x-auto">
-                          {attachedFiles.length > 0 && (
-                            <div className="flex items-center px-2 space-x-2 flex-shrink-0">
-                              {attachedFiles.map((file, index) => (
-                                <div
-                                  key={index}
-                                  className="flex items-center bg-gray-100 dark:bg-gray-700 px-2 py-1 text-sm rounded-full"
-                                >
-                                  <span className="text-gray-500 dark:text-gray-400 mr-1">
-                                    {getFileIcon(file)}
-                                  </span>
-                                  <span className="text-gray-600 dark:text-gray-300 truncate max-w-[120px]">
-                                    {file.name}
-                                  </span>
-                                  <button
-                                    onClick={() => clearAttachedFile(index)}
-                                    className="ml-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-200"
-                                  >
-                                    <FiX size={12} />
-                                  </button>
-                                </div>
-                              ))}
+                <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg shadow-inner">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-2 text-blue-500 hover:text-blue-600 transition-colors duration-200"
+                  >
+                    <FiPaperclip size={20} />
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    onChange={handleFileAttach}
+                    className="hidden"
+                    multiple
+                  />
+                  <div className="flex-1 flex flex-col">
+                    <div className="flex items-center overflow-x-auto">
+                      {attachedFiles.length > 0 && (
+                        <div className="flex items-center px-2 space-x-2 flex-shrink-0">
+                          {attachedFiles.map((file, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center bg-gray-200 dark:bg-gray-600 px-2 py-1 text-sm rounded-full"
+                            >
+                              <span className="text-gray-500 dark:text-gray-400 mr-1">
+                                {getFileIcon(file)}
+                              </span>
+                              <span className="text-gray-600 dark:text-gray-300 truncate max-w-[120px]">
+                                {file.name}
+                              </span>
+                              <button
+                                onClick={() => clearAttachedFile(index)}
+                                className="ml-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-200"
+                              >
+                                <FiX size={12} />
+                              </button>
                             </div>
-                          )}
+                          ))}
                         </div>
-                        <textarea
-                          value={input}
-                                          onChange={(e) => {
-                            setInput(e.target.value.slice(0, 1000));
-                            setUserTyping(true);
-                            setTimeout(() => setUserTyping(false), 1000);
-                          }}
-                          onKeyPress={handleKeyPress}
-                          placeholder={attachedFiles.length > 0 ? "Add a message or send files..." : "Type your message..."}
-                          className={`flex-1 p-2 bg-transparent text-gray-800 dark:text-white focus:outline-none resize-none max-h-32 min-h-[40px] ${
-                            input.length > 1000 ? 'border-red-500' : ''
-                          }`}
-                          rows={1}
-                        />
-                        <div className="flex justify-between items-center px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
-                          <span className={input.length > 1000 ? 'text-red-500' : ''}>{input.length}/1000 characters</span>
-                        </div>
-                      </div>
-                      <div className="relative">
-                        <button
-                          onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
-                          className={`p-2 mr-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
-                            isRecording ? 'text-red-500' : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
-                          }`}
-                        >
-                          <FiMic size={24} className="stroke-current stroke-2" />
-                        </button>
-                        {showVoiceRecorder && renderVoiceRecorder()}
-                      </div>
-                      <button
-                        onClick={handleSend}
-                        className={`p-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
-                          isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000
-                            ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
-                            : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
-                        }`}
-                        disabled={isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000}
-                      >
-                        <FiSend size={24} className="stroke-current stroke-2" />
-                      </button>
+                      )}
+                    </div>
+                    <textarea
+                      value={input}
+                      onChange={(e) => {
+                        setInput(e.target.value.slice(0, 1000));
+                        setUserTyping(true);
+                        setTimeout(() => setUserTyping(false), 1000);
+                      }}
+                      onKeyPress={handleKeyPress}
+                      placeholder={attachedFiles.length > 0 ? "Add a message or send files..." : "Type your message..."}
+                      className={`flex-1 p-2 bg-transparent text-gray-800 dark:text-white focus:outline-none resize-none max-h-32 min-h-[40px] ${
+                        input.length > 1000 ? 'border-red-500' : ''
+                      }`}
+                      rows={1}
+                    />
+                    <div className="flex justify-between items-center px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
+                      <span className={input.length > 1000 ? 'text-red-500' : ''}>{input.length}/1000 characters</span>
                     </div>
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 text-center pb-2 pt-1">
-                      Mazs AI v1.1.0 Anatra can make lots of mistakes, please check the facts again
-                    </div>
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
+                      className={`p-2 mr-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
+                        isRecording ? 'text-red-500' : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+                      }`}
+                    >
+                      <FiMic size={24} className="stroke-current stroke-2" />
+                    </button>
+                    {showVoiceRecorder && renderVoiceRecorder()}
+                  </div>
+                  <button
+                    onClick={handleSend}
+                    className={`p-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
+                      isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000
+                        ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                        : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+                    }`}
+                    disabled={isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000}
+                  >
+                    <FiSend size={24} className="stroke-current stroke-2" />
+                  </button>
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 text-center pb-2 pt-1">
+                  Mazs AI v1.1.0 Anatra can make mistakes. Please verify important information.
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      {scrollToBottomButton()}
+      {!isScrolledToBottom && scrollToBottomButton()}
       {showSettings && renderSettings()}
       {showChatHistory && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
