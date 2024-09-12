@@ -513,7 +513,7 @@ class NaturalLanguageProcessor {
       ['weather', [
         "I'm sorry, I don't have real-time weather information. You might want to check a weather app or website for the most up-to-date forecast.",
         "While I can't provide current weather data, I can discuss climate patterns and meteorology if you're interested!",
-        "Unfortunately, I don't have access to live weather updates. Is there something else I can help you with?",
+        "Unfortunately, I don't have access to live weather updates. Is there something else I can help with?",
         "I wish I could tell you the weather, but I don't have that capability. Maybe I can help with something else?",
         "Weather information isn't in my database, but I'd be happy to chat about climate change and its effects if you're curious!"
       ]],
@@ -1612,12 +1612,23 @@ class RLAgent {
   }
 }
 
+// Add a safeEvaluate function to safely evaluate mathematical expressions
+function safeEvaluate(mathExpression: string): number {
+  try {
+    // Use Function constructor to evaluate the expression safely
+    return Function(`'use strict'; return (${mathExpression})`)();
+  } catch (error) {
+    throw new Error("Invalid mathematical expression");
+  }
+}
+
+// Modify the processChatbotQuery function to handle mathematical operations
 export function processChatbotQuery(query: string): string {
   // Check if the query contains mathematical operations
   if (/[+\-*/]/.test(query)) {
     try {
       // Remove any non-mathematical characters and whitespace
-      const mathExpression = query.replace(/[^\d+\-*/.()**]/g, '');
+      const mathExpression = query.replace(/[^\d+\-*/.()]/g, '');
       // Use a safer method to evaluate the expression
       const result = safeEvaluate(mathExpression);
       return `The result of ${mathExpression} is ${result}.`;
@@ -2301,8 +2312,5 @@ export function getChatHistoryMessages(id: string): Promise<Message[]> {
       resolve(messages);
     }, 100);
   });
-}
-function safeEvaluate(mathExpression: string) {
-  throw new Error("Function not implemented.");
 }
 

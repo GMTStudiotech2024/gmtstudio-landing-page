@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiRepeat, FiMic, FiCopy, FiArrowDown, FiTrash2, FiEdit, FiShare, FiArchive, FiPlus, FiCheck, FiSettings, FiCheckCircle, FiAlertCircle  } from 'react-icons/fi';
+import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiRepeat, FiMic, FiCopy, FiArrowDown, FiTrash2, FiEdit, FiShare, FiArchive, FiPlus, FiCheck, FiSettings, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, regenerateResponse, getChatHistories, createChatHistory, renameChatHistory, deleteChatHistory } from './MazsAI_v1-1-0Anatra';
 // import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -1001,9 +1001,9 @@ const ChatBotUI: React.FC = () => {
       {showSettings && renderSettings()}
       {showChatHistory && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-w-full max-h-[90vh] overflow-y-auto shadow-xl">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-8 w-[480px] max-w-full max-h-[90vh] overflow-y-auto shadow-xl">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">Chat Histories</h2>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Chat History</h2>
               <button
                 onClick={() => setShowChatHistory(false)}
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
@@ -1018,59 +1018,62 @@ const ChatBotUI: React.FC = () => {
                   value={newChatName}
                   onChange={(e) => setNewChatName(e.target.value)}
                   placeholder="New chat name"
-                  className="flex-grow p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-grow p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                 />
                 <button
                   onClick={handleCreateChatHistory}
-                  className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                  className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                 >
                   <FiPlus size={24} />
                 </button>
               </div>
             </div>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {chatHistories.map((history) => (
-                <li key={history.id} className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 transition-all duration-200 hover:shadow-md">
+                <li key={history.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg">
                   {editingHistoryId === history.id ? (
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center p-4">
                       <input
                         type="text"
                         value={editingHistoryName}
                         onChange={(e) => setEditingHistoryName(e.target.value)}
-                        className="flex-grow p-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-grow p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                       />
                       <button
                         onClick={handleFinishEditHistory}
-                        className="p-1 text-green-500 hover:text-green-600 transition-colors duration-200"
+                        className="ml-2 p-2 text-green-500 hover:text-green-600 transition-colors duration-200"
                       >
                         <FiCheck size={20} />
                       </button>
                       <button
                         onClick={() => setEditingHistoryId(null)}
-                        className="p-1 text-red-500 hover:text-red-600 transition-colors duration-200"
+                        className="ml-2 p-2 text-red-500 hover:text-red-600 transition-colors duration-200"
                       >
                         <FiX size={20} />
                       </button>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-800 dark:text-white font-medium">{history.name}</span>
+                    <div className="flex items-center justify-between p-4">
+                      <span className="text-gray-800 dark:text-white font-medium truncate flex-grow">{history.name}</span>
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => handleSelectChatHistory(history.id)}
-                          className="p-1 text-blue-500 hover:text-blue-600 transition-colors duration-200"
+                          className="p-2 text-blue-500 hover:text-blue-600 transition-colors duration-200 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900"
+                          title="Select Chat"
                         >
                           <FiCheck size={20} />
                         </button>
                         <button
                           onClick={() => handleStartEditHistory(history)}
-                          className="p-1 text-yellow-500 hover:text-yellow-600 transition-colors duration-200"
+                          className="p-2 text-yellow-500 hover:text-yellow-600 transition-colors duration-200 rounded-full hover:bg-yellow-100 dark:hover:bg-yellow-900"
+                          title="Edit Chat Name"
                         >
                           <FiEdit size={20} />
                         </button>
                         <button
                           onClick={() => handleDeleteChatHistory(history.id)}
-                          className="p-1 text-red-500 hover:text-red-600 transition-colors duration-200"
+                          className="p-2 text-red-500 hover:text-red-600 transition-colors duration-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900"
+                          title="Delete Chat"
                         >
                           <FiTrash2 size={20} />
                         </button>
@@ -1080,6 +1083,12 @@ const ChatBotUI: React.FC = () => {
                 </li>
               ))}
             </ul>
+            {chatHistories.length === 0 && (
+              <div className="text-center text-gray-500 dark:text-gray-400 mt-8">
+                <FiArchive size={48} className="mx-auto mb-4" />
+                <p>No chat histories yet. Create a new one to get started!</p>
+              </div>
+            )}
           </div>
         </div>
       )}
