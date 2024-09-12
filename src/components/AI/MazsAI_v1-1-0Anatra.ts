@@ -1860,7 +1860,7 @@ const network = new MultilayerPerceptron([10, 32, 64, 32, intents.length], ['rel
 
 function trainNetwork() {
   const epochs = 50;
-  const learningRate = 0.5;
+  const learningRate = 0.1;
 
   for (let epoch = 0; epoch < epochs; epoch++) {
     let totalLoss = 0;
