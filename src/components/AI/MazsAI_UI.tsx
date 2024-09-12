@@ -56,7 +56,24 @@ const ChatBotUI: React.FC = () => {
   const botName = "Mazs AI v1.1.0 Anatra";
 
   const [showSettings, setShowSettings] = useState(false);
-  const [fontSize, setFontSize] = useState(16);
+  const [fontSize, setFontSize] = useState(() => {
+    return parseInt(localStorage.getItem('fontSize') || '16');
+  });
+  const [sendKey, setSendKey] = useState(() => {
+    return localStorage.getItem('sendKey') || 'Enter';
+  });
+  const [language, setLanguage] = useState(() => {
+    return localStorage.getItem('language') || 'English';
+  });
+  const [chatFontFamily, setChatFontFamily] = useState(() => {
+    return localStorage.getItem('chatFontFamily') || 'monospace';
+  });
+  const [autoGenerateTitle, setAutoGenerateTitle] = useState(() => {
+    return localStorage.getItem('autoGenerateTitle') === 'true';
+  });
+  const [sendPreviewBubble, setSendPreviewBubble] = useState(() => {
+    return localStorage.getItem('sendPreviewBubble') === 'true';
+  });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [userAvatar, setUserAvatar] = useState(() => {
     // Try to get the userAvatar from localStorage, or use default emoji
@@ -184,7 +201,10 @@ const ChatBotUI: React.FC = () => {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (
+      (sendKey === 'Enter' && e.key === 'Enter' && !e.shiftKey) ||
+      (sendKey === 'Ctrl + Enter' && e.key === 'Enter' && e.ctrlKey)
+    ) {
       e.preventDefault();
       handleSend();
     }
@@ -283,7 +303,7 @@ const ChatBotUI: React.FC = () => {
       onClick={scrollToBottom}
       className={`fixed bottom-20 right-4 sm:bottom-24 sm:right-8 p-2 bg-blue-500 text-white rounded-full shadow-lg transition-opacity duration-300 ${
         isScrolledToBottom ? 'opacity-0' : 'opacity-100'
-      } z-50`}
+      } z-50 hidden sm:block`}
     >
       <FiArrowDown size={24} />
     </button>
@@ -404,6 +424,32 @@ const ChatBotUI: React.FC = () => {
 
   const handleFontSizeChange = (newSize: number) => {
     setFontSize(newSize);
+    localStorage.setItem('fontSize', newSize.toString());
+  };
+
+  const handleSendKeyChange = (newSendKey: string) => {
+    setSendKey(newSendKey);
+    localStorage.setItem('sendKey', newSendKey);
+  };
+
+  const handleLanguageChange = (newLanguage: string) => {
+    setLanguage(newLanguage);
+    localStorage.setItem('language', newLanguage);
+  };
+
+  const handleChatFontFamilyChange = (newFontFamily: string) => {
+    setChatFontFamily(newFontFamily || 'monospace');
+    localStorage.setItem('chatFontFamily', newFontFamily || 'monospace');
+  };
+
+  const handleAutoGenerateTitleChange = (newValue: boolean) => {
+    setAutoGenerateTitle(newValue);
+    localStorage.setItem('autoGenerateTitle', newValue.toString());
+  };
+
+  const handleSendPreviewBubbleChange = (newValue: boolean) => {
+    setSendPreviewBubble(newValue);
+    localStorage.setItem('sendPreviewBubble', newValue.toString());
   };
 
   const checkForUpdates = () => {
@@ -412,13 +458,18 @@ const ChatBotUI: React.FC = () => {
   };
 
   const handleEmojiClick = (emojiObject: any) => {
-    setUserAvatar(emojiObject.emoji);
+    const newAvatar = emojiObject.emoji;
+    setUserAvatar(newAvatar);
     setShowEmojiPicker(false);
+    localStorage.setItem('userAvatar', newAvatar);
   };
 
   const renderSettings = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-[800px] max-w-full max-h-[90vh] overflow-y-auto shadow-xl relative">
+      <div 
+        className="bg-white dark:bg-gray-800 rounded-lg p-6 w-[800px] max-w-full max-h-[90vh] overflow-y-auto shadow-xl relative"
+        style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily || 'inherit' }}
+      >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">Settings</h2>
           <button
@@ -482,7 +533,11 @@ const ChatBotUI: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Send Key
             </label>
-            <select className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+            <select 
+              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              value={sendKey}
+              onChange={(e) => handleSendKeyChange(e.target.value)}
+            >
               <option>Enter</option>
               <option>Ctrl + Enter</option>
             </select>
@@ -504,7 +559,11 @@ const ChatBotUI: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Language
             </label>
-            <select className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+            <select 
+              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              value={language}
+              onChange={(e) => handleLanguageChange(e.target.value)}
+            >
               <option>English</option>
               <option>Spanish</option>
               <option>French</option>
@@ -516,6 +575,8 @@ const ChatBotUI: React.FC = () => {
             </label>
             <input
               type="text"
+              value={chatFontFamily}
+              onChange={(e) => handleChatFontFamilyChange(e.target.value)}
               placeholder="Font Family Name"
               className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
             />
@@ -526,6 +587,8 @@ const ChatBotUI: React.FC = () => {
             </label>
             <input
               type="checkbox"
+              checked={autoGenerateTitle}
+              onChange={(e) => handleAutoGenerateTitleChange(e.target.checked)}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />
           </div>
@@ -535,6 +598,8 @@ const ChatBotUI: React.FC = () => {
             </label>
             <input
               type="checkbox"
+              checked={sendPreviewBubble}
+              onChange={(e) => handleSendPreviewBubbleChange(e.target.checked)}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />
           </div>
@@ -574,7 +639,7 @@ const ChatBotUI: React.FC = () => {
   );
 
   return (
-    <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''}`} style={{ fontSize: `${fontSize}px` }}>
+    <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''}`}>
       <div className="flex-1 bg-gray-100 dark:bg-gray-900 transition-colors duration-200 overflow-hidden pt-20">
         <div className="max-w-7xl mx-auto p-4 h-full flex flex-col">
           {/* Header */}
@@ -639,6 +704,7 @@ const ChatBotUI: React.FC = () => {
             <div 
               ref={chatContainerRef}
               className="flex-1 overflow-y-auto p-4 space-y-4"
+              style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily || 'monospace' }}
             >
               <AnimatePresence>
                 {messages.map((message, index) => (
@@ -750,7 +816,7 @@ const ChatBotUI: React.FC = () => {
                     {suggestions.map((suggestion, index) => (
                       <button
                         key={index}
-                        className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
+                        className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 shadow-sm hover:shadow-md"
                         onClick={() => setInput(suggestion)}
                       >
                         {suggestion}
@@ -768,8 +834,8 @@ const ChatBotUI: React.FC = () => {
                     transition={{ duration: 0.3 }}
                     className="absolute bottom-full left-0 mb-2 z-10"
                   >
-                    <span className="inline-flex items-center p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white text-sm">
-                      <span>User is typing</span>
+                    <span className="inline-flex items-center p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white text-sm shadow-md">
+                      <span className="font-medium">User is typing</span>
                       <span className="ml-1 inline-flex">
                         <span className="animate-bounce" style={{ animationDelay: '0s' }}>.</span>
                         <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
@@ -778,12 +844,13 @@ const ChatBotUI: React.FC = () => {
                     </span>
                   </motion.div>
                 )}
-                <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg shadow-inner">
+                <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg shadow-inner hover:shadow-md transition-shadow duration-300">
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-2 text-blue-500 hover:text-blue-600 transition-colors duration-200"
+                    className="p-2 text-blue-500 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full"
+                    title="Attach files"
                   >
-                    <FiPaperclip size={20} />
+                    <FiPaperclip size={24} />
                   </button>
                   <input
                     ref={fileInputRef}
@@ -793,30 +860,27 @@ const ChatBotUI: React.FC = () => {
                     multiple
                   />
                   <div className="flex-1 flex flex-col">
-                    <div className="flex items-center overflow-x-auto">
-                      {attachedFiles.length > 0 && (
-                        <div className="flex items-center px-2 space-x-2 flex-shrink-0">
-                          {attachedFiles.map((file, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center bg-gray-200 dark:bg-gray-600 px-2 py-1 text-sm rounded-full"
-                            >
-                              <span className="text-gray-500 dark:text-gray-400 mr-1">
-                                {getFileIcon(file)}
-                              </span>
-                              <span className="text-gray-600 dark:text-gray-300 truncate max-w-[120px]">
-                                {file.name}
-                              </span>
-                              <button
-                                onClick={() => clearAttachedFile(index)}
-                                className="ml-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-200"
-                              >
-                                <FiX size={12} />
-                              </button>
-                            </div>
-                          ))}
+                    <div className="flex items-center overflow-x-auto py-2 px-2 space-x-2">
+                      {attachedFiles.map((file, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center bg-gray-200 dark:bg-gray-600 px-2 py-1 text-sm rounded-full shadow-sm hover:shadow-md transition-shadow duration-200"
+                        >
+                          <span className="text-gray-500 dark:text-gray-400 mr-1">
+                            {getFileIcon(file)}
+                          </span>
+                          <span className="text-gray-600 dark:text-gray-300 truncate max-w-[120px]">
+                            {file.name}
+                          </span>
+                          <button
+                            onClick={() => clearAttachedFile(index)}
+                            className="ml-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-200 focus:outline-none"
+                            title="Remove file"
+                          >
+                            <FiX size={12} />
+                          </button>
                         </div>
-                      )}
+                      ))}
                     </div>
                     <textarea
                       value={input}
@@ -827,47 +891,55 @@ const ChatBotUI: React.FC = () => {
                       }}
                       onKeyPress={handleKeyPress}
                       placeholder={attachedFiles.length > 0 ? "Add a message or send files..." : "Type your message..."}
-                      className={`flex-1 p-2 bg-transparent text-gray-800 dark:text-white focus:outline-none resize-none max-h-32 min-h-[40px] ${
+                      className={`w-full p-2 bg-transparent text-gray-800 dark:text-white focus:outline-none resize-none min-h-[30px] max-h-[50px] ${
                         input.length > 1000 ? 'border-red-500' : ''
-                      }`}
-                      rows={1}
+                      } scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent`}
+                      style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily || 'monospace' }}
                     />
                     <div className="flex justify-between items-center px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
-                      <span className={input.length > 1000 ? 'text-red-500' : ''}>{input.length}/1000 characters</span>
+                      <span className={`font-medium ${input.length > 1000 ? 'text-red-500' : ''}`}>
+                        {input.length}/1000
+                      </span>
+                      {input.length > 900 && (
+                        <span className="text-yellow-500 dark:text-yellow-400 animate-pulse">
+                          Approaching character limit
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <div className="relative">
+                  <div className="flex items-center space-x-2 px-2">
                     <button
                       onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
-                      className={`p-2 mr-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
-                        isRecording ? 'text-red-500' : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+                      className={`p-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
+                        isRecording ? 'text-red-500 animate-pulse' : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
                       }`}
+                      title={isRecording ? "Stop recording" : "Start voice recording"}
                     >
                       <FiMic size={24} className="stroke-current stroke-2" />
                     </button>
-                    {showVoiceRecorder && renderVoiceRecorder()}
+                    <button
+                      onClick={handleSend}
+                      className={`p-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
+                        isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000
+                          ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                          : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+                      }`}
+                      disabled={isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000}
+                      title="Send message"
+                    >
+                      <FiSend size={24} className="stroke-current stroke-2" />
+                    </button>
                   </div>
-                  <button
-                    onClick={handleSend}
-                    className={`p-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
-                      isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000
-                        ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
-                        : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
-                    }`}
-                    disabled={isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000}
-                  >
-                    <FiSend size={24} className="stroke-current stroke-2" />
-                  </button>
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 text-center pb-2 pt-1">
-                  Mazs AI v1.1.0 Anatra can make mistakes. Please verify important information.
-                </div>
+                {showVoiceRecorder && renderVoiceRecorder()}
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
+                <span className="font-medium">Mazs AI v1.1.0 Anatra</span> can make mistakes. Please verify important information.
               </div>
             </div>
           </div>
         </div>
       </div>
-      {!isScrolledToBottom && scrollToBottomButton()}
       {showSettings && renderSettings()}
       {showChatHistory && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
