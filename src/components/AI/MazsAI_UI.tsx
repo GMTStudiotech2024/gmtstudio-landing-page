@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiRepeat, FiMic, FiCopy, FiArrowDown, FiTrash2, FiEdit, FiShare, FiArchive, FiPlus, FiCheck, FiSettings  } from 'react-icons/fi';
+import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiRepeat, FiMic, FiCopy, FiArrowDown, FiTrash2, FiEdit, FiShare, FiArchive, FiPlus, FiCheck, FiSettings, FiCheckCircle, FiAlertCircle  } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, regenerateResponse, getChatHistories, createChatHistory, renameChatHistory, deleteChatHistory } from './MazsAI_v1-1-0Anatra';
 // import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -79,6 +79,9 @@ const ChatBotUI: React.FC = () => {
     // Try to get the userAvatar from localStorage, or use default emoji
     return localStorage.getItem('userAvatar') || '👤';
   });
+  const [isCheckingForUpdates, setIsCheckingForUpdates] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState<'up-to-date' | 'update-available' | null>(null);
+
   useEffect(() => {
     setSuggestions(getConversationSuggestions());
     addWelcomeMessage();
@@ -453,9 +456,25 @@ const ChatBotUI: React.FC = () => {
   };
 
   const checkForUpdates = () => {
-    // Implement version checking logic here
-    console.log("Checking for updates...");
+    setIsCheckingForUpdates(true);
+    setUpdateStatus(null);
+    // Simulate an API call or actual update check
+    setTimeout(() => {
+      setIsCheckingForUpdates(false);
+      // Simulate a random result (replace this with actual update check logic)
+      const isUpToDate = Math.random() > 0.5;
+      setUpdateStatus(isUpToDate ? 'up-to-date' : 'update-available');
+    }, 2000); // Simulating a 2-second delay
   };
+
+  useEffect(() => {
+    if (updateStatus) {
+      const timer = setTimeout(() => {
+        setUpdateStatus(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [updateStatus]);
 
   const handleEmojiClick = (emojiObject: any) => {
     const newAvatar = emojiObject.emoji;
@@ -464,174 +483,213 @@ const ChatBotUI: React.FC = () => {
     localStorage.setItem('userAvatar', newAvatar);
   };
 
+  const renderUpdateSection = () => (
+    <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 mb-4">
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Version Information</h3>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm text-gray-600 dark:text-gray-400">Current Version:</span>
+        <span className="font-medium text-black dark:text-white">v1.1.0 Anatra</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <button
+          onClick={checkForUpdates}
+          className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${
+            isCheckingForUpdates ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          disabled={isCheckingForUpdates}
+        >
+          {isCheckingForUpdates ? (
+            <span className="flex items-center">
+              <FiLoader className="animate-spin mr-2" />
+              Checking for updates...
+            </span>
+          ) : (
+            'Check for Updates'
+          )}
+        </button>
+        {updateStatus && (
+          <span className={`flex items-center ${
+            updateStatus === 'up-to-date' ? 'text-green-500' : 'text-yellow-500'
+          }`}>
+            {updateStatus === 'up-to-date' ? (
+              <>
+                <FiCheckCircle className="mr-2" />
+                Mazs AI is up to date
+              </>
+            ) : (
+              <>
+                <FiAlertCircle className="mr-2" />
+                Update available
+              </>
+            )}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+
   const renderSettings = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div 
-        className="bg-white dark:bg-gray-800 rounded-lg p-6 w-[800px] max-w-full max-h-[90vh] overflow-y-auto shadow-xl relative"
+        className="bg-white dark:bg-gray-800 rounded-lg p-8 w-[800px] max-w-full max-h-[90vh] overflow-y-auto shadow-xl relative"
         style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily || 'inherit' }}
       >
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">Settings</h2>
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Settings</h2>
           <button
             onClick={() => setShowSettings(false)}
-                        className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
           >
-            <FiX size={24} />
+            <FiX size={28} />
           </button>
         </div>
-        <div className="space-y-4">
+        {renderUpdateSection()}
+        <div className="space-y-8">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
               Font Size
             </label>
-            <input
-              type="range"
-              min="12"
-              max="24"
-              value={fontSize}
-              onChange={(e) => handleFontSizeChange(Number(e.target.value))}
-              className="w-full"
-            />
-            <span className="text-sm text-gray-600 dark:text-gray-400">{fontSize}px</span>
+            <div className="flex items-center space-x-4">
+              <input
+                type="range"
+                min="12"
+                max="24"
+                value={fontSize}
+                onChange={(e) => handleFontSizeChange(Number(e.target.value))}
+                className="w-full"
+              />
+              <span className="text-lg font-medium text-gray-600 dark:text-gray-400 w-12 text-center">{fontSize}px</span>
+            </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
               User Avatar
             </label>
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-lg text-2xl">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-full text-3xl">
                 {userAvatar}
               </div>
               <button
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200"
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 text-lg"
               >
                 Change Avatar
               </button>
             </div>
             {showEmojiPicker && (
-              <div className="absolute mt-2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-2">
+              <div className="absolute mt-4 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4">
                 <EmojiPicker onEmojiClick={handleEmojiClick} />
               </div>
             )}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Version
-            </label>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">v1.1 Anatra</span>
-              <button
-                onClick={checkForUpdates}
-                className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Send Key
+              </label>
+              <select 
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-lg"
+                value={sendKey}
+                onChange={(e) => handleSendKeyChange(e.target.value)}
               >
-                Check for Updates
-              </button>
+                <option>Enter</option>
+                <option>Ctrl + Enter</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Theme
+              </label>
+              <select
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-lg"
+                onChange={(e) => setIsDarkMode(e.target.value === 'Dark')}
+                value={isDarkMode ? 'Dark' : 'Light'}
+              >
+                <option>Light</option>
+                <option>Dark</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Language
+              </label>
+              <select 
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-lg"
+                value={language}
+                onChange={(e) => handleLanguageChange(e.target.value)}
+              >
+                <option>English</option>
+                <option>Spanish</option>
+                <option>French</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Chat Font Family
+              </label>
+              <input
+                type="text"
+                value={chatFontFamily}
+                onChange={(e) => handleChatFontFamilyChange(e.target.value)}
+                placeholder="Font Family Name"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-lg"
+              />
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={autoGenerateTitle}
+                onChange={(e) => handleAutoGenerateTitleChange(e.target.checked)}
+                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label className="ml-3 block text-lg text-gray-700 dark:text-gray-300">
+                Auto Generate Title
+              </label>
+            </div>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={sendPreviewBubble}
+                onChange={(e) => handleSendPreviewBubbleChange(e.target.checked)}
+                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label className="ml-3 block text-lg text-gray-700 dark:text-gray-300">
+                Send Preview Bubble
+              </label>
+            </div>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label className="ml-3 block text-lg text-gray-700 dark:text-gray-300">
+                Mask Splash Screen
+              </label>
+            </div>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label className="ml-3 block text-lg text-gray-700 dark:text-gray-300">
+                Hide Builtin Masks
+              </label>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Send Key
-            </label>
-            <select 
-              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-              value={sendKey}
-              onChange={(e) => handleSendKeyChange(e.target.value)}
-            >
-              <option>Enter</option>
-              <option>Ctrl + Enter</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Theme
-            </label>
-            <select
-              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-              onChange={(e) => setIsDarkMode(e.target.value === 'Dark')}
-              value={isDarkMode ? 'Dark' : 'Light'}
-            >
-              <option>Light</option>
-              <option>Dark</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Language
-            </label>
-            <select 
-              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-              value={language}
-              onChange={(e) => handleLanguageChange(e.target.value)}
-            >
-              <option>English</option>
-              <option>Spanish</option>
-              <option>French</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Chat Font Family
-            </label>
-            <input
-              type="text"
-              value={chatFontFamily}
-              onChange={(e) => handleChatFontFamilyChange(e.target.value)}
-              placeholder="Font Family Name"
-              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Auto Generate Title
-            </label>
-            <input
-              type="checkbox"
-              checked={autoGenerateTitle}
-              onChange={(e) => handleAutoGenerateTitleChange(e.target.checked)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Send Preview Bubble
-            </label>
-            <input
-              type="checkbox"
-              checked={sendPreviewBubble}
-              onChange={(e) => handleSendPreviewBubbleChange(e.target.checked)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Last Update
-            </label>
-            <span className="text-sm text-gray-600 dark:text-gray-400">Not sync yet</span>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Local Data
-            </label>
-            <span className="text-sm text-gray-600 dark:text-gray-400">1 chats, 2 messages, 0 prompts, 0 masks</span>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Mask Splash Screen
-            </label>
-            <input
-              type="checkbox"
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Hide Builtin Masks
-            </label>
-            <input
-              type="checkbox"
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">System Information</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-lg text-gray-600 dark:text-gray-400">Last Update:</span>
+                <span className="text-lg font-medium text-gray-800 dark:text-white">Not sync yet</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-lg text-gray-600 dark:text-gray-400">Local Data:</span>
+                <span className="text-lg font-medium text-gray-800 dark:text-white">1 chats, 2 messages, 0 prompts, 0 masks</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
