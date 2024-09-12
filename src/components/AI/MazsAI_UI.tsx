@@ -847,7 +847,7 @@ const ChatBotUI: React.FC = () => {
                     </div>
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 text-center pb-2 pt-1">
-                      Mazs AI can make lots of mistakes, please check the facts again
+                      Mazs AI v1.1.0 Anatra can make lots of mistakes, please check the facts again
                     </div>
                 </div>
               </div>
