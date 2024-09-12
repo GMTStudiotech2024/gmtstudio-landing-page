@@ -45,6 +45,8 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
         { to: '/news13', label: 'GMTStudio MazsAI v1.0: A Comprehensive Approach to Conversational AI', icon: FaComments },
         { to: '/news14', label: 'Bring Mazs AI into our official website', icon: FaComments },
         { to: '/news15', label: 'Mazs AI v1.0 Anatra update', icon: FaComments },
+        { to: '/news16', label: 'Mazs AI v1.1.0 update', icon: FaComments },
+        { to: '/news17', label: 'Mazs AI v1.2.0 update', icon: FaComments },
       ],
     },
     {label: 'Mazs AI Projects', icon: FaCode, 
