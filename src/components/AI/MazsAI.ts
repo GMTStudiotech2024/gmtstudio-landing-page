@@ -565,7 +565,19 @@ class NaturalLanguageProcessor {
         "Proper nutrition is crucial for pets. Have you discussed your pet's diet with a veterinarian?",
         "Mental stimulation, like toys and play, is important for many pets' well-being.",
         "Remember, pets are a long-term commitment and responsibility."
-      ]]
+      ]],
+      ['generate code for me', ['i can generate code for you, but i am not very good at it, i am not trained for it, anyways what do you want to generate?']],
+      ['generate a simple python code snippet for me', [
+        "Here's a simple Python code snippet for you:\n\ndef greet(name):\n    return f'Hello, {name}!'\n\nprint(greet('World'))",
+        "Sure, here's a basic Python function:\n\ndef calculate_area(length, width):\n    return length * width\n\nprint(calculate_area(5, 3))",
+        "Here's a simple Python list comprehension:\n\nnumbers = [1, 2, 3, 4, 5]\nsquared = [x**2 for x in numbers]\nprint(squared)",
+        "Here's a basic Python class:\n\nclass Dog:\n    def __init__(self, name):\n        self.name = name\n    def bark(self):\n        return f'{self.name} says Woof!'\n\nmy_dog = Dog('Buddy')\nprint(my_dog.bark())"
+      ]],
+      ['generate a simple javascript code snippet for me', [
+        "Sure, here's a basic JavaScript function:\n\nfunction calculateArea(length, width) {\n    return length * width;\n}\n\nconsole.log(calculateArea(5, 3));",
+        "Here's a simple JavaScript array method:\n\nconst numbers = [1, 2, 3, 4, 5];\nconst squared = numbers.map(x => x * x);\nconsole.log(squared);",
+        "Here's a basic JavaScript class:\n\nclass Car {\n    constructor(brand) {\n        this.brand = brand;\n    }\n    drive() {\n        return 'I am driving a ' + this.brand + ' car.';\n    }\\n}\\n\\nconst myCar = new Car('Toyota');\\nconsole.log(myCar.drive());"
+      ]],
     ]);
 
     // Initialize advanced sentiment analysis model
@@ -1405,7 +1417,8 @@ class NaturalLanguageProcessor {
     }
 
     return sentence.join(' ');
-  }}
+  }
+}
 
 // Advanced sentiment analysis model
 class AdvancedSentimentModel {
@@ -1614,12 +1627,27 @@ class RLAgent {
 
 // Add a safeEvaluate function to safely evaluate mathematical expressions
 function safeEvaluate(mathExpression: string): number {
-  try {
-    // Use Function constructor to evaluate the expression safely
-    return Function(`'use strict'; return (${mathExpression})`)();
-  } catch (error) {
-    throw new Error("Invalid mathematical expression");
+  // This is a very basic implementation and should be expanded for real use
+  const operators = {
+    '+': (a: number, b: number) => a + b,
+    '-': (a: number, b: number) => a - b,
+    '*': (a: number, b: number) => a * b,
+    '/': (a: number, b: number) => a / b,
+  };
+
+  const tokens = mathExpression.match(/(\d+|\+|-|\*|\/)/g);
+  if (!tokens) throw new Error("Invalid mathematical expression");
+  let result = parseFloat(tokens[0]);
+  for (let i = 1; i < tokens.length; i += 2) {
+    const operator = tokens[i] as keyof typeof operators;
+    const operand = parseFloat(tokens[i + 1]);
+    if (isNaN(operand) || !(operator in operators)) {
+      throw new Error("Invalid mathematical expression");
+    }
+    result = operators[operator](result, operand);
   }
+
+  return result;
 }
 
 // Modify the processChatbotQuery function to handle mathematical operations
@@ -1865,6 +1893,11 @@ const intents: Intent[] = [
     patterns: ['How to improve communication skills', 'Better communication'],
     responses: ["To improve communication skills, practice active listening, be clear and concise, pay attention to non-verbal cues, ask questions, show empathy, and seek feedback on your communication style."],
   },
+  {
+    patterns: ['How to improve coding skills', 'coding tips','coding', ],
+    responses: ["To improve coding skills, practice regularly, learn new programming languages, participate in coding challenges, read documentation, and join coding communities."],
+
+  },
 ];
 
 const network = new MultilayerPerceptron([10, 32, 64, 32, intents.length], ['relu', 'relu', 'relu', 'sigmoid']);
@@ -2011,9 +2044,6 @@ export async function processAttachedFile(file: File): Promise<string> {
             response = await processTextFile(event.target?.result as string);
             break;
           case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-          case 'application/vnd.ms-excel':
-            response = await processExcelFile(event.target?.result as ArrayBuffer);
-            break;
           case 'application/json':
             response = await processJsonFile(event.target?.result as string);
             break;
@@ -2140,48 +2170,6 @@ ${nlpSummary}
 Would you like me to perform any specific analysis on this text?`;
 }
 
-async function processExcelFile(content: ArrayBuffer): Promise<string> {
-  // Function to process Excel file
-  async function processExcelFile(content: ArrayBuffer): Promise<string> {
-    // Note: This is a basic implementation without using external libraries
-    // It may not handle all Excel file formats and complex structures
-
-    try {
-      // Convert ArrayBuffer to string
-      const data = new Uint8Array(content);
-      let result = '';
-      for (let i = 0; i < data.length; i++) {
-        result += String.fromCharCode(data[i]);
-      }
-
-      // Simple parsing (assumes CSV-like structure)
-      const rows = result.split('\n');
-      const rowCount = rows.length;
-      const columnCount = rows[0].split(',').length;
-
-      // Generate a summary
-      const summary = nlp.generateComplexSentence(
-        "The Excel file analysis reveals",
-        `approximately ${rowCount} rows and ${columnCount} columns`,
-        50
-      );
-
-      return `I've analyzed the Excel file. Here's a basic overview:
-
-1. Approximate number of rows: ${rowCount}
-2. Approximate number of columns: ${columnCount}
-
-${summary}
-
-Please note that this is a simplified analysis and may not be accurate for complex Excel files. For a more detailed analysis, we would need to use a specialized Excel parsing library.
-
-Would you like me to explain any specific part of this data?`;
-    } catch (error) {
-      return "I encountered an error while processing the Excel file. Please make sure it's a valid Excel file in a simple format.";
-    }
-  }
-  return "I've received an Excel file. To process this, we'd need to implement Excel parsing logic.";
-}
 
 async function processJsonFile(content: string): Promise<string> {
   try {

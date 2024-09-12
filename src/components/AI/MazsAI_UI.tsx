@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiRepeat, FiMic, FiCopy, FiArrowDown, FiTrash2, FiEdit, FiShare, FiArchive, FiPlus, FiCheck, FiSettings, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiRepeat, FiMic, FiCopy, FiTrash2, FiEdit, FiShare, FiArchive, FiPlus, FiCheck, FiSettings, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, regenerateResponse, getChatHistories, createChatHistory, renameChatHistory, deleteChatHistory } from './MazsAI';
 // import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -26,7 +26,7 @@ const ChatBotUI: React.FC = () => {
   const [input, setInput] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
+  const [isTyping] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [currentTypingIndex, setCurrentTypingIndex] = useState(0);
@@ -38,13 +38,13 @@ const ChatBotUI: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [userTyping, setUserTyping] = useState(false);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
-  const [isScrolledToBottom, setIsScrolledToBottom] = useState(true);
+  const [,setIsScrolledToBottom] = useState(true);
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [selectedMessageIndex, setSelectedMessageIndex] = useState<number | null>(null);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
   const [showChatHistory, setShowChatHistory] = useState(false);
   const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
-  const [selectedChatHistory, setSelectedChatHistory] = useState<string | null>(null);
+  const [, setSelectedChatHistory] = useState<string | null>(null);
   const [newChatName, setNewChatName] = useState('');
   const [editingHistoryId, setEditingHistoryId] = useState<string | null>(null);
   const [editingHistoryName, setEditingHistoryName] = useState('');
@@ -301,16 +301,6 @@ const ChatBotUI: React.FC = () => {
     // Optionally, show a toast notification
   };
 
-  const scrollToBottomButton = () => (
-    <button
-      onClick={scrollToBottom}
-      className={`fixed bottom-20 right-4 sm:bottom-24 sm:right-8 p-2 bg-blue-500 text-white rounded-full shadow-lg transition-opacity duration-300 ${
-        isScrolledToBottom ? 'opacity-0' : 'opacity-100'
-      } z-50 hidden sm:block`}
-    >
-      <FiArrowDown size={24} />
-    </button>
-  );
 
   const renderVoiceRecorder = () => (
     <div className="absolute bottom-full mb-2 bg-white dark:bg-gray-700 rounded-lg shadow-lg p-4">
