@@ -1859,7 +1859,7 @@ const intents: Intent[] = [
 const network = new MultilayerPerceptron([10, 32, 64, 32, intents.length], ['relu', 'relu', 'relu', 'sigmoid']);
 
 function trainNetwork() {
-  const epochs = 100;
+  const epochs = 50;
   const learningRate = 0.5;
 
   for (let epoch = 0; epoch < epochs; epoch++) {
