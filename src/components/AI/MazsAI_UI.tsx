@@ -53,7 +53,7 @@ const ChatBotUI: React.FC = () => {
     return localStorage.getItem('userName') || "User(change it if you want)" ;
   });
   const [isEditingUserName, setIsEditingUserName] = useState(false);
-  const botName = "Mazs AI v1.1 Anatra";
+  const botName = "Mazs AI v1.1.0 Anatra";
 
   const [showSettings, setShowSettings] = useState(false);
   const [fontSize, setFontSize] = useState(16);
@@ -107,7 +107,7 @@ const ChatBotUI: React.FC = () => {
 
   const addWelcomeMessage = () => {
     const welcomeMessage: Message = {
-      text: "Hello! I'm Mazs AI v1.1 Anatra. I How can I assist you today? ",
+      text: "Hello! I'm Mazs AI v1.1.0 Anatra. I How can I assist you today? ",
       isUser: false,
       timestamp: new Date()
     };
@@ -846,6 +846,9 @@ const ChatBotUI: React.FC = () => {
                       </button>
                     </div>
                   </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 text-center pb-2 pt-1">
+                      Mazs AI can make lots of mistakes, please check the facts again
+                    </div>
                 </div>
               </div>
             </div>

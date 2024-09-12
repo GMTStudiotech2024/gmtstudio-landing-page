@@ -472,7 +472,28 @@ class NaturalLanguageProcessor {
         "Great inquiry! There's a lot to explore in that area. Where should we start?",
         "You've piqued my interest! Shall we explore this topic further?",
         "That's a thought-provoking question! I'd love to discuss it in more detail."
-      ]]
+      ]],
+      ['gmtstudio', [
+        "GMTStudio is a platform that offers various services, including an AI WorkSpace and a social media platform called Theta.",
+        "Theta is a social media platform developed by GMTStudio, offering unique features for connecting and sharing content.",
+        "The AI WorkSpace is a powerful tool offered by GMTStudio for AI development, allowing users to train models and run experiments.",
+        "GMTStudio is dedicated to providing innovative solutions in the field of AI and technology.",
+        "If you have any questions about GMTStudio or its services, feel free to ask!"
+      ]],
+      ['AI',[
+        "AI, or Artificial Intelligence, refers to the simulation of human intelligence in machines that are programmed to think and learn like humans.",
+        "There are various types of AI, including machine learning, deep learning, natural language processing, and computer vision.",
+        "AI has applications in fields such as healthcare, finance, education, and entertainment.",
+        "The development of AI has led to significant advancements in technology and automation.",
+        "If you have any questions about AI or its applications, feel free to ask!"
+      ]],
+      ['Mazs AI',[
+        "Mazs AI is a powerful AI system developed by GMTStudio, designed to provide advanced natural language processing and machine learning capabilities.",
+        "Mazs AI can be used for a wide range of applications, including chatbots, virtual assistants, and language translation.",
+        "Mazs AI is built on cutting-edge technology, including neural networks and deep learning algorithms.",
+        "Mazs AI is designed to be highly customizable, allowing developers to tailor it to their specific needs.",
+        "If you have any questions about Mazs AI or its capabilities, feel free to ask!"
+      ]],      
     ]);
 
     // Initialize advanced sentiment analysis model
