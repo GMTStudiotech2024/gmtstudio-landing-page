@@ -53,7 +53,7 @@ const ChatBotUI: React.FC = () => {
     return localStorage.getItem('userName') || "User(change it if you want)" ;
   });
   const [isEditingUserName, setIsEditingUserName] = useState(false);
-  const botName = "Mazs AI v1.2.0 Anatra";
+  const botName = "Mazs AI v1.3.0 Anatra";
 
   const [showSettings, setShowSettings] = useState(false);
   const [fontSize, setFontSize] = useState(() => {
@@ -127,7 +127,7 @@ const ChatBotUI: React.FC = () => {
 
   const addWelcomeMessage = () => {
     const welcomeMessage: Message = {
-      text: "Hello! I'm Mazs AI v1.2.0 Anatra. I How can I assist you today? ",
+      text: "Hello! I'm Mazs AI v1.3.0 Anatra. I How can I assist you today? ",
       isUser: false,
       timestamp: new Date()
     };
@@ -478,7 +478,7 @@ const ChatBotUI: React.FC = () => {
       <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Version Information</h3>
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm text-gray-600 dark:text-gray-400">Current Version:</span>
-        <span className="font-medium text-black dark:text-white">v1.2.0 Anatra</span>
+        <span className="font-medium text-black dark:text-white">v1.3.0 Anatra</span>
       </div>
       <div className="flex items-center justify-between">
         <button
@@ -742,7 +742,7 @@ const ChatBotUI: React.FC = () => {
                 transition={{ duration: 0.3 }}
                 className="mb-6 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg text-blue-800 dark:text-blue-200 shadow-md"
               >
-                <p className="text-sm">Mazs AI v1.2.0 Anatra is an advanced chatbot powered by natural language processing and machine learning. It can assist you with information about GMTStudio, Theta platform, and AI WorkSpace.</p>
+                <p className="text-sm">Mazs AI v1.3.0 Anatra is an advanced chatbot powered by natural language processing and machine learning. It can assist you with information about GMTStudio, Theta platform, and AI WorkSpace.</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -844,7 +844,7 @@ const ChatBotUI: React.FC = () => {
                 >
                   <span className="inline-flex items-center p-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">
                     <FiLoader className="animate-spin mr-2" />
-                    <span className="text-sm">Mazs AI v1.2.0 Anatra is thinking</span>
+                    <span className="text-sm">Mazs AI v1.3.0 Anatra is thinking</span>
                     <span className="ml-1 inline-flex">
                       <span className="animate-bounce" style={{ animationDelay: '0s' }}>.</span>
                       <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
@@ -982,7 +982,7 @@ const ChatBotUI: React.FC = () => {
                 {showVoiceRecorder && renderVoiceRecorder()}
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
-                <span className="font-medium">Mazs AI v1.2.0 Anatra</span> can make mistakes. Please verify important information.
+                <span className="font-medium">Mazs AI v1.3.0 Anatra</span> can make mistakes. Please verify important information.
               </div>
             </div>
           </div>

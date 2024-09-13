@@ -321,7 +321,7 @@ class NaturalLanguageProcessor {
     this.encoder = new MultilayerPerceptron([100, 32, 64, 32, 100], ['relu', 'relu', 'relu', 'sigmoid']);
     this.decoder = new MultilayerPerceptron([100, 32, 64, 32, 100], ['relu', 'relu', 'relu', 'sigmoid']);
     this.gan = new GAN(trainingData || this.generateDummyData());
-    this.rlAgent = new RLAgent();
+    this.rlAgent = new RLAgent(this.wordVectors);
     this.wordProbabilities = new Map();
     this.ngramFrequency = new Map();
     this.markovChain = new Map();
@@ -1578,10 +1578,15 @@ class RLAgent {
   private valueNetwork: MultilayerPerceptron;
   private gamma: number = 0.99;
   private epsilon: number = 0.1;
+  private replayBuffer: Array<{state: number[], action: number[], reward: number, nextState: number[]}>;
+  private batchSize: number = 32;
+  private wordEmbeddings: Map<string, number[]>;
 
-  constructor() {
+  constructor(wordEmbeddings: Map<string, number[]>) {
     this.policy = new MultilayerPerceptron([100, 256, 512, 256, 100], ['relu', 'relu', 'relu', 'tanh']);
     this.valueNetwork = new MultilayerPerceptron([100, 256, 512, 256, 1], ['relu', 'relu', 'relu', 'linear']);
+    this.replayBuffer = [];
+    this.wordEmbeddings = wordEmbeddings;
   }
 
   improve(state: number[], context: any): number[] {
@@ -1590,46 +1595,136 @@ class RLAgent {
     } else {
       const action = this.policy.predict(state);
       const reward = this.calculateReward(action, context);
-      this.train([{ state, action, reward, nextState: action }]);
+      const nextState = this.getNextState(state, action);
+      this.replayBuffer.push({state, action, reward, nextState});
+      
+      if (this.replayBuffer.length >= this.batchSize) {
+        this.train();
+      }
+      
       return action;
     }
   }
 
   private calculateReward(action: number[], context: any): number {
-    const coherence = this.assessCoherence(action, context.previousWords);
-    const topicRelevance = this.assessTopicRelevance(action, context.topicStack);
-    const sentimentAlignment = this.assessSentimentAlignment(action, context.sentimentHistory);
+    const coherence = this.assessCoherence(action, context?.previousWords || []);
+    const topicRelevance = this.assessTopicRelevance(action, context?.topicStack || []);
+    const sentimentAlignment = this.assessSentimentAlignment(action, context?.sentimentHistory || []);
+    const novelty = this.assessNovelty(action, context?.previousWords || []);
+    const grammaticalCorrectness = this.assessGrammaticalCorrectness(action);
     
-    return coherence * 0.4 + topicRelevance * 0.4 + sentimentAlignment * 0.2;
+    return coherence * 0.3 + topicRelevance * 0.3 + sentimentAlignment * 0.2 + novelty * 0.1 + grammaticalCorrectness * 0.1;
   }
 
   private assessCoherence(action: number[], previousWords: string[]): number {
-    // Implement a more sophisticated coherence check
-    // This is a placeholder implementation
-    return Math.random();
+    if (!previousWords || previousWords.length === 0) {
+      return 0;
+    }
+    const previousWordVectors = previousWords.map(word => this.wordEmbeddings.get(word) || []);
+    const similarities = previousWordVectors.map(vec => this.cosineSimilarity(action, vec));
+    return Math.max(...similarities, 0);
   }
 
   private assessTopicRelevance(action: number[], topicStack: string[]): number {
-    // Implement topic relevance assessment
-    // This is a placeholder implementation
-    return Math.random();
+    if (!topicStack || topicStack.length === 0) {
+      return 0;
+    }
+    const topicVectors = topicStack.map(topic => this.wordEmbeddings.get(topic) || []);
+    const similarities = topicVectors.map(vec => this.cosineSimilarity(action, vec));
+    return Math.max(...similarities, 0);
   }
 
   private assessSentimentAlignment(action: number[], sentimentHistory: number[]): number {
-    // Implement sentiment alignment assessment
-    // This is a placeholder implementation
+    if (!sentimentHistory || sentimentHistory.length === 0) {
+      return 0.5; // Neutral sentiment if no history
+    }
+    const actionWord = this.vectorToWord(action);
+    const predictedSentiment = this.predictSentiment(actionWord);
+    const recentSentiment = sentimentHistory[sentimentHistory.length - 1];
+    return 1 - Math.abs(predictedSentiment - recentSentiment);
+  }
+
+  private assessNovelty(action: number[], previousWords: string[]): number {
+    if (!previousWords || previousWords.length === 0) {
+      return 1; // Completely novel if no previous words
+    }
+    const actionWord = this.vectorToWord(action);
+    if (previousWords.includes(actionWord)) {
+      return 0;
+    }
+    const similarities = previousWords.map(word => {
+      const wordVector = this.wordEmbeddings.get(word) || [];
+      return this.cosineSimilarity(action, wordVector);
+    });
+    return 1 - Math.max(...similarities, 0);
+  }
+
+  private assessGrammaticalCorrectness(action: number[]): number {
+    // This is a placeholder. In a real implementation, you would use a pre-trained
+    // language model to score the grammatical correctness of the action.
     return Math.random();
   }
 
-  train(experiences: { state: number[], action: number[], reward: number, nextState: number[] }[]) {
-    experiences.forEach(exp => {
-      const targetValue = exp.reward + this.gamma * this.valueNetwork.predict(exp.nextState)[0];
-      const currentValue = this.valueNetwork.predict(exp.state)[0];
-      const advantage = targetValue - currentValue;
+  private getNextState(state: number[], action: number[]): number[] {
+    return state.map((s, i) => (s + action[i]) / 2);
+  }
 
-      this.valueNetwork.train(exp.state, [targetValue], 0.001);
-      this.policy.train(exp.state, exp.action.map(a => a * advantage), 0.001);
+  private train() {
+    const batch = this.sampleFromReplayBuffer();
+    
+    batch.forEach(experience => {
+      const { state, action, reward, nextState } = experience;
+      
+      const nextStateValue = this.valueNetwork.predict(nextState)[0];
+      const targetQ = reward + this.gamma * nextStateValue;
+      
+      this.policy.train(state, action, 0.001);
+      this.valueNetwork.train(state, [targetQ], 0.001);
     });
+    
+    this.epsilon = Math.max(this.epsilon * 0.999, 0.01);
+  }
+
+  private sampleFromReplayBuffer() {
+    return this.shuffleArray(this.replayBuffer).slice(0, this.batchSize);
+  }
+
+  private shuffleArray<T>(array: T[]): T[] {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  private vectorToWord(vector: number[]): string {
+    let closestWord = '';
+    let closestDistance = Infinity;
+    for (const [word, embedding] of Array.from(this.wordEmbeddings.entries())) {
+      const distance = this.euclideanDistance(vector, embedding);
+      if (distance < closestDistance) {
+        closestWord = word;
+        closestDistance = distance;
+      }
+    }
+    return closestWord;
+  }
+
+  private cosineSimilarity(a: number[], b: number[]): number {
+    const dotProduct = a.reduce((sum, _, i) => sum + a[i] * b[i], 0);
+    const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
+    const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
+    return dotProduct / (magnitudeA * magnitudeB);
+  }
+
+  private euclideanDistance(a: number[], b: number[]): number {
+    return Math.sqrt(a.reduce((sum, _, i) => sum + Math.pow(a[i] - b[i], 2), 0));
+  }
+
+  private predictSentiment(word: string): number {
+    // This is a placeholder. In a real implementation, you would use a pre-trained
+    // sentiment analysis model to predict the sentiment of the word.
+    return Math.random() * 2 - 1;  // Returns a value between -1 and 1
   }
 }
 
