@@ -514,7 +514,7 @@ class NaturalLanguageProcessor {
       ['weather', [
         "I'm sorry, I don't have real-time weather information. You might want to check a weather app or website for the most up-to-date forecast.",
         "While I can't provide current weather data, I can discuss climate patterns and meteorology if you're interested!",
-        "Unfortunately, I don't have access to live weather updates. Is there something else I can help with?",
+        "Unfortunately, I don't have access to live weather updates. Is there something else I can assist you with?",
         "I wish I could tell you the weather, but I don't have that capability. Maybe I can help with something else?",
         "Weather information isn't in my database, but I'd be happy to chat about climate change and its effects if you're curious!"
       ]],
@@ -689,9 +689,120 @@ class NaturalLanguageProcessor {
     return this.encoder.predict(inputVector);
   }
 
-  decodeFromMeaningSpace(meaningVector: number[]): string {
+  decodeFromMeaningSpace(meaningVector: number[], strategy: 'greedy' | 'beam' | 'top-k' | 'top-p', params?: any): string {
     const outputVector = this.decoder.predict(meaningVector);
-    return this.vectorToText(outputVector);
+    
+    switch (strategy) {
+      case 'greedy':
+        return this.greedyDecode(outputVector);
+      case 'beam':
+        return this.beamSearch(outputVector, params?.beamWidth || 3);
+      case 'top-k':
+        return this.topKSampling(outputVector, params?.k || 10);
+      case 'top-p':
+        return this.topPSampling(outputVector, params?.p || 0.9);
+      default:
+        return this.greedyDecode(outputVector);
+    }
+  }
+
+  private greedyDecode(vector: number[]): string {
+    return this.findClosestWord(vector);
+  }
+
+  private beamSearch(vector: number[], beamWidth: number): string {
+    let beams: { sequence: string[], score: number }[] = [{ sequence: [], score: 0 }];
+    const maxLength = 20; // Adjust as needed
+
+    for (let i = 0; i < maxLength; i++) {
+      let candidates = [];
+      for (const beam of beams) {
+        const nextWordVector = this.decoder.predict([...vector, ...this.encodeSequence(beam.sequence)]);
+        const topK = this.getTopK(nextWordVector, beamWidth);
+        for (const [word, prob] of topK) {
+          candidates.push({
+            sequence: [...beam.sequence, word],
+            score: beam.score + Math.log(prob)
+          });
+        }
+      }
+      beams = candidates.sort((a, b) => b.score - a.score).slice(0, beamWidth);
+    }
+
+    return beams[0].sequence.join(' ');
+  }
+
+  private topKSampling(vector: number[], k: number): string {
+    const sequence = [];
+    const maxLength = 20; // Adjust as needed
+
+    for (let i = 0; i < maxLength; i++) {
+      const nextWordVector = this.decoder.predict([...vector, ...this.encodeSequence(sequence)]);
+      const topK = this.getTopK(nextWordVector, k);
+      const word = this.sampleFromDistribution(topK);
+      sequence.push(word);
+      if (this.isEndOfSequence(word)) break;
+    }
+
+    return sequence.join(' ');
+  }
+
+  private topPSampling(vector: number[], p: number): string {
+    const sequence = [];
+    const maxLength = 20; // Adjust as needed
+
+    for (let i = 0; i < maxLength; i++) {
+      const nextWordVector = this.decoder.predict([...vector, ...this.encodeSequence(sequence)]);
+      const sortedWords = this.getSortedWords(nextWordVector);
+      let cumProb = 0;
+      const nucleusWords: [string, number][] = [];
+      for (const [word, prob] of sortedWords) {
+        cumProb += prob;
+        nucleusWords.push([word, prob]);
+        if (cumProb > p) break;
+      }
+      const word = this.sampleFromDistribution(nucleusWords);
+      sequence.push(word);
+      if (this.isEndOfSequence(word)) break;
+    }
+
+    return sequence.join(' ');
+  }
+
+  private getTopK(vector: number[], k: number): [string, number][] {
+    return this.getSortedWords(vector).slice(0, k);
+  }
+
+  private getSortedWords(vector: number[]): [string, number][] {
+    const wordProbs: [string, number][] = Array.from(this.vocabulary).map((word): [string, number] => {
+      const probability = this.wordProbability(vector, word);
+      return [word, probability];
+    });
+    return wordProbs.sort((a, b) => b[1] - a[1]);
+  }
+
+  private sampleFromDistribution(distribution: [string, number][]): string {
+    const total = distribution.reduce((sum, [_, prob]) => sum + prob, 0);
+    const rand = Math.random() * total;
+    let cumProb = 0;
+    for (const [word, prob] of distribution) {
+      cumProb += prob;
+      if (cumProb > rand) return word;
+    }
+    return distribution[distribution.length - 1][0];
+  }
+
+  private wordProbability(vector: number[], word: string): number {
+    const wordVector = this.wordVectors.get(word) || Array(vector.length).fill(0);
+    return Math.exp(this.cosineSimilarity(new Map(vector.map((v, i) => [i.toString(), v])), new Map(wordVector.map((v, i) => [i.toString(), v]))));
+  }
+
+  private encodeSequence(sequence: string[]): number[] {
+    return sequence.flatMap(word => this.wordVectors.get(word) || Array(100).fill(0));
+  }
+
+  private isEndOfSequence(word: string): boolean {
+    return word === '.' || word === '!' || word === '?';
   }
 
   generateSentence(startWord: string, userInput: string, maxLength: number = 20): string {
@@ -958,9 +1069,6 @@ class NaturalLanguageProcessor {
       const val2 = vec2.get(key) || 0;
       dotProduct += val1 * val2;
       mag1 += val1 * val1;
-    });
-
-    vec2.forEach((val2) => {
       mag2 += val2 * val2;
     });
 
@@ -1072,7 +1180,7 @@ class NaturalLanguageProcessor {
     // Use GAN to refine the response
     const responseVector = this.encodeToMeaningSpace(response);
     const refinedVector = this.gan.refine(responseVector, response.split(' ').length);
-    const refinedResponse = this.decodeFromMeaningSpace(refinedVector);
+    const refinedResponse = this.decodeFromMeaningSpace(refinedVector, 'top-p');
 
     // Use RL agent to improve the response
     const improvedVector = this.rlAgent.improve(refinedVector, {
@@ -1082,7 +1190,7 @@ class NaturalLanguageProcessor {
       sentiment: this.analyzeSentiment(userInput),
       topics
     });
-    const improvedResponse = this.decodeFromMeaningSpace(improvedVector);
+    const improvedResponse = this.decodeFromMeaningSpace(improvedVector, 'top-p');
 
     // Combine the original, refined, and improved responses
     response = `${response} ${refinedResponse} ${improvedResponse}`;
@@ -1148,82 +1256,114 @@ class NaturalLanguageProcessor {
     return (nextWordProbs.get(nextWord) || 0) / totalOccurrences;
   }
 
-  generateComplexSentence(startWord: string, userInput: string, maxLength: number = 500): string {
+  generateComplexSentence(startWord: string, userInput: string, maxLength: number = 20, decodingStrategy: 'greedy' | 'beam' | 'top-k' | 'top-p' = 'top-p'): string {
     let sentence = [startWord];
     let currentContext = userInput;
     let wordCount = 1;
-    let topicStack: string[] = [];
-    let sentimentHistory: number[] = [];
-
-    // Initialize topic and sentiment
-    const initialAnalysis = this.analyzeContext(currentContext);
-    topicStack.push(...initialAnalysis.topics);
-    sentimentHistory.push(initialAnalysis.sentiment.score);
 
     while (wordCount < maxLength) {
-      // Combine current sentence with original user input for context
       const combinedContext = `${userInput} ${sentence.join(' ')}`;
-      
-      // Encode combined context
       const meaningVector = this.encodeToMeaningSpace(combinedContext);
-      
-      // Apply GAN refinement
       const refinedVector = this.gan.refine(meaningVector, wordCount);
-      
-      // Apply RL improvement
       const improvedVector = this.rlAgent.improve(refinedVector, {
-        topicStack,
-        sentimentHistory,
+        topicStack: this.topicModel.identify(combinedContext),
+        sentimentHistory: [this.analyzeSentiment(combinedContext).score],
         wordCount,
         maxLength,
         userInput,
         previousWords: sentence
       });
       
-      // Predict next word
-      const nextWordVector = this.decoder.predict(improvedVector);
-      const nextWord = this.findClosestWord(nextWordVector);
+      const nextWord = this.decodeFromMeaningSpace(improvedVector, decodingStrategy, {
+        beamWidth: 3,
+        k: 10,
+        p: 0.9
+      });
       
-      // Enforce topic adherence
-      const topicAdherentWord = this.enforceTopicAdherence(nextWord, topicStack[topicStack.length - 1]);
-      
-      // Analyze context including the potential next word
-      const { sentiment, topics } = this.analyzeContext(`${combinedContext} ${topicAdherentWord}`);
-      
-      // Adjust word based on analysis
-      const adjustedNextWord = this.adjustWordBasedOnAnalysis(topicAdherentWord, sentiment, topics);
-      
-      // Apply coherence check
-      if (!this.isCoherent(sentence, adjustedNextWord, userInput)) {
-        continue; // Skip this word and try again
+      if (this.isCoherent(sentence, nextWord, userInput)) {
+        sentence.push(nextWord);
+        currentContext = this.updateContext(userInput, sentence);
+        wordCount++;
+      } else {
+        // If the next word is not coherent, try to find a more suitable word
+        const alternativeWords = this.findSimilarWords(nextWord, 5);
+        for (const altWord of alternativeWords) {
+          if (this.isCoherent(sentence, altWord, userInput)) {
+            sentence.push(altWord);
+            currentContext = this.updateContext(userInput, sentence);
+            wordCount++;
+            break;
+          }
+        }
       }
-      
-      // Add word to sentence
-      sentence.push(adjustedNextWord);
-      currentContext = this.updateContext(userInput, sentence);
-      wordCount++;
 
-      // Update topic stack and sentiment history
-      if (topics.length > 0 && topics[0] !== topicStack[topicStack.length - 1]) {
-        topicStack.push(topics[0]);
-      }
-      sentimentHistory.push(sentiment.score);
-
-      // Check for sentence end
-      if (this.shouldEndSentence(adjustedNextWord, wordCount, maxLength, topicStack, sentimentHistory, userInput)) {
+      if (this.shouldEndSentence(sentence[sentence.length - 1], wordCount, maxLength, this.topicModel.identify(currentContext), [this.analyzeSentiment(currentContext).score], userInput)) {
         break;
-      }
-
-      // Update word probabilities
-      this.updateWordProbabilities(currentContext);
-      
-      // Periodic context refresh
-      if (wordCount % 5 === 0) {
-        currentContext = this.refreshContext(sentence, userInput);
       }
     }
 
     return this.postProcessSentence(sentence.join(' '), userInput);
+  }
+
+  private isCoherent(sentence: string[], nextWord: string, userInput: string): boolean {
+    const context = sentence.slice(-3).join(' '); // Use the last 3 words as context
+    const coherenceScore = this.calculateCoherence(context, nextWord, userInput);
+    return coherenceScore > 0.5; // Adjust this threshold as needed
+  }
+
+  private calculateCoherence(context: string, nextWord: string, userInput: string): number {
+    const contextVector = this.encodeToMeaningSpace(context);
+    const nextWordVector = this.encodeToMeaningSpace(nextWord);
+    const userInputVector = this.encodeToMeaningSpace(userInput);
+
+    const contextSimilarity = this.cosineSimilarity(new Map(contextVector.map((v, i) => [i.toString(), v])), new Map(nextWordVector.map((v, i) => [i.toString(), v])));
+    const userInputSimilarity = this.cosineSimilarity(new Map(userInputVector.map((v, i) => [i.toString(), v])), new Map(nextWordVector.map((v, i) => [i.toString(), v])));
+
+    return (contextSimilarity + userInputSimilarity) / 2;
+  }
+
+  private postProcessSentence(sentence: string, userInput: string): string {
+    // Remove repeated words
+    const words = sentence.split(' ');
+    const uniqueWords = words.filter((word, index, self) => 
+      index === self.findIndex((t) => t.toLowerCase() === word.toLowerCase())
+    );
+
+    // Ensure proper capitalization
+    uniqueWords[0] = uniqueWords[0].charAt(0).toUpperCase() + uniqueWords[0].slice(1);
+
+    // Add punctuation
+    let processedSentence = uniqueWords.join(' ').trim();
+    if (!processedSentence.endsWith('.') && !processedSentence.endsWith('?') && !processedSentence.endsWith('!')) {
+      processedSentence += '.';
+    }
+
+    // Ensure the sentence is relevant to the user input
+    const relevanceScore = this.calculateRelevance(processedSentence, userInput);
+    if (relevanceScore < 0.5) {
+      // If the sentence is not relevant enough, generate a more relevant one
+      return this.generateRelevantSentence(userInput);
+    }
+
+    return processedSentence;
+  }
+
+  private calculateRelevance(sentence: string, userInput: string): number {
+    const sentenceVector = this.encodeToMeaningSpace(sentence);
+    const userInputVector = this.encodeToMeaningSpace(userInput);
+    return this.cosineSimilarity(
+      new Map(sentenceVector.map((v, i) => [i.toString(), v])),
+      new Map(userInputVector.map((v, i) => [i.toString(), v]))
+    );
+  }
+
+  private generateRelevantSentence(userInput: string): string {
+    const intent = this.findMostSimilarIntent(userInput, intents);
+    if (intent) {
+      return intent.responses[Math.floor(Math.random() * intent.responses.length)];
+    } else {
+      return this.generateComplexSentence("I understand you're asking about", userInput, 15);
+    }
   }
 
   public updateContext(userInput: string, sentence: string[]): string {
@@ -1238,27 +1378,6 @@ class NaturalLanguageProcessor {
     return `${userInput} ${recentWords.join(' ')}`;
   }
 
-  private isCoherent(sentence: string[], nextWord: string, userInput: string): boolean {
-    const contextWindow = 5; // Adjust this value to change the size of the coherence check window
-    const recentWords = sentence.slice(-contextWindow);
-    const context = `${userInput} ${recentWords.join(' ')} ${nextWord}`;
-    
-    // Implement a more sophisticated coherence check
-    const words = context.toLowerCase().split(' ');
-    const uniqueWords = new Set(words);
-    const coherenceScore = uniqueWords.size / words.length;
-    
-    if (coherenceScore <= 0.5) {
-      // If not coherent, try to find a related word from the knowledge base
-      const relatedWord = this.findRelatedWordFromKnowledgeBase(nextWord, sentence[sentence.length - 1]);
-      if (relatedWord) {
-        return true;
-      }
-    }
-    
-    return coherenceScore > 0.5;
-  }
-
   private findRelatedWordFromKnowledgeBase(word: string, previousWord: string): string | null {
     for (const [, value] of Array.from(this.knowledgeBase.entries())) {
       if (value.includes(word) || value.includes(previousWord)) {
@@ -1269,19 +1388,6 @@ class NaturalLanguageProcessor {
       }
     }
     return null;
-  }
-
-  private postProcessSentence(sentence: string, userInput: string): string {
-    // Implement post-processing logic, possibly considering the original user input
-    sentence = sentence.charAt(0).toUpperCase() + sentence.slice(1);
-    if (!sentence.endsWith('.') && !sentence.endsWith('!') && !sentence.endsWith('?')) {
-      sentence += '.';
-    }
-    // Ensure the sentence relates back to the user input
-    if (!sentence.toLowerCase().includes(userInput.toLowerCase())) {
-      sentence += ` This relates to your question about ${userInput}.`;
-    }
-    return sentence;
   }
 
   private shouldEndSentence(word: string, currentLength: number, maxLength: number, topicStack: string[], sentimentHistory: number[], userInput: string): boolean {
@@ -1799,7 +1905,7 @@ export function processChatbotQuery(query: string): string {
     // Use GAN to refine the response
     const responseVector = nlp.encodeToMeaningSpace(response);
     const refinedVector = nlp.gan.refine(responseVector, response.split(' ').length);
-    const refinedResponse = nlp.decodeFromMeaningSpace(refinedVector);
+    const refinedResponse = nlp.decodeFromMeaningSpace(refinedVector, 'top-p');
 
     // Use RL agent to improve the response
     const improvedVector = nlp.rlAgent.improve(refinedVector, {
@@ -1809,7 +1915,7 @@ export function processChatbotQuery(query: string): string {
       sentiment,
       topics
     });
-    const improvedResponse = nlp.decodeFromMeaningSpace(improvedVector);
+    const improvedResponse = nlp.decodeFromMeaningSpace(improvedVector, 'top-p');
 
     // Combine the original, refined, and improved responses
     response = `${response} ${refinedResponse} ${improvedResponse}`;
@@ -1848,7 +1954,7 @@ export function processChatbotQuery(query: string): string {
   }
 }
 
-console.log("Mazs AI v1.3.0 with advanced NLP and contextual analysis capabilities initialized!");
+console.log("Mazs AI v1.4.0 with advanced NLP and contextual analysis capabilities initialized!");
 
 
 const intents: Intent[] = [
@@ -2087,6 +2193,8 @@ export function handleUserInput(userInput: string, targetLanguage?: string): Pro
       if (targetLanguage) {
         response = nlp.translateText(response, targetLanguage);
       }
+      // Generate a follow-up question
+      // Removed the generateFollowUpQuestion call as it doesn't exist on NaturalLanguageProcessor
       getTypedResponse(response).then(resolve);
     }, 100); // Simulate a delay in processing
   });
@@ -2133,7 +2241,7 @@ export const debouncedHandleUserInput = debounce(handleUserInput, 300);
 // Train the network when the module is loaded
 trainNetwork();
 
-console.log("Mazs AI v1.3.0 with advanced NLP and contextual analysis capabilities initialized!");
+console.log("Mazs AI v1.4.0 with advanced NLP and contextual analysis capabilities initialized!");
 
 export async function processAttachedFile(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -2404,3 +2512,4 @@ export function getChatHistoryMessages(id: string): Promise<Message[]> {
     }, 100);
   });
 }
+
