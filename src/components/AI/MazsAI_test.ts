@@ -306,6 +306,12 @@ class NaturalLanguageProcessor {
   private topicModel: TopicModel;
   private ngramFrequency: Map<string, number>;
   private markovChain: Map<string, Map<string, number>>;
+  private attentionMechanism: AttentionMechanism;
+  private contextualEmbeddings: ContextualEmbeddings;
+  private beamSearch: BeamSearch;
+  private topKSampling: TopKSampling;
+  private nuclearSampling: NuclearSampling;
+  private sentimentHistory: number[];
 
   constructor(trainingData?: number[][]) {
     this.vocabulary = new Set();
@@ -325,6 +331,12 @@ class NaturalLanguageProcessor {
     this.wordProbabilities = new Map();
     this.ngramFrequency = new Map();
     this.markovChain = new Map();
+    this.attentionMechanism = new AttentionMechanism();
+    this.contextualEmbeddings = new ContextualEmbeddings();
+    this.beamSearch = new BeamSearch();
+    this.topKSampling = new TopKSampling();
+    this.nuclearSampling = new NuclearSampling();
+    this.sentimentHistory = [];
     
     // Expand sentiment lexicon
     this.sentimentLexicon = new Map([
@@ -684,8 +696,14 @@ class NaturalLanguageProcessor {
     }
   }
 
-  encodeToMeaningSpace(input: string): number[] {
+  encodeToMeaningSpace(input: string, attentionWeights?: number[]): number[] {
     const inputVector = this.textToVector(input);
+    if (attentionWeights) {
+      // Apply attention weights to the input vector
+      for (let i = 0; i < inputVector.length; i++) {
+        inputVector[i] *= attentionWeights[i] || 1;
+      }
+    }
     return this.encoder.predict(inputVector);
   }
 
@@ -1160,57 +1178,84 @@ class NaturalLanguageProcessor {
     topicStack.push(...initialAnalysis.topics);
     sentimentHistory.push(initialAnalysis.sentiment.score);
 
+    // Create initial state for beam search
+    let beamStates = [{ sentence, score: 0 }];
+
     while (wordCount < maxLength) {
-      // Combine current sentence with original user input for context
-      const combinedContext = `${userInput} ${sentence.join(' ')}`;
-      
-      // Encode combined context
-      const meaningVector = this.encodeToMeaningSpace(combinedContext);
-      
-      // Apply GAN refinement
-      const refinedVector = this.gan.refine(meaningVector, wordCount);
-      
-      // Apply RL improvement
-      const improvedVector = this.rlAgent.improve(refinedVector, {
-        topicStack,
-        sentimentHistory,
-        wordCount,
-        maxLength,
-        userInput,
-        previousWords: sentence
-      });
-      
-      // Predict next word
-      const nextWordVector = this.decoder.predict(improvedVector);
-      const nextWord = this.findClosestWord(nextWordVector);
-      
-      // Enforce topic adherence
-      const topicAdherentWord = this.enforceTopicAdherence(nextWord, topicStack[topicStack.length - 1]);
-      
-      // Analyze context including the potential next word
-      const { sentiment, topics } = this.analyzeContext(`${combinedContext} ${topicAdherentWord}`);
-      
-      // Adjust word based on analysis
-      const adjustedNextWord = this.adjustWordBasedOnAnalysis(topicAdherentWord, sentiment, topics);
-      
-      // Apply coherence check
-      if (!this.isCoherent(sentence, adjustedNextWord, userInput)) {
-        continue; // Skip this word and try again
+      const newBeamStates: { sentence: string[], score: number }[] = [];
+
+      for (const state of beamStates) {
+        // Combine current sentence with original user input for context
+        const combinedContext = `${userInput} ${state.sentence.join(' ')}`;
+        
+        // Generate contextual embeddings
+        const contextEmbeddings = this.contextualEmbeddings.generate(combinedContext);
+        
+        // Apply attention mechanism
+        const attentionWeights = this.attentionMechanism.calculate(contextEmbeddings);
+        
+        // Encode combined context with attention
+        const meaningVector = this.encodeToMeaningSpace(combinedContext, attentionWeights);
+        
+        // Apply GAN refinement
+        const refinedVector = this.gan.refine(meaningVector, wordCount);
+        
+        // Apply RL improvement
+        const improvedVector = this.rlAgent.improve(refinedVector, {
+          topicStack,
+          sentimentHistory,
+          wordCount,
+          maxLength,
+          userInput,
+          previousWords: state.sentence
+        });
+        
+        // Generate candidate next words
+        const candidateWords = this.generateCandidateWords(improvedVector);
+        
+        for (const candidateWord of candidateWords) {
+          // Enforce topic adherence
+          const topicAdherentWord = this.enforceTopicAdherence(candidateWord, topicStack[topicStack.length - 1]);
+          
+          // Analyze context including the potential next word
+          const { sentiment, topics } = this.analyzeContext(`${combinedContext} ${topicAdherentWord}`);
+          
+          // Adjust word based on analysis
+          const adjustedNextWord = this.adjustWordBasedOnAnalysis(topicAdherentWord, sentiment, topics);
+          
+          // Apply coherence check
+          if (!this.isCoherent(state.sentence, adjustedNextWord, userInput)) {
+            continue; // Skip this word and try the next candidate
+          }
+          
+          // Calculate new score
+          const newScore = this.calculateScore(state.score, adjustedNextWord, sentiment, topics, userInput);
+          
+          // Add new state to beam
+          newBeamStates.push({
+            sentence: [...state.sentence, adjustedNextWord],
+            score: newScore
+          });
+        }
       }
-      
-      // Add word to sentence
-      sentence.push(adjustedNextWord);
-      currentContext = this.updateContext(userInput, sentence);
-      wordCount++;
+
+      // Select top beam states
+      beamStates = this.beamSearch.selectTopStates(newBeamStates);
+
+      // Update word count, topic stack, and sentiment history based on the best state
+      const bestState = beamStates[0];
+      wordCount = bestState.sentence.length;
+      currentContext = this.updateContext(userInput, bestState.sentence);
 
       // Update topic stack and sentiment history
-      if (topics.length > 0 && topics[0] !== topicStack[topicStack.length - 1]) {
-        topicStack.push(topics[0]);
+      const latestAnalysis = this.analyzeContext(currentContext);
+      if (latestAnalysis.topics.length > 0 && latestAnalysis.topics[0] !== topicStack[topicStack.length - 1]) {
+        topicStack.push(latestAnalysis.topics[0]);
       }
-      sentimentHistory.push(sentiment.score);
+      sentimentHistory.push(latestAnalysis.sentiment.score);
 
       // Check for sentence end
-      if (this.shouldEndSentence(adjustedNextWord, wordCount, maxLength, topicStack, sentimentHistory, userInput)) {
+      if (this.shouldEndSentence(bestState.sentence[bestState.sentence.length - 1], wordCount, maxLength, topicStack, sentimentHistory, userInput)) {
         break;
       }
 
@@ -1219,11 +1264,13 @@ class NaturalLanguageProcessor {
       
       // Periodic context refresh
       if (wordCount % 5 === 0) {
-        currentContext = this.refreshContext(sentence, userInput);
+        currentContext = this.refreshContext(bestState.sentence, userInput);
       }
     }
 
-    return this.postProcessSentence(sentence.join(' '), userInput);
+    // Select the best sentence from beam search
+    const finalSentence = beamStates[0].sentence.join(' ');
+    return this.postProcessSentence(finalSentence, userInput);
   }
 
   public updateContext(userInput: string, sentence: string[]): string {
@@ -1425,6 +1472,129 @@ class NaturalLanguageProcessor {
     }
 
     return sentence.join(' ');
+  }
+
+  private generateCandidateWords(vector: number[]): string[] {
+    const logits = this.decoder.predict(vector);
+    const candidates = [];
+
+    // Use top-k sampling
+    candidates.push(...this.topKSampling.sample(logits, 10));
+
+    // Use nucleus (top-p) sampling
+    candidates.push(...this.nuclearSampling.sample(logits, 0.9));
+
+    return Array.from(new Set(candidates)); // Remove duplicates
+  }
+
+  private calculateScore(previousScore: number, nextWord: string, sentiment: { score: number, explanation: string }, topics: string[], userInput: string): number {
+    let score = previousScore;
+
+    // Consider relevance to user input
+    score += this.calculateRelevanceScore(nextWord, userInput);
+
+    // Consider sentiment consistency
+    score += this.calculateSentimentConsistencyScore(sentiment);
+
+    // Consider topic adherence
+    score += this.calculateTopicAdherenceScore(nextWord, topics);
+
+    // Consider word probability
+    score += Math.log(this.getWordProbability(nextWord));
+
+    return score;
+  }
+
+  private calculateRelevanceScore(word: string, userInput: string): number {
+    const userInputWords = new Set(this.tokenize(userInput));
+    return userInputWords.has(word) ? 1 : 0;
+  }
+
+  private calculateSentimentConsistencyScore(sentiment: { score: number, explanation: string }): number {
+    const recentSentiments = this.sentimentHistory.slice(-5);
+    const averageSentiment = recentSentiments.reduce((sum, s) => sum + s, 0) / recentSentiments.length;
+    return 1 - Math.abs(sentiment.score - averageSentiment);
+  }
+
+  private calculateTopicAdherenceScore(word: string, topics: string[]): number {
+    return topics.some(topic => word.toLowerCase().includes(topic.toLowerCase())) ? 1 : 0;
+  }
+
+  private getWordProbability(word: string): number {
+    const totalWords = Array.from(this.wordFrequency.values()).reduce((sum, count) => sum + count, 0);
+    return (this.wordFrequency.get(word) || 0) / totalWords;
+  }
+}
+
+class AttentionMechanism {
+  calculate(contextEmbeddings: number[][]): number[] {
+    // Implement attention mechanism calculation
+    // This is a simplified version; real implementations would be more complex
+    const attentionScores = contextEmbeddings.map(embedding => 
+      embedding.reduce((sum, val) => sum + Math.abs(val), 0)
+    );
+    const totalScore = attentionScores.reduce((sum, score) => sum + score, 0);
+    return attentionScores.map(score => score / totalScore);
+  }
+}
+
+class ContextualEmbeddings {
+  generate(context: string): number[][] {
+    // Implement contextual embedding generation
+    // This is a placeholder; real implementations would use more sophisticated models
+    return context.split(' ').map(() => Array(100).fill(0).map(() => Math.random()));
+  }
+}
+
+class BeamSearch {
+  selectTopStates(states: { sentence: string[], score: number }[], beamWidth: number = 5): { sentence: string[], score: number }[] {
+    return states.sort((a, b) => b.score - a.score).slice(0, beamWidth);
+  }
+}
+
+class TopKSampling {
+  sample(logits: number[], k: number): string[] {
+    // Implement top-k sampling
+    const topKIndices = logits
+      .map((score, index) => ({ score, index }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, k)
+      .map(item => item.index);
+    
+    // Convert indices back to words (assuming a vocabulary mapping exists)
+    return topKIndices.map(index => this.indexToWord(index));
+  }
+
+  private indexToWord(index: number): string {
+    // Implement index to word conversion
+    // This is a placeholder; real implementations would use a vocabulary mapping
+    return `word_${index}`;
+  }
+}
+
+class NuclearSampling {
+  sample(logits: number[], p: number): string[] {
+    // Implement nucleus (top-p) sampling
+    const sortedLogits = logits
+      .map((score, index) => ({ score, index }))
+      .sort((a, b) => b.score - a.score);
+    
+    let cumulativeProbability = 0;
+    const selectedIndices = [];
+    for (const { score, index } of sortedLogits) {
+      cumulativeProbability += Math.exp(score);
+      selectedIndices.push(index);
+      if (cumulativeProbability >= p) break;
+    }
+    
+    // Convert indices back to words (assuming a vocabulary mapping exists)
+    return selectedIndices.map(index => this.indexToWord(index));
+  }
+
+  private indexToWord(index: number): string {
+    // Implement index to word conversion
+    // This is a placeholder; real implementations would use a vocabulary mapping
+    return `word_${index}`;
   }
 }
 
