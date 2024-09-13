@@ -2107,10 +2107,9 @@ export function regenerateResponse(userInput: string): Promise<string> {
 export function getConversationSuggestions(): string[] {
   return [
     "Tell me about GMTStudio",
-    "What features does Theta offer?",
-    "How can I use the AI WorkSpace?",
-    "Is there a mobile app for GMTStudio?",
-    "What programming languages are supported?",
+    "What is 47 * 53 ? ",
+    "what is AI ? ",
+    "who are you ? "
   ];
 }
 
