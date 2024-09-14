@@ -10,7 +10,6 @@ import Footer from './components/Landing_Page/Footer';
 import Error from './components/Pages/Error';
 import Research from './components/Pages/Research';
 import Learning from './components/Pages/Learning';
-import Mazs from './components/AI/Mazs_AI_test';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Analytics } from '@vercel/analytics/react';
@@ -129,7 +128,6 @@ const AppContent: React.FC = () => {
           <Route path="/system-status" element={<SystemStatus />} />
           <Route path="/advanced-search" element={<AdvancedSearch />} />
           <Route path="/mazsai" element={<MazsAI />} />
-          <Route path="/mazsai_test" element={<Mazs />} />
         </Routes>
         {!isMazsAIPage && <Footer />}
       </main>
