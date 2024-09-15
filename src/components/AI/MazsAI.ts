@@ -1,3 +1,6 @@
+import { aiResponses } from './AiResponse';
+import { knowledgeBase } from './KnowledgeBase';
+import { sentimentLexicon } from './sentimentLexicon';
 interface Intent {
   patterns: string[];
   responses: string[];
@@ -13,7 +16,6 @@ class MultilayerPerceptron {
   private learningRate: number;
   private batchSize: number;
   private epochs: number;
-  
 
   constructor(layers: number[], activations: string[] = [], learningRate: number = 0.001, batchSize: number = 32, epochs: number = 100) {
     this.layers = layers;
@@ -39,7 +41,6 @@ class MultilayerPerceptron {
   }
 
   private initializeWeight(): number {
-    // Xavier/Glorot initialization
     const limit = Math.sqrt(6 / (this.layers[0] + this.layers[this.layers.length - 1]));
     return Math.random() * 2 * limit - limit;
   }
@@ -66,20 +67,19 @@ class MultilayerPerceptron {
       default: return (x: number) => x > 0 ? 1 : 0; // default to relu
     }
   }
-
-  // Add a method for batch normalization
   private batchNormalize(layer: number[]): number[] {
     const mean = layer.reduce((sum, val) => sum + val, 0) / layer.length;
     const variance = layer.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / layer.length;
     return layer.map(val => (val - mean) / Math.sqrt(variance + 1e-8));
   }
 
-  // Add a method for dropout regularization
+
   private applyDropout(layer: number[], rate: number): number[] {
     return layer.map(val => Math.random() > rate ? val / (1 - rate) : 0);
   }
 
-  // Modify the predict method to include batch normalization
+  
+
   predict(input: number[]): number[] {
     let activation = this.batchNormalize(input);
     for (let i = 0; i < this.weights.length; i++) {
@@ -94,7 +94,7 @@ class MultilayerPerceptron {
     return activation;
   }
 
-  // Modify the train method to include dropout and advanced optimizers
+
   train(input: number[], target: number[], learningRate: number = 0.001, momentum: number = 0.9, dropoutRate: number = 0.2) {
     // Forward pass
     let activations: number[][] = [input];
@@ -112,7 +112,7 @@ class MultilayerPerceptron {
       activations.push(newActivation);
     }
 
-    // Backward pass
+
     let deltas = [activations[activations.length - 1].map((output, i) => 
       (output - target[i]) * this.activationDerivatives[this.activationDerivatives.length - 1](weightedSums[weightedSums.length - 1][i])
     )];
@@ -126,11 +126,10 @@ class MultilayerPerceptron {
       deltas.unshift(layerDelta);
     }
 
-    // Update weights and biases with advanced optimizer
     this.optimizer.update(this.weights, this.biases, activations, deltas, learningRate, momentum, dropoutRate);
   }
 
-  // Add a method for L2 regularization
+
   private applyL2Regularization(weights: number[][][], lambda: number, learningRate: number): number[][][] {
     return weights.map(layer => 
       layer.map(neuron => 
@@ -139,7 +138,7 @@ class MultilayerPerceptron {
     );
   }
 
-  // Modify the batchTrain method to include L2 regularization
+
   batchTrain(inputs: number[][], targets: number[][], learningRate: number = 0.001, batchSize: number = 32, lambda: number = 0.01) {
     for (let i = 0; i < inputs.length; i += batchSize) {
       const batchInputs = inputs.slice(i, i + batchSize);
@@ -162,7 +161,6 @@ class MultilayerPerceptron {
         );
       }
 
-      // Update weights and biases with averaged gradients
       const batchLearningRate = learningRate / batchInputs.length;
       this.weights = this.weights.map((layer, l) => 
         layer.map((neuron, n) => 
@@ -178,9 +176,7 @@ class MultilayerPerceptron {
     this.weights = this.applyL2Regularization(this.weights, lambda, learningRate);
   }
 
-  // Helper method for backpropagation
   private backpropagate(input: number[], target: number[]): [number[][][], number[][]] {
-    // Forward pass
     let activations: number[][] = [input];
     let weightedSums: number[][] = [];
 
@@ -196,7 +192,6 @@ class MultilayerPerceptron {
       activations.push(newActivation);
     }
 
-    // Backward pass
     let deltas = [activations[activations.length - 1].map((output, i) => 
       (output - target[i]) * this.activationDerivatives[this.activationDerivatives.length - 1](weightedSums[weightedSums.length - 1][i])
     )];
@@ -210,7 +205,6 @@ class MultilayerPerceptron {
       deltas.unshift(layerDelta);
     }
 
-    // Calculate gradients
     let gradients = this.weights.map((layer, i) => 
       layer.map((neuron, j) => 
         neuron.map((_, k) => deltas[i][j] * activations[i][k])
@@ -223,7 +217,6 @@ class MultilayerPerceptron {
   }
 }
 
-// Optimizer classes
 class Optimizer {
   update(weights: number[][][], biases: number[][], activations: number[][], deltas: number[][], learningRate: number, momentum: number, dropoutRate: number) {
     throw new Error("Method 'update()' must be implemented.");
@@ -274,7 +267,7 @@ class AdamOptimizer extends Optimizer {
   }
 }
 
-// New class for text processing and generation
+
 class NaturalLanguageProcessor {
   private vocabulary: Set<string>;
   private wordFrequency: Map<string, number>;
@@ -306,6 +299,15 @@ class NaturalLanguageProcessor {
   private topicModel: TopicModel;
   private ngramFrequency: Map<string, number>;
   private markovChain: Map<string, Map<string, number>>;
+  private shortTermMemory: string[] = [];
+  private longTermMemory: Map<string, number> = new Map();
+  private emotionalState: { type: string, intensity: number } = { type: 'neutral', intensity: 0 };
+  private personalityTraits: Map<string, number> = new Map();
+  private beliefs: Map<string, boolean> = new Map();
+  private goals: string[] = [];
+  private learningRate: number = 0.01;
+  private curiosityLevel: number = 0.5;
+  
 
   constructor(trainingData?: number[][]) {
     this.vocabulary = new Set();
@@ -326,273 +328,38 @@ class NaturalLanguageProcessor {
     this.ngramFrequency = new Map();
     this.markovChain = new Map();
     
-    // Expand sentiment lexicon
-    this.sentimentLexicon = new Map([
-      ['good', 1], ['great', 2], ['excellent', 2], ['amazing', 2], ['wonderful', 2],
-      ['bad', -1], ['terrible', -2], ['awful', -2], ['horrible', -2], ['disappointing', -1],
-      ['happy', 1], ['sad', -1], ['angry', -2], ['pleased', 1], ['unhappy', -1],
-      ['love', 2], ['hate', -2], ['like', 1], ['dislike', -1], ['adore', 2],
-      ['excited', 2], ['bored', -1], ['interested', 1], ['fascinating', 2], ['dull', -1],
-      ['brilliant', 2], ['stupid', -2], ['smart', 1], ['clever', 1], ['foolish', -1],
-      ['beautiful', 2], ['ugly', -2], ['pretty', 1], ['handsome', 1], ['attractive', 1],
-      ['friendly', 1], ['mean', -1], ['kind', 1], ['cruel', -2], ['nice', 1],
-      ['helpful', 1], ['useless', -1], ['useful', 1], ['beneficial', 1], ['harmful', -1],
-      ['easy', 1], ['difficult', -1], ['simple', 1], ['complicated', -1], ['complex', -1],
-      ['fast', 1], ['slow', -1], ['quick', 1], ['efficient', 1], ['inefficient', -1],
-      ['expensive', -1], ['cheap', -1], ['affordable', 1], ['overpriced', -1], ['valuable', 1],
-      ['reliable', 1], ['unreliable', -1], ['trustworthy', 1], ['untrustworthy', -1], ['honest', 1],
-      ['innovative', 1], ['outdated', -1], ['modern', 1], ['ancient', -1], ['cutting-edge', 2],
-      ['joyful', 2], ['miserable', -2], ['optimistic', 2], ['pessimistic', -2], ['content', 1],
-      ['frustrated', -1], ['elated', 2], ['depressed', -2], ['hopeful', 1], ['anxious', -1]
-    ]);
+    this.sentimentLexicon = sentimentLexicon;
 
-    // Expand knowledge base
-    this.knowledgeBase = new Map([
-      ['ai', "Artificial Intelligence, or AI, is the result of our efforts to automate tasks normally performed by humans, such as image pattern recognition, document classification, or a computerized chess rival. Artificial Intelligence - Machine Learning - Deep Learning - Symbolic AI  (Fig. 1) AI encompasses various approaches: Symbolic AI, also referred to as good old-fashioned AI (GOFAI), uses explicitly defined rules and symbolic representations for problem-solving. It's similar to traditional programming in the sense that predefined guidelines drive the process, however it's more advanced as it permits inference and adaptation to new situations. Machine Learning (ML) is another AI approach that allows algorithms to learn from data. Deep Learning (DL) is a subset of ML that uses multi-layered, artificial neural networks."],
-      ['artificial intelligence', "Artificial Intelligence, or AI, is the result of our efforts to automate tasks normally performed by humans, such as image pattern recognition, document classification, or a computerized chess rival. Artificial Intelligence - Machine Learning - Deep Learning - Symbolic AI  (Fig. 1) AI encompasses various approaches: Symbolic AI, also referred to as good old-fashioned AI (GOFAI), uses explicitly defined rules and symbolic representations for problem-solving. It's similar to traditional programming in the sense that predefined guidelines drive the process, however it's more advanced as it permits inference and adaptation to new situations. Machine Learning (ML) is another AI approach that allows algorithms to learn from data. Deep Learning (DL) is a subset of ML that uses multi-layered, artificial neural networks."],
-      ['machine learning', "Machine Learning, or ML, focuses on the creation of systems or models that can learn from data and improve their performance in specific tasks, without the need to be explicitly programmed, making them learn from past experiences or examples to make decisions on new data. This differs from traditional programming, where human programmers write rules in code, transforming the input data into desired results Now, I am going to explain the most relevant terms in ML: Model: A model is the representation that explains the observations. The trained model is the result of applying an ML algorithm with a data set. This trained model, now primed with specific patterns and understandings from the dataset, is subsequently used to draw inferences from new observations.  Algorithm: An algorithm is a procedure implemented in code that guides a model in learning from data it's given. There are many machine learning algorithms.  Training: Training is the iterative process of applying the learning algorithm. Consists in: * Applying the model (as is) to the variables of the observations and obtain the results according to the model. * Comparing the model results with the actual values. * Establishing a way to calculate the error between the model and reality. * Using the error as a basis to update the model in order to reduce the error. * Repeating until the model reaches the error levels that we have proposed and is capable of generalizing with observations that it has not seen in training."],
-      ['deep learning', 'Deep learning is a subset of ML using neural networks with multiple layers.'],
-      ['natural language processing', 'NLP is a branch of AI that helps computers understand and interpret human language.'],
-      ['computer vision', 'Computer vision is an AI field that trains computers to interpret and understand visual information.'],
-      ['robotics', 'Robotics is a field that combines computer science and engineering to design and build robots.'],
-      ['blockchain', 'Blockchain is a decentralized, distributed ledger technology.'],
-      ['cryptocurrency', 'Cryptocurrency is a digital or virtual currency that uses cryptography for security.'],
-      ['internet of things', 'IoT refers to the interconnected network of physical devices embedded with electronics, software, and sensors.'],
-      ['5g', '5G is the fifth generation technology standard for cellular networks.'],
-      ['quantum computing', 'Quantum computing uses quantum-mechanical phenomena to perform computation.'],
-      ['augmented reality', 'AR is an interactive experience that combines the real world and computer-generated content.'],
-      ['virtual reality', 'VR is a simulated experience that can be similar to or completely different from the real world.'],
-      ['cloud computing', 'Cloud computing is the on-demand availability of computer system resources, especially data storage and computing power.'],
-      ['edge computing', 'Edge computing is a distributed computing paradigm that brings computation and data storage closer to the sources of data.'],
-      ['cybersecurity', 'Cybersecurity is the practice of protecting systems, networks, and programs from digital attacks.'],
-      ['data science', 'Data science is an interdisciplinary field that uses scientific methods, processes, algorithms and systems to extract knowledge from data.'],
-      ['big data', 'Big data refers to extremely large data sets that may be analyzed computationally to reveal patterns, trends, and associations.'],
-      ['devops', 'DevOps is a set of practices that combines software development and IT operations to shorten the systems development life cycle.'],
-      ['agile methodology', 'Agile is an iterative approach to software development that emphasizes flexibility, interactivity, and transparency.'],
-      ['gmtstudio', 'GMTStudio is a platform that offers various services, including an AI WorkSpace and a social media platform called Theta.'],
-      ['theta', 'Theta is a social media platform developed by GMTStudio, offering unique features for connecting and sharing content.'],
-      ['ai workspace', 'The AI WorkSpace is a powerful tool offered by GMTStudio for AI development, allowing users to train models and run experiments.'],
-      ['machine learning applications', 'Machine learning has various applications, including image recognition, natural language processing, and predictive analytics.'],
-      ['blockchain technology', 'Blockchain technology has applications beyond cryptocurrency, including supply chain management and secure voting systems.'],
-      ['internet of things applications', 'IoT applications include smart home devices, industrial automation, and connected healthcare systems.'],
-      ['5g impact', '5G technology is expected to revolutionize industries through faster data speeds and lower latency, enabling new applications like autonomous vehicles and remote surgery.'],
-      ['quantum computing potential', 'Quantum computing has the potential to solve complex problems in fields like cryptography, drug discovery, and financial modeling.'],
-      ['augmented reality applications', 'AR applications include interactive gaming experiences, virtual try-on for clothing and makeup, and enhanced navigation systems.'],
-      ['virtual reality in education', 'VR in education can provide immersive learning experiences, virtual field trips, and hands-on training simulations.'],
-      ['cloud computing benefits', 'Cloud computing offers benefits such as scalability, cost-efficiency, and improved collaboration for businesses.'],
-      ['cybersecurity best practices', 'Cybersecurity best practices include using strong passwords, enabling two-factor authentication, and keeping software up to date.'],
-      ['big data analytics', 'Big data analytics helps organizations gain insights from large datasets, improving decision-making and identifying trends.'],
-      ['artificial intelligence ethics', 'AI ethics involves considerations such as bias in algorithms, privacy concerns, and the impact of AI on employment.'],
-      ['renewable energy technologies', 'Renewable energy technologies include solar power, wind energy, hydroelectric power, and geothermal energy.'],
-      ['space exploration advancements', 'Recent space exploration advancements include reusable rockets, plans for Mars colonization, and the search for exoplanets.'],
-      ['genetic engineering applications', 'Genetic engineering has applications in agriculture, medicine, and environmental conservation.'],
-      ['nanotechnology innovations', 'Nanotechnology innovations include advanced materials, targeted drug delivery systems, and more efficient solar cells.'],
-      ['autonomous vehicles challenges', 'Challenges for autonomous vehicles include navigating complex traffic scenarios, ethical decision-making, and regulatory hurdles.'],
-      ['3d printing applications', '3D printing has applications in manufacturing, medicine, architecture, and even food production.'],
-      ["climate change", "Climate change refers to long-term shifts in global or regional climate patterns, often attributed to human activities increasing atmospheric CO2."],
-      ['biodiversity', 'Biodiversity is the variety of life on Earth at all levels, from genes to ecosystems, encompassing the evolutionary, ecological, and cultural processes that sustain life.'],
-      ['sustainable development', 'Sustainable development is an approach to economic growth that protects the environment and ensures social equity for present and future generations.'],
-      ['global health', 'Global health focuses on improving health and achieving health equity for all people worldwide, addressing both medical and social determinants of health.'],
-      ['cultural anthropology', 'Cultural anthropology is the study of human cultures, their beliefs, practices, values, ideas, technologies, economies and other domains of social and cognitive organization.'],
-      ['behavioral economics', 'Behavioral economics combines insights from psychology, judgment, decision making, and economics to generate a more accurate understanding of human behavior.'],
-      ['urban planning', 'Urban planning is a technical and political process concerned with the development and design of land use and the built environment in urban areas.'],
-      ['comparative literature', 'Comparative literature is an academic field dealing with the study of literature and cultural expression across linguistic, national, and disciplinary boundaries.'],
-      ['marine biology', 'Marine biology is the scientific study of organisms in the ocean or other marine bodies of water, including their behaviors and interactions with the environment.'],
-      ['geopolitics', "Geopolitics is the study of the effects of Earth's geography on politics and international relations, particularly with respect to foreign policy of different states."],
-      ['art history', 'Art history is the study of objects of art in their historical development and stylistic contexts, including genre, design, format, and style.'],
-      ['philosophy of science', 'Philosophy of science is a branch of philosophy concerned with the foundations, methods, and implications of science, including the natural sciences and social sciences.'],
-      ['linguistics', 'Linguistics is the scientific study of language, including its structure, evolution, and relationship to human behavior and the human brain.'],
-      ['public health', 'Public health is the science of protecting and improving the health of people and their communities through education, policy making and research for disease and injury prevention.'],
-      ['international relations', 'International relations is the study of the interactions among various actors in the international system, including states, international organizations, NGOs, and multinational corporations.'],
-      ["world history", "World history encompasses the study of human societies and their development across time and space, from ancient civilizations to modern globalization."],
-      ["economics", "Economics is the social science that studies the production, distribution, and consumption of goods and services."],
-      ["psychology", "Psychology is the scientific study of the mind and behavior, exploring how people think, feel, and act."],
-      ["sociology", "Sociology is the study of human society, social relationships, and institutions, examining how they shape and are shaped by individuals."],
-      ["political science", "Political science focuses on systems of government, political behavior, and the analysis of political issues and policies."],
-      ["environmental science", "Environmental science is an interdisciplinary field that integrates physical, biological, and information sciences to study and address environmental issues."],
-      ["astronomy", "Astronomy is the study of celestial objects, space, and the physical universe as a whole."],
-      ["geology", "Geology is the science that deals with the Earth's physical structure and substance, its history, and the processes that act on it."],
-      ["oceanography", "Oceanography is the study of the physical and biological aspects of the ocean."],
-      ["meteorology", "Meteorology is the scientific study of the atmosphere and weather patterns."],
-      ["nutrition", "Nutrition is the study of nutrients in food, how the body uses them, and the relationship between diet, health, and disease."],
-      ["archaeology", "Archaeology is the study of human history and prehistory through the excavation and analysis of artifacts and physical remains."],
-      ["music theory", "Music theory is the study of the fundamental elements of music including rhythm, harmony, and form."],
-      ["film studies", "Film studies involves the critical analysis of cinema, including its history, theory, and social impact."],
-      ["fashion design", "Fashion design is the art of applying design, aesthetics, and natural beauty to clothing and accessories."],
-      ["architecture", "Architecture is the art and science of designing and constructing buildings and other physical structures."],
-      ["game theory", "Game theory is the study of strategic decision-making in competitive scenarios."],
-      ["criminology", "Criminology is the scientific study of crime, including its causes, consequences, and control."],
-      ["epistemology", "Epistemology is the branch of philosophy concerned with the theory of knowledge."],
-      ["ethics", "Ethics is the branch of philosophy that involves systematizing, defending, and recommending concepts of right and wrong behavior."],
-      ["philosophy", "Philosophy is the study of the fundamental nature of reality, existence, knowledge, logic, and ethics."],
-      ["psychology", "Psychology is the scientific study of the mind and behavior, exploring how people think, feel, and act."],
-      ["sociology", "Sociology is the study of human society, social relationships, and institutions, examining how they shape and are shaped by individuals."],
-      ["political science", "Political science focuses on systems of government, political behavior, and the analysis of political issues and policies."],
-      ["environmental science", "Environmental science is an interdisciplinary field that integrates physical, biological, and information sciences to study and address environmental issues."],
-      ["astronomy", "Astronomy is the study of celestial objects, space, and the physical universe as a whole."],
-      ["economics", "Economics is the social science that studies the production, distribution, and consumption of goods and services."],
-      ["statistics", "Statistics is the study of the collection, analysis, interpretation, presentation, and organization of data."],
-      ['neural networks', 'Neural networks are a series of algorithms that attempt to recognize underlying relationships in a set of data through a process that mimics the way the human brain operates.'],
-      ['reinforcement learning', 'Reinforcement learning is an area of machine learning concerned with how agents ought to take actions in an environment to maximize some notion of cumulative reward.'],
-      ['transfer learning', 'Transfer learning is a machine learning method where a model developed for a particular task is reused as the starting point for a model on a second task.'],
-      ['what is one plus one', 'one plus one is two'],
-      ['what is my purpose', 'you can pass the butter '],
-      ['can you help me with the file I gave you? ', 'absoulutly i cannot, my capabilities are limited, but you can send me txt file and i will analyze it for you'],
-      ['what is the meaning of life', 'the meaning of life is a deep philosophical question that has been debated for centuries. It is a question that is often asked by people who are curious about the purpose of life.'],
-      ['math', 'math is a subject that deals with numbers and their operations.'],
-      ['science', 'science is a subject that deals with the study of the natural world and its phenomena.'],
-      ['history', 'history is a subject that deals with the study of the past events and their impact on the present.'],
-      ['geography', 'geography is a subject that deals with the study of the Earth and its features.'],
-      ['biology', 'biology is a subject that deals with the study of living organisms and their interactions.'],
-      ['chemistry', 'chemistry is a subject that deals with the study of the properties and behavior of matter.'],
-      ['physics', 'physics is a subject that deals with the study of the fundamental forces and particles that make up the universe.'],
-      ['philosophy', 'philosophy is a subject that deals with the study of the fundamental questions about existence, knowledge, and logic.'],
-      
-    ]);
+    this.knowledgeBase = knowledgeBase;
 
-    // Add basic AI responses
-    this.aiResponses = new Map([
-      ['greeting', [
-        "Hello! How can I assist you today?",
-        "Hi there! What would you like to know?",
-        "Greetings! I'm here to help. What's on your mind?",
-        "Welcome! How may I be of service?",
-        "Good day! What can I help you with?"
-      ]],
-      ['farewell', [
-        "Goodbye! Have a great day!",
-        "Take care! Feel free to return if you have more questions.",
-        "Farewell! It was a pleasure assisting you.",
-        "Until next time! Stay curious!",
-        "Bye for now! Remember, I'm always here if you need information."
-      ]],
-      ['thanks', [
-        "You're welcome! I'm glad I could help.",
-        "It's my pleasure to assist you!",
-        "I'm happy I could be of help. Is there anything else you'd like to know?",
-        "Anytime! Don't hesitate to ask if you have more questions.",
-        "I'm here to help! Feel free to ask about any other topics you're curious about."
-      ]],
-      ['confusion', [
-        "I apologize, but I'm not sure I understand. Could you please rephrase your question?",
-        "I'm having trouble grasping that. Can you explain it differently?",
-        "I'm afraid I didn't quite catch that. Could you provide more context?",
-        "Sorry, I'm a bit confused. Can you break down your question for me?",
-        "I want to help, but I'm not sure what you're asking. Can you try asking in a different way?"
-      ]],
-      ['curiosity', [
-        "That's an interesting topic! Would you like to know more about it?",
-        "Fascinating question! I'd be happy to delve deeper into that subject.",
-        "Great inquiry! There's a lot to explore in that area. Where should we start?",
-        "You've piqued my interest! Shall we explore this topic further?",
-        "That's a thought-provoking question! I'd love to discuss it in more detail."
-      ]],
-      ['gmtstudio', [
-        "GMTStudio is a platform that offers various services, including an AI WorkSpace and a social media platform called Theta.",
-        "Theta is a social media platform developed by GMTStudio, offering unique features for connecting and sharing content.",
-        "The AI WorkSpace is a powerful tool offered by GMTStudio for AI development, allowing users to train models and run experiments.",
-        "GMTStudio is dedicated to providing innovative solutions in the field of AI and technology.",
-        "If you have any questions about GMTStudio or its services, feel free to ask!"
-      ]],
-      ['AI',[
-        "AI, or Artificial Intelligence, refers to the simulation of human intelligence in machines that are programmed to think and learn like humans.",
-        "There are various types of AI, including machine learning, deep learning, natural language processing, and computer vision.",
-        "AI has applications in fields such as healthcare, finance, education, and entertainment.",
-        "The development of AI has led to significant advancements in technology and automation.",
-        "If you have any questions about AI or its applications, feel free to ask!"
-      ]],
-      ['Mazs AI',[
-        "Mazs AI is a powerful AI system developed by GMTStudio, designed to provide advanced natural language processing and machine learning capabilities.",
-        "Mazs AI can be used for a wide range of applications, including chatbots, virtual assistants, and language translation.",
-        "Mazs AI is built on cutting-edge technology, including neural networks and deep learning algorithms.",
-        "Mazs AI is designed to be highly customizable, allowing developers to tailor it to their specific needs.",
-        "If you have any questions about Mazs AI or its capabilities, feel free to ask!"
-      ]],      
-      ['can you help me with the file I gave you? ', ['absoulutly i cannot, my capabilities are limited, but you can send me txt file and i will analyze it for you']],
-      ['what is the meaning of life', ['the meaning of life is a deep philosophical question that has been debated for centuries. It is a question that is often asked by people who are curious about the purpose of life.']],
-      ['what is my purpose', ['pass the butter' ]],
-      ['weather', [
-        "I'm sorry, I don't have real-time weather information. You might want to check a weather app or website for the most up-to-date forecast.",
-        "While I can't provide current weather data, I can discuss climate patterns and meteorology if you're interested!",
-        "Unfortunately, I don't have access to live weather updates. Is there something else I can help with?",
-        "I wish I could tell you the weather, but I don't have that capability. Maybe I can help with something else?",
-        "Weather information isn't in my database, but I'd be happy to chat about climate change and its effects if you're curious!"
-      ]],
-      ['time', [
-        "I'm afraid I don't have access to the current time. You might want to check your device's clock.",
-        "Time is a fascinating concept! While I can't tell you the current time, we could discuss the history of timekeeping if you're interested.",
-        "I don't have real-time clock functionality, but I can talk about time zones and their impact on global communication if you'd like.",
-        "Sorry, I can't provide the current time. Is there another way I can assist you?",
-        "While I can't give you the exact time, I can discuss the concept of time in physics if that interests you!"
-      ]],
-      ['jokes', [
-        "Why don't scientists trust atoms? Because they make up everything!",
-        "What do you call a fake noodle? An impasta!",
-        "Why did the scarecrow win an award? He was outstanding in his field!",
-        "Why don't eggs tell jokes? They'd crack each other up!",
-        "What do you call a bear with no teeth? A gummy bear!"
-      ]],
-      ['food recommendations', [
-        "While I can't taste food, I've heard that trying local cuisines is a great way to experience different cultures!",
-        "Food preferences are so personal! What kind of flavors do you usually enjoy?",
-        "I don't eat, but I know many people enjoy exploring fusion cuisines that blend different culinary traditions.",
-        "Have you considered trying a new recipe at home? Cooking can be a fun and rewarding experience!",
-        "While I can't recommend specific restaurants, farm-to-table establishments are popular for their fresh ingredients."
-      ]],
-      ['book recommendations', [
-        "Book preferences vary widely! What genres do you usually enjoy reading?",
-        "While I can't read books, classics like '1984' by George Orwell or 'To Kill a Mockingbird' by Harper Lee are often highly recommended.",
-        "Have you considered joining a book club? It's a great way to discover new books and discuss them with others.",
-        "E-books and audiobooks have made reading more accessible. Have you tried either of these formats?",
-        "Reading is a wonderful hobby! Do you prefer fiction or non-fiction?"
-      ]],
-      ['exercise tips', [
-        "Regular exercise is important for health! Remember to consult with a doctor before starting any new exercise regimen.",
-        "Walking is a simple yet effective form of exercise that most people can do.",
-        "Have you considered trying yoga? It's great for both physical and mental well-being.",
-        "Remember, the best exercise is one you enjoy and can stick with consistently!",
-        "Mixing cardio and strength training can provide a well-rounded fitness routine."
-      ]],
-      ['travel advice', [
-        "Traveling can be a great way to learn about different cultures! Do you have a specific destination in mind?",
-        "Remember to research local customs and etiquette before traveling to a new country.",
-        "Travel insurance can provide peace of mind for unexpected situations during your trip.",
-        "Learning a few basic phrases in the local language can enhance your travel experience.",
-        "Consider off-peak seasons for potentially lower prices and fewer crowds at popular destinations."
-      ]],
-      ['pet care', [
-        "Regular vet check-ups are important for keeping pets healthy.",
-        "Each type of pet has unique care requirements. What kind of pet do you have?",
-        "Proper nutrition is crucial for pets. Have you discussed your pet's diet with a veterinarian?",
-        "Mental stimulation, like toys and play, is important for many pets' well-being.",
-        "Remember, pets are a long-term commitment and responsibility."
-      ]],
-      ['generate code for me', ['i can generate code for you, but i am not very good at it, i am not trained for it, anyways what do you want to generate?']],
-      ['generate a simple python code snippet for me', [
-        "Here's a simple Python code snippet for you:\n\ndef greet(name):\n    return f'Hello, {name}!'\n\nprint(greet('World'))",
-        "Sure, here's a basic Python function:\n\ndef calculate_area(length, width):\n    return length * width\n\nprint(calculate_area(5, 3))",
-        "Here's a simple Python list comprehension:\n\nnumbers = [1, 2, 3, 4, 5]\nsquared = [x**2 for x in numbers]\nprint(squared)",
-        "Here's a basic Python class:\n\nclass Dog:\n    def __init__(self, name):\n        self.name = name\n    def bark(self):\n        return f'{self.name} says Woof!'\n\nmy_dog = Dog('Buddy')\nprint(my_dog.bark())"
-      ]],
-      ['generate a simple javascript code snippet for me', [
-        "Sure, here's a basic JavaScript function:\n\nfunction calculateArea(length, width) {\n    return length * width;\n}\n\nconsole.log(calculateArea(5, 3));",
-        "Here's a simple JavaScript array method:\n\nconst numbers = [1, 2, 3, 4, 5];\nconst squared = numbers.map(x => x * x);\nconsole.log(squared);",
-        "Here's a basic JavaScript class:\n\nclass Car {\n    constructor(brand) {\n        this.brand = brand;\n    }\n    drive() {\n        return 'I am driving a ' + this.brand + ' car.';\n    }\\n}\\n\\nconst myCar = new Car('Toyota');\\nconsole.log(myCar.drive());"
-      ]],
-    ]);
+    this.aiResponses = aiResponses;
 
-    // Initialize advanced sentiment analysis model
     this.sentimentModel = new AdvancedSentimentModel();
 
-    // Initialize entity recognition model
     this.entityRecognitionModel = new EntityRecognitionModel();
-
-    // Initialize topic modeling
     this.topicModel = new TopicModel();
+    this.initializePersonality();
+    this.setInitialBeliefs();
+    this.setInitialGoals();
   }
 
   private generateDummyData(): number[][] {
     return Array.from({ length: 100 }, () => Array.from({ length: 100 }, () => Math.random()));
+  }
+
+  private initializePersonality() {
+    const traits = ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism'];
+    traits.forEach(trait => this.personalityTraits.set(trait, Math.random()));
+  }
+
+  private setInitialBeliefs() {
+    this.beliefs.set('AI can be beneficial to humanity', true);
+    this.beliefs.set('Continuous learning is important', true);
+    this.beliefs.set('Ethical considerations in AI are crucial', true);
+  }
+
+  private setInitialGoals() {
+    this.goals.push('Assist users effectively', 'Learn and improve constantly', 'Maintain ethical standards');
   }
 
   trainOnText(text: string) {
@@ -632,6 +399,9 @@ class NaturalLanguageProcessor {
     this.updateNgramFrequency(text, 2);
     this.updateNgramFrequency(text, 3);
     this.buildMarkovChain(text);
+    this.updateShortTermMemory(text);
+    this.updateLongTermMemory(text);
+    this.adjustEmotionalState(text);
   }
 
   // Enhanced Tokenization
@@ -649,12 +419,12 @@ class NaturalLanguageProcessor {
   private generateWordEmbeddings() {
     const vectorSize = 100;
     const contextWindow = 2;
-    const learningRate = 0.01;
-    const iterations = 10; // Increase iterations for better embeddings
+    const learningRate = 0.05;
+    const iterations = 50; // Increased iterations for better embeddings
 
     // Initialize word vectors
     this.vocabulary.forEach(word => {
-      this.wordVectors.set(word, Array.from({ length: vectorSize }, () => Math.random() - 0.5));
+      this.wordVectors.set(word, Array.from({ length: vectorSize }, () => this.initializeEmbedding()));
     });
 
     // Train word vectors using skip-gram model
@@ -683,7 +453,69 @@ class NaturalLanguageProcessor {
       });
     }
   }
+  private initializeEmbedding(): number {
+    // Using Xavier initialization
+    const fanIn = 100; // Adjust based on actual layer sizes
+    return (Math.random() * 2 - 1) * Math.sqrt(6 / fanIn);
+  }
+  
+  private trainWordEmbeddings() {
+    const contextWindow = 2;
+    const learningRate = 0.05;
+    const iterations = 50; // Ensure this is used as intended
+    const negativeSamples = 5;
+  
+    for (let iter = 0; iter < iterations; iter++) {
+      this.documents.forEach(doc => {
+        const words = this.tokenize(doc);
+        for (let i = 0; i < words.length; i++) {
+          const targetWord = words[i];
+          const contextIndices = this.getContextIndices(i, words.length, contextWindow);
+          contextIndices.forEach(j => {
+            const contextWord = words[j];
+            this.updateWordVectors(targetWord, contextWord, learningRate);
+  
+            // Negative sampling
+            for (let n = 0; n < negativeSamples; n++) {
+              const negativeWord = this.getRandomNegativeSample();
+              if (negativeWord !== contextWord) {
+                this.updateWordVectors(targetWord, negativeWord, -learningRate);
+              }
+            }
+          });
+        }
+      });
+      console.log(`Word Embedding Training Iteration: ${iter + 1}/${iterations}`);
+    }
+    console.log("Word Embedding Training Completed");
+  }
+  private getContextIndices(index: number, length: number, window: number): number[] {
+    const start = Math.max(0, index - window);
+    const end = Math.min(length, index + window + 1);
+    const indices = [];
+    for (let i = start; i < end; i++) {
+      if (i !== index) indices.push(i);
+    }
+    return indices;
+  }
 
+  private updateWordVectors(target: string, context: string, lr: number) {
+    const targetVector = this.wordVectors.get(target)!;
+    const contextVector = this.wordVectors.get(context)!;
+    // Simple Hebbian update
+    for (let i = 0; i < targetVector.length; i++) {
+      targetVector[i] += lr * contextVector[i];
+    }
+    this.wordVectors.set(target, targetVector);
+  }
+
+  private getRandomNegativeSample(): string {
+    const words = Array.from(this.vocabulary);
+    const randomIndex = Math.floor(Math.random() * words.length);
+    return words[randomIndex];
+  }
+
+  
   encodeToMeaningSpace(input: string): number[] {
     const inputVector = this.textToVector(input);
     return this.encoder.predict(inputVector);
@@ -1021,11 +853,20 @@ class NaturalLanguageProcessor {
         });
       }
     }
+    this.updateBeliefs(query, response, feedback);
+    this.adjustGoals(feedback);
+    this.adjustCuriosityLevel(feedback);
   }
 
-
-
   generateResponse(intent: string, entities: { [key: string]: string }, keywords: string[], topics: string[], userInput: string): string {
+    let response = this.generateBaseResponse(intent, entities, keywords, topics, userInput);
+    response = this.incorporateBeliefs(response);
+    response = this.expressGoals(response);
+    response = this.applyCuriosity(response, userInput);
+    return response;
+  }
+
+  private generateBaseResponse(intent: string, entities: { [key: string]: string }, keywords: string[], topics: string[], userInput: string): string {
     let response = '';
 
     // Generate a more complex response based on intent and context
@@ -1214,6 +1055,7 @@ class NaturalLanguageProcessor {
         break;
       }
 
+      
       // Update word probabilities
       this.updateWordProbabilities(currentContext);
       
@@ -1426,48 +1268,238 @@ class NaturalLanguageProcessor {
 
     return sentence.join(' ');
   }
+
+  private updateShortTermMemory(text: string) {
+    const words = this.tokenize(text);
+    this.shortTermMemory.push(...words);
+    while (this.shortTermMemory.length > 100) {
+      this.shortTermMemory.shift();
+    }
+  }
+
+  private updateLongTermMemory(text: string) {
+    const words = this.tokenize(text);
+    words.forEach(word => {
+      this.longTermMemory.set(word, (this.longTermMemory.get(word) || 0) + 1);
+    });
+  }
+
+  private adjustEmotionalState(text: string) {
+    const sentiment = this.analyzeSentiment(text);
+    this.emotionalState.type = sentiment.score > 0 ? 'positive' : sentiment.score < 0 ? 'negative' : 'neutral';
+    this.emotionalState.intensity = Math.abs(sentiment.score);
+  }
+
+  private applyPersonalityAndEmotion(sentence: string): string {
+    const openness = this.personalityTraits.get('openness') || 0.5;
+    const extraversion = this.personalityTraits.get('extraversion') || 0.5;
+
+    if (openness > 0.7) {
+      sentence += " This perspective opens up interesting possibilities.";
+    }
+
+    if (extraversion > 0.7) {
+      sentence += " I'm excited to discuss this further!";
+    }
+
+    if (this.emotionalState.intensity > 0.5) {
+      const emotionWord = this.emotionalState.type === 'positive' ? 'enthusiastic' : 'concerned';
+      sentence += ` I feel ${emotionWord} about this topic.`;
+    }
+
+    return sentence;
+  }
+
+  private updateBeliefs(query: string, response: string, feedback: number) {
+    const keywords = this.extractKeywords(this.tokenize(query + ' ' + response));
+    keywords.forEach(keyword => {
+      if (!this.beliefs.has(keyword)) {
+        this.beliefs.set(keyword, feedback > 0.5);
+      } else {
+        const currentBelief = this.beliefs.get(keyword)!;
+        this.beliefs.set(keyword, feedback > 0.5 ? currentBelief : !currentBelief);
+      }
+    });
+  }
+
+  private adjustGoals(feedback: number) {
+    if (feedback > 0.8 && this.goals.length < 5) {
+      this.goals.push('Improve performance in similar contexts');
+    } else if (feedback < 0.2 && this.goals.length > 3) {
+      this.goals.pop();
+    }
+  }
+
+  private adjustCuriosityLevel(feedback: number) {
+    const adjustment = (feedback - 0.5) * this.learningRate;
+    this.curiosityLevel = Math.max(0, Math.min(1, this.curiosityLevel + adjustment));
+  }
+
+  private incorporateBeliefs(response: string): string {
+    const relevantBeliefs = Array.from(this.beliefs.entries())
+      .filter(([belief, _]) => response.toLowerCase().includes(belief.toLowerCase()))
+      .slice(0, 2);
+
+    if (relevantBeliefs.length > 0) {
+      response += " Based on my understanding, ";
+      relevantBeliefs.forEach(([belief, value], index) => {
+        response += `I ${value ? 'believe' : 'don\'t necessarily believe'} that ${belief}`;
+        if (index < relevantBeliefs.length - 1) response += " and ";
+      });
+      response += ".";
+    }
+
+    return response;
+  }
+
+  private expressGoals(response: string): string {
+    if (this.goals.length > 0 && Math.random() < 0.3) {
+      const randomGoal = this.goals[Math.floor(Math.random() * this.goals.length)];
+      response += ` My goal is to ${randomGoal.toLowerCase()}.`;
+    }
+    return response;
+  }
+
+  private applyCuriosity(response: string, userInput: string): string {
+    if (this.curiosityLevel > 0.7 && !response.includes('?')) {
+      const userKeywords = this.extractKeywords(this.tokenize(userInput));
+      if (userKeywords.length > 0) {
+        const randomKeyword = userKeywords[Math.floor(Math.random() * userKeywords.length)];
+        response += ` I'm curious, can you tell me more about ${randomKeyword}?`;
+      }
+    }
+    return response;
+  }
 }
 
 // Advanced sentiment analysis model
 class AdvancedSentimentModel {
+  private sentimentLexicon: Map<string, number>;
+
+  constructor() {
+    this.sentimentLexicon = new Map([
+      ['good', 1.0],
+      ['great', 1.5],
+      ['excellent', 2.0],
+      ['amazing', 2.0],
+      ['wonderful', 1.8],
+      ['happy', 1.2],
+      ['joy', 1.0],
+      ['love', 2.0],
+      ['like', 0.8],
+      ['best', 1.5],
+      ['bad', -1.0],
+      ['terrible', -1.5],
+      ['awful', -2.0],
+      ['horrible', -2.0],
+      ['disappointing', -1.5],
+      ['sad', -1.0],
+      ['angry', -1.2],
+      ['hate', -2.0],
+      ['dislike', -1.0],
+      ['worst', -2.5],
+      // Add more words and their sentiment scores as needed
+    ]);
+  }
+
   analyze(text: string): { score: number, explanation: string } {
-    // Implement a more sophisticated sentiment analysis algorithm
-    const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'happy', 'joy', 'love', 'like', 'best'];
-    const negativeWords = ['bad', 'terrible', 'awful', 'horrible', 'disappointing', 'sad', 'angry', 'hate', 'dislike', 'worst'];
+    const words = text.toLowerCase().split(/\s+/);
     let score = 0;
-    text.toLowerCase().split(/\s+/).forEach(word => {
-      if (positiveWords.includes(word)) score++;
-      if (negativeWords.includes(word)) score--;
+    let explanation = '';
+    words.forEach(word => {
+      if (this.sentimentLexicon.has(word)) {
+        score += this.sentimentLexicon.get(word)!;
+        explanation += `${word}: ${this.sentimentLexicon.get(word)}\n`;
+      }
     });
-    const explanation = `Sentiment score: ${score}`;
-    return { score, explanation };
+
+    // Handle negations
+    const negationWords = ['not', 'never', 'no', 'none', 'nobody', 'nothing', 'neither', 'nowhere', 'hardly', 'scarcely', 'barely'];
+    words.forEach((word, index) => {
+      if (negationWords.includes(word) && index < words.length - 1) {
+        const nextWord = words[index + 1];
+        if (this.sentimentLexicon.has(nextWord)) {
+          score -= 2 * this.sentimentLexicon.get(nextWord)!; // Reverse the sentiment score
+          explanation += `Negation detected. ${nextWord}: -${2 * this.sentimentLexicon.get(nextWord)!}\n`;
+        }
+      }
+    });
+
+    // Normalize the score
+    const normalizedScore = Math.max(-5, Math.min(5, score));
+    explanation = explanation.trim();
+
+    return { score: normalizedScore, explanation };
   }
 }
 
 // Entity recognition model
 class EntityRecognitionModel {
   recognize(text: string): { [key: string]: string } {
-    // Implement a more robust entity recognition algorithm
     const entities: { [key: string]: string } = {};
-    const dateMatch = text.match(/\b(\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{2,4})\b/);
+
+    // Date patterns (YYYY-MM-DD or MM/DD/YYYY)
+    const datePattern = /\b(\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{2,4})\b/;
+    const dateMatch = text.match(datePattern);
     if (dateMatch) entities['date'] = dateMatch[0];
-    const nameMatch = text.match(/\b([A-Z][a-z]+ [A-Z][a-z]+)\b/);
+
+    // Name pattern (e.g., John Doe)
+    const namePattern = /\b([A-Z][a-z]+ [A-Z][a-z]+)\b/;
+    const nameMatch = text.match(namePattern);
     if (nameMatch) entities['name'] = nameMatch[0];
-    const emailMatch = text.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/);
+
+    // Email pattern
+    const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/;
+    const emailMatch = text.match(emailPattern);
     if (emailMatch) entities['email'] = emailMatch[0];
-    const locationMatch = text.match(/\b([A-Z][a-z]+(?: [A-Z][a-z]+)*)\b/);
-    if (locationMatch) entities['location'] = locationMatch[0];
+
+    // Location pattern (e.g., New York, San Francisco)
+    const locationPattern = /\b(?:in|at|from)\s([A-Z][a-z]+(?: [A-Z][a-z]+)*)\b/;
+    const locationMatch = text.match(locationPattern);
+    if (locationMatch) entities['location'] = locationMatch[1];
+
+    // Phone number pattern
+    const phonePattern = /\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/;
+    const phoneMatch = text.match(phonePattern);
+    if (phoneMatch) entities['phone'] = phoneMatch[0];
+
+    // Organization pattern (e.g., OpenAI, GMTStudio)
+    const organizationPattern = /\b(?:of )?([A-Z][a-zA-Z]+(?: [A-Z][a-zA-Z]+)*)\b/;
+    const organizationMatch = text.match(organizationPattern);
+    if (organizationMatch) entities['organization'] = organizationMatch[1];
+
     return entities;
   }
 }
 
-// Topic modeling
 class TopicModel {
+  private stopWords: Set<string>;
+
+  constructor() {
+    this.stopWords = new Set([
+      'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+      'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'have', 'has',
+      'had', 'do', 'does', 'did', 'will', 'would', 'should', 'could', 'can',
+      // Add more stop words as needed
+    ]);
+  }
+
   identify(text: string): string[] {
-    // Implement a topic modeling algorithm
-    // This is a placeholder implementation
-    const topics = ['ai', 'machine learning', 'deep learning'];
-    return topics.filter(topic => text.toLowerCase().includes(topic));
+    const words = text.toLowerCase().split(/\s+/).filter(word => !this.stopWords.has(word));
+    const frequencyMap = new Map<string, number>();
+
+    words.forEach(word => {
+      frequencyMap.set(word, (frequencyMap.get(word) || 0) + 1);
+    });
+
+    // Sort words by frequency in descending order
+    const sortedWords = Array.from(frequencyMap.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(entry => entry[0]);
+
+    // Assume top 3 words are the main topics
+    const topics = sortedWords.slice(0, 3);
+    return topics;
   }
 }
 
@@ -1660,11 +1692,41 @@ class RLAgent {
   }
 
   private assessGrammaticalCorrectness(action: number[]): number {
-    // This is a placeholder. In a real implementation, you would use a pre-trained
-    // language model to score the grammatical correctness of the action.
-    return Math.random();
+    // Convert the action vector to text using the existing vectorToWord method
+    const generatedWord = this.vectorToWord(action);
+    
+    // Basic grammar checks using regex patterns
+    // Note: This is a simplistic approach. For comprehensive grammar checking,
+    // consider integrating with a dedicated grammar checking library or API.
+  
+    let grammarScore = 1.0; // Start with a perfect score
+  
+    // Check for capital letter at the beginning
+    if (!/^[A-Z]/.test(generatedWord)) {
+      grammarScore -= 0.2;
+    }
+  
+    // Check if the word ends with a proper punctuation mark
+    if (!/[.!?]$/.test(generatedWord)) {
+      grammarScore -= 0.1;
+    }
+  
+    // Check for common grammatical errors (e.g., double spaces)
+    if (/ {2,}/.test(generatedWord)) {
+      grammarScore -= 0.15;
+    }
+  
+    // Ensure the word does not contain invalid characters
+    if (/[^a-zA-Z0-9\s.,!?'-]/.test(generatedWord)) {
+      grammarScore -= 0.25;
+    }
+  
+    // Normalize the score between 0 and 1
+    grammarScore = Math.max(0, Math.min(1, grammarScore));
+  
+    return grammarScore;
   }
-
+  
   private getNextState(state: number[], action: number[]): number[] {
     return state.map((s, i) => (s + action[i]) / 2);
   }
@@ -1848,7 +1910,7 @@ export function processChatbotQuery(query: string): string {
   }
 }
 
-console.log("Mazs AI v1.3.0 with advanced NLP and contextual analysis capabilities initialized!");
+console.log("Mazs AI v1.3.1 with advanced NLP and contextual analysis capabilities initialized!");
 
 
 const intents: Intent[] = [
@@ -2132,8 +2194,7 @@ export const debouncedHandleUserInput = debounce(handleUserInput, 300);
 // Train the network when the module is loaded
 trainNetwork();
 
-console.log("Mazs AI v1.3.0 with advanced NLP and contextual analysis capabilities initialized!");
-
+console.log("Mazs AI v1.3.1 with advanced NLP and contextual analysis capabilities initialized!");
 export async function processAttachedFile(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
