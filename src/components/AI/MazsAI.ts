@@ -729,8 +729,40 @@ class NaturalLanguageProcessor {
     return Array.from(candidates.keys())[0];
   }
 
-  analyzeSentiment(text: string): { score: number, explanation: string } {
-    return this.sentimentModel.analyze(text);
+  /**
+   * Analyze sentiment using the sentimentLexicon
+   */
+  private analyzeSentiment(text: string): { score: number, explanation: string } {
+    const words = text.toLowerCase().split(/\s+/);
+    let score = 0;
+    let explanation = '';
+
+    words.forEach(word => {
+      if (this.sentimentLexicon.has(word)) {
+        const wordScore = this.sentimentLexicon.get(word)!;
+        score += wordScore;
+        explanation += `${word}: ${wordScore}\n`;
+      }
+    });
+
+    // Handle negations
+    const negationWords = ['not', 'never', 'no', 'none', 'nobody', 'nothing', 'neither', 'nowhere', 'hardly', 'scarcely', 'barely'];
+    words.forEach((word, index) => {
+      if (negationWords.includes(word) && index < words.length - 1) {
+        const nextWord = words[index + 1];
+        if (this.sentimentLexicon.has(nextWord)) {
+          const negatedScore = -2 * this.sentimentLexicon.get(nextWord)!;
+          score += negatedScore;
+          explanation += `Negation detected. ${nextWord}: ${negatedScore}\n`;
+        }
+      }
+    });
+
+    // Normalize the score
+    const normalizedScore = Math.max(-5, Math.min(5, score));
+    explanation = explanation.trim();
+
+    return { score: normalizedScore, explanation };
   }
 
   understandQuery(query: string): { intent: string, entities: { [key: string]: string }, keywords: string[], analysis: string, sentiment: { score: number, explanation: string }, topics: string[] } {
@@ -800,9 +832,18 @@ class NaturalLanguageProcessor {
   }
 
   private extractEntities(query: string): { [key: string]: string } {
-    // Enhanced entity extraction logic
+    // Extract entities using existing models
     const entities = this.entityRecognitionModel.recognize(query);
     const additionalEntities = this.extractAdditionalEntities(query);
+
+    // Cross-reference with KnowledgeBase for enriched information
+    Object.keys(entities).forEach(key => {
+      const entity = entities[key].toLowerCase();
+      if (this.knowledgeBase.has(entity)) {
+        entities[key] = this.knowledgeBase.get(entity)!;
+      }
+    });
+
     return { ...entities, ...additionalEntities };
   }
 
@@ -833,31 +874,44 @@ class NaturalLanguageProcessor {
   learnFromInteraction(query: string, response: string, feedback: number) {
     const normalizedQuery = query.toLowerCase().trim();
     this.learningMemory.set(normalizedQuery, { response, feedback });
-    
-    // If feedback is positive, add the query and response to training data
+
+    // If feedback is positive, add the query and response to training data and knowledge base
     if (feedback > this.feedbackThreshold) {
       this.trainOnText(query);
       this.trainOnText(response);
-      
-      // Update knowledge base if the response contains new information
-      const potentialNewInfo = response.match(/([^.!?]+[.!?])/g);
-      if (potentialNewInfo) {
-        potentialNewInfo.forEach(info => {
-          const keywords = this.extractKeywords(this.tokenize(info));
-          if (keywords.length > 0) {
-            const key = keywords.join(' ');
-            if (!this.knowledgeBase.has(key)) {
-              this.knowledgeBase.set(key, info);
-            }
-          }
-        });
-      }
+
+      // Extract and add new information to the KnowledgeBase
+      const extractedInfo = this.extractKeyInformation(response);
+      extractedInfo.forEach(info => {
+        const key = this.extractKeywords(this.tokenize(info)).join(' ');
+        if (key && !this.knowledgeBase.has(key)) {
+          this.knowledgeBase.set(key, info);
+        }
+      });
     }
     this.updateBeliefs(query, response, feedback);
     this.adjustGoals(feedback);
     this.adjustCuriosityLevel(feedback);
   }
-
+  private extractKeyInformation(response: string): string[] {
+    // Split response into sentences
+    const sentences = response.match(/[^.!?]+[.!?]+/g) || [];
+    // Filter sentences that contain key information based on keywords
+    return sentences.filter(sentence => {
+      const keywords = this.extractKeywords(this.tokenize(sentence));
+      return keywords.length > 0;
+    });
+  }
+      private identifyIntent(query: string): string {
+      // Encode the input query
+      const encodedInput = encodeInput(query);
+      // Predict intent using the trained neural network
+      const prediction = network.predict(encodedInput);
+      // Determine the intent with the highest probability
+      const maxIndex = prediction.indexOf(Math.max(...prediction));
+      const identifiedIntent = intents[maxIndex]?.patterns[0] || 'confusion';
+      return identifiedIntent;
+    }
   generateResponse(intent: string, entities: { [key: string]: string }, keywords: string[], topics: string[], userInput: string): string {
     let response = this.generateBaseResponse(intent, entities, keywords, topics, userInput);
     response = this.incorporateBeliefs(response);
