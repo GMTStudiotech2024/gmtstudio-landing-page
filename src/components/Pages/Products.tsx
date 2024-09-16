@@ -2,16 +2,12 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaRocket,
-  FaRobot,
   FaSearch,
   FaThLarge,
   FaList,
   FaExclamationCircle,
   FaGlobe,
   FaCompass,
-  FaClock,
-  FaFlask,
-  FaLock,
   FaCode,
   FaTimes,
 } from 'react-icons/fa';
