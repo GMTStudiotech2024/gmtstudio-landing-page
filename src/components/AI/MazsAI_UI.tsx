@@ -6,8 +6,8 @@ import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFi
 // import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import * as MazsAI from './MazsAI';
 
-
 import EmojiPicker from 'emoji-picker-react';
+
 interface Message {
   text: string;
   isUser: boolean;
@@ -21,7 +21,8 @@ interface ChatHistory {
   id: string;
   name: string;
 }
-const ChatBotUI: React.FC = () => {
+
+const MazsAIChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -301,7 +302,6 @@ const ChatBotUI: React.FC = () => {
     // Optionally, show a toast notification
   };
 
-
   const renderVoiceRecorder = () => (
     <div className="absolute bottom-full mb-2 bg-white dark:bg-gray-700 rounded-lg shadow-lg p-4">
       <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
@@ -490,7 +490,7 @@ const ChatBotUI: React.FC = () => {
         >
           {isCheckingForUpdates ? (
             <span className="flex items-center">
-              <FiLoader className="animate-spin mr-2" />
+              <FiLoader  />
               Checking for updates...
             </span>
           ) : (
@@ -503,12 +503,12 @@ const ChatBotUI: React.FC = () => {
           }`}>
             {updateStatus === 'up-to-date' ? (
               <>
-                <FiCheckCircle className="mr-2" />
+                <FiCheckCircle  />
                 Mazs AI is up to date
               </>
             ) : (
               <>
-                <FiAlertCircle className="mr-2" />
+                <FiAlertCircle  />
                 Update available
               </>
             )}
@@ -688,11 +688,11 @@ const ChatBotUI: React.FC = () => {
 
   return (
     <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''}`}>
-    <div className="flex-1 bg-gray-100 dark:bg-gray-900 transition-colors duration-200 overflow-hidden pt-20">
-      <div className="max-w-7xl mx-auto p-4 h-full flex flex-col">
+      <div className="flex-1 bg-gray-100 dark:bg-gray-900 transition-colors duration-200 overflow-hidden pt-16">
+        <div className="max-w-7xl mx-auto p-4 h-full flex flex-col">
           {/* Header */}
           <header className="flex justify-between items-center mb-6 sticky top-0 z-10 bg-gray-100 dark:bg-gray-900 py-4">
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Mazs AI Lab Preview</h1>
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Mazs AI Lab</h1>
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => setShowInfo(!showInfo)}
@@ -749,11 +749,11 @@ const ChatBotUI: React.FC = () => {
 
           {/* Chat Container */}
           <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-800 rounded-lg shadow-xl">
-          <div 
-            ref={chatContainerRef}
-            className="flex-1 overflow-y-auto p-4 space-y-4 sm:space-y-6"
-            style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily || 'monospace' }}
-          >
+            <div 
+              ref={chatContainerRef}
+              className="flex-1 overflow-y-auto p-4 space-y-4"
+              style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily || 'monospace' }}
+            >
               <AnimatePresence>
                 {messages.map((message, index) => (
                   <motion.div
@@ -763,7 +763,7 @@ const ChatBotUI: React.FC = () => {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
                     className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
-                    onContextMenu={(e) => handleMessageContextMenu(e, index)}
+                    onContextMenu={(e: React.MouseEvent) => handleMessageContextMenu(e, index)}
                   >
                     <div className={`max-w-[70%] ${message.isUser ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white'} rounded-lg p-3 shadow-md`}>
                       <div className="flex items-center mb-1">
@@ -788,7 +788,7 @@ const ChatBotUI: React.FC = () => {
                                 />
                               ) : (
                                 <>
-                                  <span className="mr-2">{userAvatar}</span>
+                                  <span >{userAvatar}</span>
                                   {userName}
                                 </>
                               )}
@@ -825,7 +825,7 @@ const ChatBotUI: React.FC = () => {
                               title="Regenerate response"
                               disabled={isGenerating}
                             >
-                              <FiRepeat size={12} className={isGenerating ? 'animate-spin' : ''} />
+                              <FiRepeat />
                             </button>
                           </div>
                         )}
@@ -843,7 +843,7 @@ const ChatBotUI: React.FC = () => {
                   className="flex justify-start"
                 >
                   <span className="inline-flex items-center p-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">
-                    <FiLoader className="animate-spin mr-2" />
+                    <FiLoader  />
                     <span className="text-sm">Mazs AI v1.3.1 Anatra is thinking</span>
                     <span className="ml-1 inline-flex">
                       <span className="animate-bounce" style={{ animationDelay: '0s' }}>.</span>
@@ -963,7 +963,7 @@ const ChatBotUI: React.FC = () => {
                       }`}
                       title={isRecording ? "Stop recording" : "Start voice recording"}
                     >
-                      <FiMic size={24} className="stroke-current stroke-2" />
+                      <FiMic  />
                     </button>
                     <button
                       onClick={handleSend}
@@ -975,7 +975,7 @@ const ChatBotUI: React.FC = () => {
                       disabled={isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000}
                       title="Send message"
                     >
-                      <FiSend size={24} className="stroke-current stroke-2" />
+                      <FiSend size={24} />
                     </button>
                   </div>
                 </div>
@@ -1075,7 +1075,7 @@ const ChatBotUI: React.FC = () => {
             </ul>
             {chatHistories.length === 0 && (
               <div className="text-center text-gray-500 dark:text-gray-400 mt-8">
-                <FiArchive size={48} className="mx-auto mb-4" />
+                <FiArchive size={48}  />
                 <p>No chat histories yet. Create a new one to get started!</p>
               </div>
             )}
@@ -1095,25 +1095,25 @@ const ChatBotUI: React.FC = () => {
             onClick={() => deleteMessage(selectedMessageIndex)}
             className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
           >
-            <FiTrash2 className="mr-2" /> Delete Message
+            <FiTrash2  /> Delete Message
           </button>
           <button
             onClick={() => editMessage(selectedMessageIndex)}
             className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
           >
-            <FiEdit className="mr-2" /> Edit Message
+            <FiEdit  /> Edit Message
           </button>
           <button
             onClick={() => shareMessage(selectedMessageIndex)}
             className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
           >
-            <FiShare className="mr-2" /> Share Message
+            <FiShare  /> Share Message
           </button>
           <button
             onClick={closeContextMenu}
             className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
           >
-            <FiX className="mr-2" /> Cancel
+            <FiX  /> Cancel
           </button>
         </motion.div>
       )}
@@ -1121,4 +1121,4 @@ const ChatBotUI: React.FC = () => {
   );
 };
 
-export default ChatBotUI;
+export default MazsAIChat;
