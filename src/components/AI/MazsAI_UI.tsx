@@ -5,8 +5,8 @@ import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFi
 // import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 // import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import * as MazsAI from './MazsAI';
-
 import EmojiPicker from 'emoji-picker-react';
+import './MazsAI_UI.css'; // Import the CSS for loading animations
 
 interface Message {
   text: string;
@@ -22,7 +22,26 @@ interface ChatHistory {
   name: string;
 }
 
+interface IconButtonProps {
+  onClick: () => void;
+  title: string;
+  ariaLabel: string;
+  children: React.ReactNode;
+}
+
+const IconButton: React.FC<IconButtonProps> = ({ onClick, title, ariaLabel, children }) => (
+  <button
+    onClick={onClick}
+    className="p-2 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    title={title}
+    aria-label={ariaLabel}
+  >
+    {children}
+  </button>
+);
+
 const MazsAIChat: React.FC = () => {
+  // State Management
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -39,7 +58,7 @@ const MazsAIChat: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [userTyping, setUserTyping] = useState(false);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
-  const [,setIsScrolledToBottom] = useState(true);
+  const [, setIsScrolledToBottom] = useState(true);
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [selectedMessageIndex, setSelectedMessageIndex] = useState<number | null>(null);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
@@ -50,11 +69,10 @@ const MazsAIChat: React.FC = () => {
   const [editingHistoryId, setEditingHistoryId] = useState<string | null>(null);
   const [editingHistoryName, setEditingHistoryName] = useState('');
   const [userName, setUserName] = useState(() => {
-    // Try to get the userName from localStorage, or use "User" as default
-    return localStorage.getItem('userName') || "User(change it if you want)" ;
+    return localStorage.getItem('userName') || 'User';
   });
   const [isEditingUserName, setIsEditingUserName] = useState(false);
-  const botName = "Mazs AI v1.3.1 Anatra";
+  const botName = 'Mazs AI';
 
   const [showSettings, setShowSettings] = useState(false);
   const [fontSize, setFontSize] = useState(() => {
@@ -77,11 +95,26 @@ const MazsAIChat: React.FC = () => {
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [userAvatar, setUserAvatar] = useState(() => {
-    // Try to get the userAvatar from localStorage, or use default emoji
     return localStorage.getItem('userAvatar') || '👤';
   });
   const [isCheckingForUpdates, setIsCheckingForUpdates] = useState(false);
   const [updateStatus, setUpdateStatus] = useState<'up-to-date' | 'update-available' | null>(null);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+
+  // Effects
+  useEffect(() => {
+    const savedAvatar = localStorage.getItem('userAvatar');
+    const savedFontSize = localStorage.getItem('fontSize');
+    const savedSendKey = localStorage.getItem('sendKey');
+    const savedLanguage = localStorage.getItem('language');
+    const savedFontFamily = localStorage.getItem('chatFontFamily');
+
+    if (savedAvatar) setUserAvatar(savedAvatar);
+    if (savedFontSize) setFontSize(Number(savedFontSize));
+    if (savedSendKey) setSendKey(savedSendKey);
+    if (savedLanguage) setLanguage(savedLanguage);
+    if (savedFontFamily) setChatFontFamily(savedFontFamily);
+  }, []);
 
   useEffect(() => {
     setSuggestions(getConversationSuggestions());
@@ -100,20 +133,6 @@ const MazsAIChat: React.FC = () => {
     }
   }, [isLoading]);
 
-  const scrollToBottom = () => {
-    if (chatContainerRef.current) {
-      const scrollHeight = chatContainerRef.current.scrollHeight;
-      chatContainerRef.current.scrollTop = scrollHeight;
-    }
-  };
-
-  const handleScroll = () => {
-    if (chatContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
-      setIsScrolledToBottom(scrollHeight - scrollTop === clientHeight);
-    }
-  };
-
   useEffect(() => {
     const chatContainer = chatContainerRef.current;
     if (chatContainer) {
@@ -125,94 +144,6 @@ const MazsAIChat: React.FC = () => {
       }
     };
   }, []);
-
-  const addWelcomeMessage = () => {
-    const welcomeMessage: Message = {
-      text: "Hello! I'm Mazs AI v1.3.1 Anatra. I How can I assist you today? ",
-      isUser: false,
-      timestamp: new Date()
-    };
-    setMessages([welcomeMessage]);
-  };
-
-  const handleSend = async () => {
-    if (isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000) {
-      return;
-    }
-
-    setIsGenerating(true);
-    setIsLoading(true);
-
-    const userMessage: Message = { 
-      text: attachedFiles.length > 0 ? `Attached ${attachedFiles.length} file(s)` : input, 
-      isUser: true,
-      attachments: attachedFiles,
-      timestamp: new Date(),
-      userName: userName
-    };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
-
-    // Clear input immediately after sending
-    setInput('');
-
-    try {
-      if (attachedFiles.length > 0) {
-        await processFiles(attachedFiles);
-      } else {
-        const botResponse = await debouncedHandleUserInput(input);
-        const botMessage: Message = { text: botResponse, isUser: false, isTyping: true, timestamp: new Date() };
-        setMessages((prevMessages) => [...prevMessages, botMessage]);
-        setCurrentTypingIndex(0);
-      }
-    } catch (error) {
-      console.error("Error processing message:", error);
-      const errorMessage: Message = { text: "I'm sorry, I encountered an error. Please try again.", isUser: false, timestamp: new Date() };
-      setMessages((prevMessages) => [...prevMessages, errorMessage]);
-    } finally {
-      setIsGenerating(false);
-      setIsLoading(false);
-      setAttachedFiles([]);
-    }
-  };
-
-  const regenerateResponseHandler = async (index: number) => {
-    const userMessage = messages[index - 1]; // Assuming the user message is always before the AI response
-    if (userMessage && !userMessage.isUser) {
-      setIsGenerating(true);
-      setIsLoading(true);
-
-      try {
-        const regeneratedResponse = await regenerateResponse(userMessage.text);
-        const newMessage: Message = { 
-          text: regeneratedResponse, 
-          isUser: false, 
-          isTyping: true,
-          timestamp: new Date()
-        };
-        setMessages((prevMessages) => [
-          ...prevMessages.slice(0, index),
-          newMessage,
-          ...prevMessages.slice(index + 1)
-        ]);
-        setCurrentTypingIndex(0);
-      } catch (error) {
-        console.error("Error regenerating response:", error);
-      } finally {
-        setIsGenerating(false);
-        setIsLoading(false);
-      }
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (
-      (sendKey === 'Enter' && e.key === 'Enter' && !e.shiftKey) ||
-      (sendKey === 'Ctrl + Enter' && e.key === 'Enter' && e.ctrlKey)
-    ) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
 
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
@@ -232,6 +163,132 @@ const MazsAIChat: React.FC = () => {
     }
   }, [messages, currentTypingIndex]);
 
+  useEffect(() => {
+    if (updateStatus) {
+      const timer = setTimeout(() => {
+        setUpdateStatus(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [updateStatus]);
+
+  // Helper Functions
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const handleScroll = () => {
+    if (chatContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+      setIsScrolledToBottom(scrollHeight - scrollTop === clientHeight);
+    }
+  };
+
+  const addWelcomeMessage = () => {
+    const welcomeMessage: Message = {
+      text: "Hello! I'm Mazs AI. How can I assist you today?",
+      isUser: false,
+      timestamp: new Date(),
+    };
+    setMessages([welcomeMessage]);
+  };
+
+  const handleSend = async () => {
+    if (
+      isGenerating ||
+      (!input.trim() && attachedFiles.length === 0) ||
+      input.length > 1000
+    ) {
+      return;
+    }
+
+    setIsGenerating(true);
+    setIsLoading(true);
+
+    const userMessage: Message = {
+      text: attachedFiles.length > 0 ? `Attached ${attachedFiles.length} file(s)` : input,
+      isUser: true,
+      attachments: attachedFiles,
+      timestamp: new Date(),
+      userName: userName,
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+
+    setInput('');
+
+    try {
+      if (attachedFiles.length > 0) {
+        await processFiles(attachedFiles);
+      } else {
+        const botResponse = await debouncedHandleUserInput(input);
+        const botMessage: Message = {
+          text: botResponse,
+          isUser: false,
+          isTyping: true,
+          timestamp: new Date(),
+        };
+        setMessages((prevMessages) => [...prevMessages, botMessage]);
+        setCurrentTypingIndex(0);
+      }
+    } catch (error) {
+      console.error('Error processing message:', error);
+      const errorMessage: Message = {
+        text: "I'm sorry, I encountered an error. Please try again.",
+        isUser: false,
+        timestamp: new Date(),
+      };
+      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+    } finally {
+      setIsGenerating(false);
+      setIsLoading(false);
+      setAttachedFiles([]);
+    }
+  };
+
+  const regenerateResponseHandler = async (index: number) => {
+    const userMessage = messages[index - 1];
+    if (userMessage && !userMessage.isUser) {
+      setIsGenerating(true);
+      setIsLoading(true);
+
+      try {
+        const regeneratedResponse = await regenerateResponse(userMessage.text);
+        const newMessage: Message = {
+          text: regeneratedResponse,
+          isUser: false,
+          isTyping: true,
+          timestamp: new Date(),
+        };
+        setMessages((prevMessages) => [
+          ...prevMessages.slice(0, index),
+          newMessage,
+          ...prevMessages.slice(index + 1),
+        ]);
+        setCurrentTypingIndex(0);
+      } catch (error) {
+        console.error('Error regenerating response:', error);
+      } finally {
+        setIsGenerating(false);
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (
+      (sendKey === 'Enter' && e.key === 'Enter' && !e.shiftKey) ||
+      (sendKey === 'Ctrl + Enter' && e.key === 'Enter' && e.ctrlKey)
+    ) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
@@ -245,30 +302,34 @@ const MazsAIChat: React.FC = () => {
   const handleFileAttach = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      setAttachedFiles(prevFiles => [...prevFiles, ...Array.from(files)]);
+      setAttachedFiles((prevFiles) => [...prevFiles, ...Array.from(files)]);
     }
   };
 
   const clearAttachedFile = (index: number) => {
-    setAttachedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+    setAttachedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
   const processFiles = async (files: File[]) => {
     setIsLoading(true);
     try {
-      const responses = await Promise.all(files.map(file => processAttachedFile(file)));
-      const botMessage: Message = { 
-        text: responses.join('\n\n'), 
-        isUser: false, 
+      const responses = await Promise.all(files.map((file) => processAttachedFile(file)));
+      const botMessage: Message = {
+        text: responses.join('\n\n'),
+        isUser: false,
         isTyping: true,
         attachments: files,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
       setMessages((prevMessages) => [...prevMessages, botMessage]);
       setCurrentTypingIndex(0);
     } catch (error) {
-      console.error("Error processing files:", error);
-      const errorMessage: Message = { text: "I'm sorry, I encountered an error processing the files. Please try again.", isUser: false, timestamp: new Date() };
+      console.error('Error processing files:', error);
+      const errorMessage: Message = {
+        text: "I'm sorry, I encountered an error processing the files. Please try again.",
+        isUser: false,
+        timestamp: new Date(),
+      };
       setMessages((prevMessages) => [...prevMessages, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -280,15 +341,24 @@ const MazsAIChat: React.FC = () => {
     const fileType = file.type.split('/')[0];
     switch (fileType) {
       case 'image':
-        return <FiImage />;
+        return <FiImage className="text-blue-500" />;
       case 'audio':
-        return <FiMusic />;
+        return <FiMusic className="text-green-500" />;
       case 'video':
-        return <FiVideo />;
+        return <FiVideo className="text-purple-500" />;
       case 'text':
-        return file.name.endsWith('.json') || file.name.endsWith('.xml') || file.name.endsWith('.html') || file.name.endsWith('.css') || file.name.endsWith('.js') ? <FiCode /> : <FiFile />;
+        if (
+          file.name.endsWith('.json') ||
+          file.name.endsWith('.xml') ||
+          file.name.endsWith('.html') ||
+          file.name.endsWith('.css') ||
+          file.name.endsWith('.js')
+        ) {
+          return <FiCode className="text-yellow-500" />;
+        }
+        return <FiFile className="text-gray-500" />;
       default:
-        return <FiFile />;
+        return <FiFile className="text-gray-500" />;
     }
   };
 
@@ -319,7 +389,39 @@ const MazsAIChat: React.FC = () => {
       </button>
     </div>
   );
-
+  interface ModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    title: string;
+    message: string;
+  }
+  
+  const ConfirmationModal: React.FC<ModalProps> = ({ isOpen, onClose, onConfirm, title, message }) => {
+    if (!isOpen) return null;
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-11/12 max-w-md shadow-lg">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">{title}</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">{message}</p>
+          <div className="flex justify-end space-x-4">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors duration-200"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onConfirm}
+              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200"
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
   const handleMessageContextMenu = (event: React.MouseEvent, index: number) => {
     event.preventDefault();
     setSelectedMessageIndex(index);
@@ -378,12 +480,11 @@ const MazsAIChat: React.FC = () => {
   };
 
   const loadMessagesForChatHistory = async (id: string): Promise<Message[]> => {
-    // Fetch messages for the selected chat history
     try {
       const messages = await MazsAI.getChatHistoryMessages(id);
       return messages;
     } catch (error) {
-      console.error("Error loading chat history messages:", error);
+      console.error('Error loading chat history messages:', error);
       return [];
     }
   };
@@ -407,7 +508,6 @@ const MazsAIChat: React.FC = () => {
 
   const handleUserNameSave = () => {
     setIsEditingUserName(false);
-    // Save the userName to localStorage
     localStorage.setItem('userName', userName);
   };
 
@@ -431,8 +531,8 @@ const MazsAIChat: React.FC = () => {
   };
 
   const handleChatFontFamilyChange = (newFontFamily: string) => {
-    setChatFontFamily(newFontFamily || 'monospace');
-    localStorage.setItem('chatFontFamily', newFontFamily || 'monospace');
+    setChatFontFamily(newFontFamily || 'Arial, sans-serif');
+    localStorage.setItem('chatFontFamily', newFontFamily || 'Arial, sans-serif');
   };
 
   const handleAutoGenerateTitleChange = (newValue: boolean) => {
@@ -451,20 +551,10 @@ const MazsAIChat: React.FC = () => {
     // Simulate an API call or actual update check
     setTimeout(() => {
       setIsCheckingForUpdates(false);
-      // Simulate a random result (replace this with actual update check logic)
       const isUpToDate = Math.random() > 0.5;
       setUpdateStatus(isUpToDate ? 'up-to-date' : 'update-available');
-    }, 2000); // Simulating a 2-second delay
+    }, 2000);
   };
-
-  useEffect(() => {
-    if (updateStatus) {
-      const timer = setTimeout(() => {
-        setUpdateStatus(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [updateStatus]);
 
   const handleEmojiClick = (emojiObject: any) => {
     const newAvatar = emojiObject.emoji;
@@ -474,11 +564,24 @@ const MazsAIChat: React.FC = () => {
   };
 
   const renderUpdateSection = () => (
-    <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 mb-4">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Version Information</h3>
+    <div
+      className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 mb-4"
+      role="region"
+      aria-labelledby="version-information"
+    >
+      <h3
+        id="version-information"
+        className="text-lg font-semibold text-gray-800 dark:text-white mb-2"
+      >
+        Version Information
+      </h3>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm text-gray-600 dark:text-gray-400">Current Version:</span>
-        <span className="font-medium text-black dark:text-white">v1.3.1 Anatra</span>
+        <span className="text-sm text-gray-600 dark:text-gray-400">
+          Current Version:
+        </span>
+        <span className="font-medium text-black dark:text-white">
+          v1.3.1 Anatra
+        </span>
       </div>
       <div className="flex items-center justify-between">
         <button
@@ -490,7 +593,7 @@ const MazsAIChat: React.FC = () => {
         >
           {isCheckingForUpdates ? (
             <span className="flex items-center">
-              <FiLoader  />
+              <FiLoader className="animate-spin mr-2" />
               Checking for updates...
             </span>
           ) : (
@@ -498,17 +601,21 @@ const MazsAIChat: React.FC = () => {
           )}
         </button>
         {updateStatus && (
-          <span className={`flex items-center ${
-            updateStatus === 'up-to-date' ? 'text-green-500' : 'text-yellow-500'
-          }`}>
+          <span
+            className={`flex items-center ${
+              updateStatus === 'up-to-date'
+                ? 'text-green-500'
+                : 'text-yellow-500'
+            }`}
+          >
             {updateStatus === 'up-to-date' ? (
               <>
-                <FiCheckCircle  />
+                <FiCheckCircle className="mr-1" />
                 Mazs AI is up to date
               </>
             ) : (
               <>
-                <FiAlertCircle  />
+                <FiAlertCircle className="mr-1" />
                 Update available
               </>
             )}
@@ -519,16 +626,19 @@ const MazsAIChat: React.FC = () => {
   );
 
   const renderSettings = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div 
-        className="bg-white dark:bg-gray-800 rounded-lg p-8 w-[800px] max-w-full max-h-[90vh] overflow-y-auto shadow-xl relative"
-        style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily || 'inherit' }}
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
+      <div
+        className="bg-white dark:bg-gray-800 rounded-lg p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-xl relative transform transition-transform duration-300 scale-100 sm:w-11/12 md:w-3/4 lg:w-2/3"
+        style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily }}
       >
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Settings</h2>
+          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
+            Settings
+          </h2>
           <button
             onClick={() => setShowSettings(false)}
             className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
+            aria-label="Close Settings"
           >
             <FiX size={28} />
           </button>
@@ -548,7 +658,9 @@ const MazsAIChat: React.FC = () => {
                 onChange={(e) => handleFontSizeChange(Number(e.target.value))}
                 className="w-full"
               />
-              <span className="text-lg font-medium text-gray-600 dark:text-gray-400 w-12 text-center">{fontSize}px</span>
+              <span className="text-lg font-medium text-gray-600 dark:text-gray-400 w-12 text-center">
+                {fontSize}px
+              </span>
             </div>
           </div>
           <div>
@@ -577,7 +689,7 @@ const MazsAIChat: React.FC = () => {
               <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Send Key
               </label>
-              <select 
+              <select
                 className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-lg"
                 value={sendKey}
                 onChange={(e) => handleSendKeyChange(e.target.value)}
@@ -591,7 +703,7 @@ const MazsAIChat: React.FC = () => {
                 Theme
               </label>
               <select
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-lg"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-lg transition-colors duration-300"
                 onChange={(e) => setIsDarkMode(e.target.value === 'Dark')}
                 value={isDarkMode ? 'Dark' : 'Light'}
               >
@@ -603,7 +715,7 @@ const MazsAIChat: React.FC = () => {
               <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Language
               </label>
-              <select 
+              <select
                 className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-lg"
                 value={language}
                 onChange={(e) => handleLanguageChange(e.target.value)}
@@ -617,13 +729,17 @@ const MazsAIChat: React.FC = () => {
               <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Chat Font Family
               </label>
-              <input
-                type="text"
+              <select
                 value={chatFontFamily}
                 onChange={(e) => handleChatFontFamilyChange(e.target.value)}
-                placeholder="Font Family Name"
                 className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-lg"
-              />
+              >
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Courier New', Courier, monospace">Courier New</option>
+                <option value="'Georgia', serif">Georgia</option>
+                <option value="'Times New Roman', Times, serif">Times New Roman</option>
+                <option value="'Verdana', sans-serif">Verdana</option>
+              </select>
             </div>
           </div>
           <div className="space-y-4">
@@ -669,15 +785,25 @@ const MazsAIChat: React.FC = () => {
             </div>
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">System Information</h3>
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
+              System Information
+            </h3>
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-lg text-gray-600 dark:text-gray-400">Last Update:</span>
-                <span className="text-lg font-medium text-gray-800 dark:text-white">Not sync yet</span>
+                <span className="text-lg text-gray-600 dark:text-gray-400">
+                  Last Update:
+                </span>
+                <span className="text-lg font-medium text-gray-800 dark:text-white">
+                  Not synced yet
+                </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-lg text-gray-600 dark:text-gray-400">Local Data:</span>
-                <span className="text-lg font-medium text-gray-800 dark:text-white">1 chats, 2 messages, 0 prompts, 0 masks</span>
+                <span className="text-lg text-gray-600 dark:text-gray-400">
+                  Local Data:
+                </span>
+                <span className="text-lg font-medium text-gray-800 dark:text-white">
+                  1 chat, 2 messages, 0 prompts, 0 masks
+                </span>
               </div>
             </div>
           </div>
@@ -686,49 +812,162 @@ const MazsAIChat: React.FC = () => {
     </div>
   );
 
+  const renderChatHistory = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-8 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl sm:max-w-sm md:max-w-md lg:max-w-lg">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+            Chat History
+          </h2>
+          <button
+            onClick={() => setShowChatHistory(false)}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
+          >
+            <FiX size={24} />
+          </button>
+        </div>
+        <div className="mb-6">
+          <div className="flex items-center space-x-2">
+            <input
+              type="text"
+              value={newChatName}
+              onChange={(e) => setNewChatName(e.target.value)}
+              placeholder="New chat name"
+              className="flex-grow p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+            />
+            <button
+              onClick={handleCreateChatHistory}
+              className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            >
+              <FiPlus size={24} />
+            </button>
+          </div>
+        </div>
+        <ul className="space-y-4">
+          {chatHistories.map((history) => (
+            <li
+              key={history.id}
+              className="bg-gray-50 dark:bg-gray-700 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg"
+            >
+              {editingHistoryId === history.id ? (
+                <div className="flex items-center p-4">
+                  <input
+                    type="text"
+                    value={editingHistoryName}
+                    onChange={(e) => setEditingHistoryName(e.target.value)}
+                    className="flex-grow p-2 border border-gray-300 dark:border-gray-600 "/>
+                  <button
+                    onClick={handleFinishEditHistory}
+                    className="ml-2 p-2 text-green-500 hover:text-green-600 transition-colors duration-200"
+                  >
+                    <FiCheck size={20} />
+                  </button>
+                  <button
+                    onClick={() => setEditingHistoryId(null)}
+                    className="ml-2 p-2 text-red-500 hover:text-red-600 transition-colors duration-200"
+                  >
+                    <FiX size={20} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-4">
+                  <span className="text-gray-800 dark:text-white font-medium truncate flex-grow">
+                    {history.name}
+                  </span>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleSelectChatHistory(history.id)}
+                      className="p-2 text-blue-500 hover:text-blue-600 transition-colors duration-200 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900"
+                      title="Select Chat"
+                    >
+                      <FiCheck size={20} />
+                    </button>
+                    <button
+                      onClick={() => handleStartEditHistory(history)}
+                      className="p-2 text-yellow-500 hover:text-yellow-600 transition-colors duration-200 rounded-full hover:bg-yellow-100 dark:hover:bg-yellow-900"
+                      title="Edit Chat Name"
+                    >
+                      <FiEdit size={20} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteChatHistory(history.id)}
+                      className="p-2 text-red-500 hover:text-red-600 transition-colors duration-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900"
+                      title="Delete Chat"
+                    >
+                      <FiTrash2 size={20} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+        {chatHistories.length === 0 && (
+          <div className="text-center text-gray-500 dark:text-gray-400 mt-8">
+            <FiArchive size={48} className="mx-auto mb-4" />
+            <p>No chat histories yet. Create a new one to get started!</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const confirmReset = () => {
+    resetConversation();
+    setIsResetModalOpen(false);
+  };
+
+  const resetConversationWithConfirmation = () => {
+    setIsResetModalOpen(true);
+  };
+
   return (
-    <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''}`}>
+    <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''} transition-colors duration-500`} role="main" aria-labelledby="chatbot-title">
+      {/* Main Container */}
       <div className="flex-1 bg-gray-100 dark:bg-gray-900 transition-colors duration-200 overflow-hidden pt-16">
         <div className="max-w-7xl mx-auto p-4 h-full flex flex-col">
           {/* Header */}
-          <header className="flex justify-between items-center mb-6 sticky top-0 z-10 bg-gray-100 dark:bg-gray-900 py-4">
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Mazs AI Lab</h1>
+          <header className="flex justify-between items-center mb-6 sticky top-0 z-10 bg-gray-100 dark:bg-gray-900 py-4" role="banner">
+            <h1 id="chatbot-title" className="text-3xl font-bold text-gray-800 dark:text-white">
+              Mazs AI Lab
+            </h1>
             <div className="flex items-center space-x-3">
-              <button
+              <IconButton
                 onClick={() => setShowInfo(!showInfo)}
-                className="p-2 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md hover:shadow-lg transition-all duration-200"
                 title="Info"
+                ariaLabel="Toggle information panel"
               >
                 <FiInfo size={20} />
-              </button>
-              <button
-                onClick={resetConversation}
-                className="p-2 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md hover:shadow-lg transition-all duration-200"
+              </IconButton>
+              <IconButton
+                onClick={resetConversationWithConfirmation}
                 title="Reset Conversation"
+                ariaLabel="Reset Conversation"
               >
+                
                 <FiRefreshCw size={20} />
-              </button>
-              <button
+              </IconButton>
+              <IconButton
                 onClick={toggleDarkMode}
-                className="p-2 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md hover:shadow-lg transition-all duration-200"
                 title="Toggle Dark Mode"
+                ariaLabel="Toggle Dark Mode"
               >
                 {isDarkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
-              </button>
-              <button
+              </IconButton>
+              <IconButton
                 onClick={() => setShowChatHistory(!showChatHistory)}
-                className="p-2 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md hover:shadow-lg transition-all duration-200"
                 title="Chat History"
+                ariaLabel="Chat History"
               >
                 <FiArchive size={20} />
-              </button>
-              <button
+              </IconButton>
+              <IconButton
                 onClick={() => setShowSettings(!showSettings)}
-                className="p-2 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md hover:shadow-lg transition-all duration-200"
                 title="Settings"
+                ariaLabel="Settings"
               >
                 <FiSettings size={20} />
-              </button>
+              </IconButton>
             </div>
           </header>
 
@@ -742,17 +981,19 @@ const MazsAIChat: React.FC = () => {
                 transition={{ duration: 0.3 }}
                 className="mb-6 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg text-blue-800 dark:text-blue-200 shadow-md"
               >
-                <p className="text-sm">Mazs AI v1.3.1 Anatra is an advanced chatbot powered by natural language processing and machine learning. It can assist you with information about GMTStudio, Theta platform, and AI WorkSpace.</p>
+                <p className="text-sm">
+                  Mazs AI v1.3.1 Anatra is an advanced chatbot powered by natural language processing and machine learning. It can assist you with information about GMTStudio, Theta platform, and AI WorkSpace.
+                </p>
               </motion.div>
             )}
           </AnimatePresence>
 
           {/* Chat Container */}
           <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-800 rounded-lg shadow-xl">
-            <div 
+            <div
               ref={chatContainerRef}
               className="flex-1 overflow-y-auto p-4 space-y-4"
-              style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily || 'monospace' }}
+              style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily }}
             >
               <AnimatePresence>
                 {messages.map((message, index) => (
@@ -761,67 +1002,80 @@ const MazsAIChat: React.FC = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
-                    onContextMenu={(e: React.MouseEvent) => handleMessageContextMenu(e, index)}
+                    transition={{ duration: 0.3, type: 'spring', stiffness: 300 }}
+                    className={`flex ${
+                      message.isUser ? 'justify-end' : 'justify-start'
+                    }`}
+                    onContextMenu={(e: React.MouseEvent) =>
+                      handleMessageContextMenu(e, index)
+                    }
                   >
-                    <div className={`max-w-[70%] ${message.isUser ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white'} rounded-lg p-3 shadow-md`}>
-                      <div className="flex items-center mb-1">
+                    <div
+                      className={`max-w-[70%] ${
+                        message.isUser
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white'
+                      } rounded-lg p-4 shadow-md relative`}
+                    >
+                      {/* Message Header */}
+                      <div className="flex items-center mb-2">
                         {message.isUser ? (
                           <>
                             {!isEditingUserName && (
                               <button
                                 onClick={handleUserNameEdit}
-                                className="text-white hover:text-gray-700 dark:text-white dark:hover:text-gray-200 mr-2"
+                                className="text-white hover:text-gray-200 dark:text-white dark:hover:text-gray-300 mr-2"
                               >
                                 <FiEdit size={12} />
                               </button>
                             )}
-                            <span className="text-sm font-semibold text-yellow-300 dark:text-yellow-400">
+                            <span className="text-sm font-semibold">
                               {isEditingUserName ? (
                                 <input
                                   type="text"
                                   value={userName}
                                   onChange={handleUserNameChange}
                                   onBlur={handleUserNameSave}
-                                  className="bg-transparent border-b border-blue-600 dark:border-blue-400 focus:outline-none text-right "
+                                  className="bg-transparent border-b border-blue-600 dark:border-blue-400 focus:outline-none"
                                 />
                               ) : (
                                 <>
-                                  <span >{userAvatar}</span>
+                                  <span className="mr-1">{userAvatar}</span>
                                   {userName}
                                 </>
                               )}
                             </span>
                           </>
                         ) : (
-                          <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                          <span className="text-sm font-semibold">
                             {botName}
                           </span>
                         )}
                       </div>
-                      <p className="text-sm break-words">
+                      {/* Message Body */}
+                      <div className="markdown text-sm break-words">
                         {message.isUser || !message.isTyping
                           ? message.text
                           : message.text.slice(0, currentTypingIndex)}
                         {!message.isUser && message.isTyping && (
-                          <span className="inline-block w-1 h-4 ml-1 bg-gray-800 dark:bg-white animate-blink"></span>
+                          <span className="inline-block w-1 h-4 ml-1 bg-gray-800 dark:bg-white animate-pulse"></span>
                         )}
-                      </p>
+                      </div>
+                      {/* Message Footer */}
                       <div className="mt-2 text-xs opacity-70 flex justify-between items-center">
                         <span>{message.timestamp.toLocaleTimeString()}</span>
                         {!message.isUser && (
                           <div className="flex items-center space-x-2">
                             <button
                               onClick={() => copyToClipboard(message.text)}
-                              className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                              className="p-1 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
                               title="Copy to clipboard"
                             >
                               <FiCopy size={12} />
                             </button>
                             <button
                               onClick={() => regenerateResponseHandler(index)}
-                              className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                              className="p-1 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
                               title="Regenerate response"
                               disabled={isGenerating}
                             >
@@ -835,23 +1089,13 @@ const MazsAIChat: React.FC = () => {
                 ))}
               </AnimatePresence>
               {isLoading && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex justify-start"
-                >
-                  <span className="inline-flex items-center p-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">
-                    <FiLoader  />
-                    <span className="text-sm">Mazs AI v1.3.1 Anatra is thinking</span>
-                    <span className="ml-1 inline-flex">
-                      <span className="animate-bounce" style={{ animationDelay: '0s' }}>.</span>
-                      <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
-                      <span className="animate-bounce" style={{ animationDelay: '0.4s' }}>.</span>
-                    </span>
-                  </span>
-                </motion.div>
+                <div className="flex justify-center items-center p-4">
+                  <div className="flex space-x-2">
+                    <div className="dot"></div>
+                    <div className="dot"></div>
+                    <div className="dot"></div>
+                  </div>
+                </div>
               )}
             </div>
 
@@ -859,7 +1103,9 @@ const MazsAIChat: React.FC = () => {
             <div className="border-t border-gray-200 dark:border-gray-700 p-4">
               {suggestions.length > 0 && messages.length === 1 && (
                 <div className="mb-4 hidden sm:block">
-                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Suggestions:</h3>
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Suggestions:
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     {suggestions.map((suggestion, index) => (
                       <button
@@ -884,10 +1130,10 @@ const MazsAIChat: React.FC = () => {
                   >
                     <span className="inline-flex items-center p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white text-sm shadow-md">
                       <span className="font-medium">User is typing</span>
-                      <span className="ml-1 inline-flex">
-                        <span className="animate-bounce" style={{ animationDelay: '0s' }}>.</span>
-                        <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
-                        <span className="animate-bounce" style={{ animationDelay: '0.4s' }}>.</span>
+                      <span className="ml-2 typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
                       </span>
                     </span>
                   </motion.div>
@@ -912,13 +1158,13 @@ const MazsAIChat: React.FC = () => {
                       {attachedFiles.map((file, index) => (
                         <div
                           key={index}
-                          className="flex items-center bg-gray-200 dark:bg-gray-600 px-2 py-1 text-sm rounded-full shadow-sm hover:shadow-md transition-shadow duration-200"
+                          className="flex items-center bg-gray-200 dark:bg-gray-600 px-2 py-1 text-sm rounded-full shadow-sm hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200"
                         >
                           <span className="text-gray-500 dark:text-gray-400 mr-1">
                             {getFileIcon(file)}
                           </span>
                           <span className="text-gray-600 dark:text-gray-300 truncate max-w-[120px]">
-                            {file.name}
+                            {file.name} ({file.size / 1024} KB)
                           </span>
                           <button
                             onClick={() => clearAttachedFile(index)}
@@ -938,15 +1184,19 @@ const MazsAIChat: React.FC = () => {
                         setTimeout(() => setUserTyping(false), 1000);
                       }}
                       onKeyPress={handleKeyPress}
-                      placeholder={attachedFiles.length > 0 ? "Add a message or send files..." : "Type your message..."}
-                      className={`w-full p-2 bg-transparent text-gray-800 dark:text-white focus:outline-none resize-none min-h-[30px] max-h-[50px] ${
-                        input.length > 1000 ? 'border-red-500' : ''
+                      placeholder={
+                        attachedFiles.length > 0
+                          ? 'Add a message or send files...'
+                          : 'Enter message to Mazs AI v1.3.1 anatra'
+                      }
+                      className={`w-full p-2 bg-transparent text-gray-800 dark:text-white focus:outline-none resize-none min-h-[40px] max-h-[100px] ${
+                        input.length > 1000 ? 'border-b-2 border-red-500' : ''
                       } scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent`}
-                      style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily || 'monospace' }}
+                      style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily }}
                     />
                     <div className="flex justify-between items-center px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
                       <span className={`font-medium ${input.length > 1000 ? 'text-red-500' : ''}`}>
-                        {input.length}/1000
+                        {input.length}/1000 characters
                       </span>
                       {input.length > 900 && (
                         <span className="text-yellow-500 dark:text-yellow-400 animate-pulse">
@@ -959,20 +1209,28 @@ const MazsAIChat: React.FC = () => {
                     <button
                       onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
                       className={`p-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
-                        isRecording ? 'text-red-500 animate-pulse' : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+                        isRecording
+                          ? 'text-red-500 animate-pulse'
+                          : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
                       }`}
-                      title={isRecording ? "Stop recording" : "Start voice recording"}
+                      title={isRecording ? 'Stop recording' : 'Start voice recording'}
                     >
-                      <FiMic  />
+                      <FiMic />
                     </button>
                     <button
                       onClick={handleSend}
                       className={`p-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
-                        isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000
+                        isGenerating ||
+                        (!input.trim() && attachedFiles.length === 0) ||
+                        input.length > 1000
                           ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
                           : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
                       }`}
-                      disabled={isGenerating || (!input.trim() && attachedFiles.length === 0) || input.length > 1000}
+                      disabled={
+                        isGenerating ||
+                        (!input.trim() && attachedFiles.length === 0) ||
+                        input.length > 1000
+                      }
                       title="Send message"
                     >
                       <FiSend size={24} />
@@ -982,106 +1240,20 @@ const MazsAIChat: React.FC = () => {
                 {showVoiceRecorder && renderVoiceRecorder()}
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
-                <span className="font-medium">Mazs AI v1.3.1 Anatra</span> can make mistakes. Please verify important information.
+                <span className="font-medium">Mazs AI</span> can make mistakes. Please verify important information.
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Settings Modal */}
       {showSettings && renderSettings()}
-      {showChatHistory && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-8 w-[480px] max-w-full max-h-[90vh] overflow-y-auto shadow-xl">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Chat History</h2>
-              <button
-                onClick={() => setShowChatHistory(false)}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
-              >
-                <FiX size={24} />
-              </button>
-            </div>
-            <div className="mb-6">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  value={newChatName}
-                  onChange={(e) => setNewChatName(e.target.value)}
-                  placeholder="New chat name"
-                  className="flex-grow p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                />
-                <button
-                  onClick={handleCreateChatHistory}
-                  className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                >
-                  <FiPlus size={24} />
-                </button>
-              </div>
-            </div>
-            <ul className="space-y-4">
-              {chatHistories.map((history) => (
-                <li key={history.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg">
-                  {editingHistoryId === history.id ? (
-                    <div className="flex items-center p-4">
-                      <input
-                        type="text"
-                        value={editingHistoryName}
-                        onChange={(e) => setEditingHistoryName(e.target.value)}
-                        className="flex-grow p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                      />
-                      <button
-                        onClick={handleFinishEditHistory}
-                        className="ml-2 p-2 text-green-500 hover:text-green-600 transition-colors duration-200"
-                      >
-                        <FiCheck size={20} />
-                      </button>
-                      <button
-                        onClick={() => setEditingHistoryId(null)}
-                        className="ml-2 p-2 text-red-500 hover:text-red-600 transition-colors duration-200"
-                      >
-                        <FiX size={20} />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between p-4">
-                      <span className="text-gray-800 dark:text-white font-medium truncate flex-grow">{history.name}</span>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => handleSelectChatHistory(history.id)}
-                          className="p-2 text-blue-500 hover:text-blue-600 transition-colors duration-200 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900"
-                          title="Select Chat"
-                        >
-                          <FiCheck size={20} />
-                        </button>
-                        <button
-                          onClick={() => handleStartEditHistory(history)}
-                          className="p-2 text-yellow-500 hover:text-yellow-600 transition-colors duration-200 rounded-full hover:bg-yellow-100 dark:hover:bg-yellow-900"
-                          title="Edit Chat Name"
-                        >
-                          <FiEdit size={20} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteChatHistory(history.id)}
-                          className="p-2 text-red-500 hover:text-red-600 transition-colors duration-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900"
-                          title="Delete Chat"
-                        >
-                          <FiTrash2 size={20} />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
-            {chatHistories.length === 0 && (
-              <div className="text-center text-gray-500 dark:text-gray-400 mt-8">
-                <FiArchive size={48}  />
-                <p>No chat histories yet. Create a new one to get started!</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+
+      {/* Chat History Modal */}
+      {showChatHistory && renderChatHistory()}
+
+      {/* Context Menu */}
       {showContextMenu && selectedMessageIndex !== null && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -1095,28 +1267,36 @@ const MazsAIChat: React.FC = () => {
             onClick={() => deleteMessage(selectedMessageIndex)}
             className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
           >
-            <FiTrash2  /> Delete Message
+            <FiTrash2 className="mr-2" /> Delete Message
           </button>
           <button
             onClick={() => editMessage(selectedMessageIndex)}
             className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
           >
-            <FiEdit  /> Edit Message
+            <FiEdit className="mr-2" /> Edit Message
           </button>
           <button
             onClick={() => shareMessage(selectedMessageIndex)}
             className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
           >
-            <FiShare  /> Share Message
+            <FiShare className="mr-2" /> Share Message
           </button>
           <button
             onClick={closeContextMenu}
             className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
           >
-            <FiX  /> Cancel
+            <FiX className="mr-2" /> Cancel
           </button>
         </motion.div>
       )}
+
+      <ConfirmationModal
+        isOpen={isResetModalOpen}
+        onClose={() => setIsResetModalOpen(false)}
+        onConfirm={confirmReset}
+        title="Reset Conversation"
+        message="Are you sure you want to reset the conversation? This action cannot be undone."
+      />
     </div>
   );
 };

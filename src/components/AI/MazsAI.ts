@@ -16,8 +16,18 @@ class MultilayerPerceptron {
   private learningRate: number;
   private batchSize: number;
   private epochs: number;
+  private dropoutRate: number;
+  private l2Lambda: number;
 
-  constructor(layers: number[], activations: string[] = [], learningRate: number = 0.001, batchSize: number = 32, epochs: number = 100) {
+  constructor(
+    layers: number[],
+    activations: string[] = [],
+    learningRate: number = 0.001,
+    batchSize: number = 32,
+    epochs: number = 100,
+    dropoutRate: number = 0.5,
+    l2Lambda: number = 0.001
+  ) {
     this.layers = layers;
     this.weights = [];
     this.biases = [];
@@ -27,19 +37,22 @@ class MultilayerPerceptron {
     this.batchSize = batchSize;
     this.epochs = epochs;
     this.optimizer = new AdamOptimizer(learningRate);
-
+    this.dropoutRate = dropoutRate;
+    this.l2Lambda = l2Lambda;
+  
     for (let i = 1; i < layers.length; i++) {
-      this.weights.push(Array(layers[i]).fill(0).map(() => 
-        Array(layers[i-1]).fill(0).map(() => this.initializeWeight())
-      ));
+      this.weights.push(
+        Array(layers[i])
+          .fill(0)
+          .map(() => Array(layers[i - 1]).fill(0).map(() => this.initializeWeight()))
+      );
       this.biases.push(Array(layers[i]).fill(0).map(() => this.initializeWeight()));
-      
+  
       const activation = activations[i - 1] || 'relu';
       this.activations.push(this.getActivationFunction(activation));
       this.activationDerivatives.push(this.getActivationDerivative(activation));
     }
   }
-
   private initializeWeight(): number {
     const limit = Math.sqrt(6 / (this.layers[0] + this.layers[this.layers.length - 1]));
     return Math.random() * 2 * limit - limit;
