@@ -334,8 +334,8 @@ class NaturalLanguageProcessor {
     this.contextMemory = [];
     this.learningMemory = new Map();
     this.meaningSpace = new Map();
-    this.encoder = new MultilayerPerceptron([100, 32, 64, 32, 100], ['relu', 'relu', 'relu', 'sigmoid']);
-    this.decoder = new MultilayerPerceptron([100, 32, 64, 32, 100], ['relu', 'relu', 'relu', 'sigmoid']);
+    this.encoder = new MultilayerPerceptron([50,16, 32, 16, 50], ['relu', 'relu', 'relu', 'sigmoid']);
+    this.decoder = new MultilayerPerceptron([50, 16, 32, 16, 50], ['relu', 'relu', 'relu', 'sigmoid']);
     this.gan = new GAN(trainingData || this.generateDummyData());
     this.rlAgent = new RLAgent(this.wordVectors);
     this.wordProbabilities = new Map();
