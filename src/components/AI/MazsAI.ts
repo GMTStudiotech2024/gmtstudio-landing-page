@@ -14,7 +14,7 @@ class MultilayerPerceptron {
   private batchSize: number;
   private epochs: number;
 
-  constructor(layers: number[], activations: string[] = [], learningRate: number = 0.001, batchSize: number = 32, epochs: number = 100) {
+  constructor(layers: number[], activations: string[] = [], learningRate: number = 0.001, batchSize: number = 32, epochs: number = 25) {
     this.layers = layers;
     this.weights = [];
     this.biases = [];
@@ -1408,7 +1408,7 @@ class GAN {
     return vector.map(v => String.fromCharCode(Math.floor(v * 26) + 97)).join('');
   }
 
-  train(realData: number[][], epochs: number = 200, batchSize: number = 32) {
+  train(realData: number[][], epochs: number = 25, batchSize: number = 32) {
     for (let epoch = 0; epoch < epochs; epoch++) {
       // Train discriminator
       const realBatch = this.getBatch(realData, batchSize);
@@ -1774,7 +1774,7 @@ const intents: Intent[] = [
 const network = new MultilayerPerceptron([10, 32, 64, 32, intents.length], ['relu', 'relu', 'relu', 'sigmoid']);
 
 function trainNetwork() {
-  const epochs = 100;
+  const epochs = 25;
   const learningRate = 0.5;
 
   for (let epoch = 0; epoch < epochs; epoch++) {
