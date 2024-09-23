@@ -675,7 +675,7 @@ const MazsAIChat: React.FC = () => {
           Current Version:
         </span>
         <span className="font-medium text-black dark:text-white">
-          v1.3.1 Anatra
+          v1.3.5 Anatra
         </span>
       </div>
       <div className="flex items-center justify-between">
@@ -1090,7 +1090,7 @@ const MazsAIChat: React.FC = () => {
                 className="mb-6 p-4 bg-white dark:bg-black rounded-lg text-gray-100 shadow-md"
               >
                 <p className="text-sm">
-                  Mazs AI v1.3.1 Anatra is an advanced chatbot powered by natural language processing and machine learning. It can assist you with information about GMTStudio, Theta platform, and AI WorkSpace.
+                  Mazs AI v1.3.5 Anatra is an advanced chatbot powered by natural language processing and machine learning. It can assist you with information about GMTStudio, Theta platform, and AI WorkSpace.
                 </p>
               </motion.div>
             )}
@@ -1291,7 +1291,7 @@ const MazsAIChat: React.FC = () => {
                       placeholder={
                         attachedFiles.length > 0
                           ? 'Add a message or send files...'
-                          : 'Enter message to Mazs AI v1.3.1 anatra'
+                          : 'Enter message to Mazs AI v1.3.5 anatra'
                       }
                       className={`w-full p-2 bg-transparent text-white focus:outline-none resize-none min-h-[40px] max-h-[100px] ${
                         input.length > 1000 ? 'border-b-2 border-red-500' : ''

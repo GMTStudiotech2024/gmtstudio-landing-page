@@ -1978,7 +1978,7 @@ export function processChatbotQuery(query: string): string {
   }
 }
 
-console.log("Mazs AI v1.3.1 with advanced NLP and contextual analysis capabilities initialized!");
+console.log("Mazs AI v1.3.5 with advanced NLP and contextual analysis capabilities initialized!");
 
 
 const intents: Intent[] = [
@@ -2189,7 +2189,7 @@ export const debouncedHandleUserInput = debounce(handleUserInput, 300);
 // Train the network when the module is loaded
 trainNetwork();
 
-console.log("Mazs AI v1.3.1 with advanced NLP and contextual analysis capabilities initialized!");
+console.log("Mazs AI v1.3.5 with advanced NLP and contextual analysis capabilities initialized!");
 export async function processAttachedFile(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
