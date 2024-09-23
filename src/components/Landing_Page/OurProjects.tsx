@@ -14,7 +14,7 @@ const projects = [
     title: 'GMTStudio AI WorkSpace',
     description: 'GMTStudio designed their own AI, MAZS AI. Although it is still in development, you can use it!',
     image: AI,
-    link: '/mazsai',
+    link: 'https://mazs-ai-lab.vercel.app/',
     icon: faRocket,
     isInternal: false,
     color: 'from-gray-200 to-gray-400 dark:from-gray-700 dark:to-gray-900',

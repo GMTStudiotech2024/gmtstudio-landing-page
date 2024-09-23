@@ -27,7 +27,7 @@ const products = [
     image: projectImage1,
     icon: FaRocket,
     category: 'AI',
-    link: '/mazsai',
+    link: 'https://mazs-ai-lab.vercel.app/',
     status: 'beta',
     details:
       'Detailed information about GMTStudio AI WorkSpace. Features, usage instructions, and more.',
