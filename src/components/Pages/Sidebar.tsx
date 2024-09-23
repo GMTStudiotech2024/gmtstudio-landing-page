@@ -74,7 +74,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
 
   return (
     <motion.div 
-      className={`fixed left-0 top-0 h-full bg-white dark:bg-gray-900 text-gray-800 dark:text-white p-4 z-40 overflow-y-auto transition-all duration-300 ease-in-out pt-20 ${isOpen ? 'w-72' : 'w-16'} ${className} shadow-lg`}
+      className={`fixed left-0 top-0 h-full bg-white dark:bg-black text-gray-800 dark:text-white p-4 z-40 overflow-y-auto transition-all duration-300 ease-in-out pt-20 ${isOpen ? 'w-72' : 'w-16'} ${className} shadow-lg`}
       initial={false}
       animate={isOpen ? 'open' : 'closed'}
       variants={sidebarVariants}

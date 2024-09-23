@@ -1,12 +1,35 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiSend, FiMoon, FiSun, FiInfo, FiRefreshCw, FiLoader, FiPaperclip, FiX, FiFile, FiImage, FiMusic, FiVideo, FiCode, FiRepeat, FiMic, FiCopy, FiTrash2, FiEdit, FiShare, FiArchive, FiPlus, FiCheck, FiSettings, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import {
+  FiSend,
+  FiMoon,
+  FiSun,
+  FiInfo,
+  FiFeather,
+  FiLoader,
+  FiPaperclip,
+  FiX,
+  FiFile,
+  FiImage,
+  FiMusic,
+  FiVideo,
+  FiCode,
+  FiRepeat,
+  FiMic,
+  FiCopy,
+  FiTrash2,
+  FiEdit,
+  FiShare,
+  FiArchive,
+  FiPlus,
+  FiCheck,
+  FiSettings,
+  FiCheckCircle,
+  FiAlertCircle,
+} from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { debouncedHandleUserInput, getConversationSuggestions, processAttachedFile, regenerateResponse, getChatHistories, createChatHistory, renameChatHistory, deleteChatHistory } from './MazsAI';
-// import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-// import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import * as MazsAI from './MazsAI';
 import EmojiPicker from 'emoji-picker-react';
-import './MazsAI_UI.css'; // Import the CSS for loading animations
+import './MazsAI_UI.css';
 
 interface Message {
   text: string;
@@ -29,7 +52,12 @@ interface IconButtonProps {
   children: React.ReactNode;
 }
 
-const IconButton: React.FC<IconButtonProps> = ({ onClick, title, ariaLabel, children }) => (
+const IconButton: React.FC<IconButtonProps> = ({
+  onClick,
+  title,
+  ariaLabel,
+  children,
+}) => (
   <button
     onClick={onClick}
     className="p-2 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -101,6 +129,10 @@ const MazsAIChat: React.FC = () => {
   const [updateStatus, setUpdateStatus] = useState<'up-to-date' | 'update-available' | null>(null);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
+  // Added state for new features
+  const [isFAQOpen, setIsFAQOpen] = useState(false);
+  const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
+
   // Effects
   useEffect(() => {
     const savedAvatar = localStorage.getItem('userAvatar');
@@ -117,7 +149,7 @@ const MazsAIChat: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setSuggestions(getConversationSuggestions());
+    setSuggestions(MazsAI.getConversationSuggestions());
     addWelcomeMessage();
     loadChatHistories();
   }, []);
@@ -225,7 +257,7 @@ const MazsAIChat: React.FC = () => {
       if (attachedFiles.length > 0) {
         await processFiles(attachedFiles);
       } else {
-        const botResponse = await debouncedHandleUserInput(input);
+        const botResponse = await MazsAI.debouncedHandleUserInput(input);
         const botMessage: Message = {
           text: botResponse,
           isUser: false,
@@ -257,7 +289,7 @@ const MazsAIChat: React.FC = () => {
       setIsLoading(true);
 
       try {
-        const regeneratedResponse = await regenerateResponse(userMessage.text);
+        const regeneratedResponse = await MazsAI.regenerateResponse(userMessage.text);
         const newMessage: Message = {
           text: regeneratedResponse,
           isUser: false,
@@ -296,7 +328,7 @@ const MazsAIChat: React.FC = () => {
   const resetConversation = () => {
     setMessages([]);
     addWelcomeMessage();
-    setSuggestions(getConversationSuggestions());
+    setSuggestions(MazsAI.getConversationSuggestions());
   };
 
   const handleFileAttach = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -313,7 +345,7 @@ const MazsAIChat: React.FC = () => {
   const processFiles = async (files: File[]) => {
     setIsLoading(true);
     try {
-      const responses = await Promise.all(files.map((file) => processAttachedFile(file)));
+      const responses = await Promise.all(files.map((file) => MazsAI.processAttachedFile(file)));
       const botMessage: Message = {
         text: responses.join('\n\n'),
         isUser: false,
@@ -373,7 +405,7 @@ const MazsAIChat: React.FC = () => {
   };
 
   const renderVoiceRecorder = () => (
-    <div className="absolute bottom-full mb-2 bg-white dark:bg-gray-700 rounded-lg shadow-lg p-4">
+    <div className="absolute bottom-full mb-2 bg-white dark:bg-black rounded-lg shadow-lg p-4">
       <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
         {isRecording ? 'Recording...' : 'Click to start recording'}
       </p>
@@ -407,7 +439,7 @@ const MazsAIChat: React.FC = () => {
           <div className="flex justify-end space-x-4">
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors duration-200"
+              className="px-4 py-2 bg-gray-300 dark:bg-black text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors duration-200"
             >
               Cancel
             </button>
@@ -450,25 +482,25 @@ const MazsAIChat: React.FC = () => {
   };
 
   const loadChatHistories = async () => {
-    const histories = await getChatHistories();
+    const histories = await MazsAI.getChatHistories();
     setChatHistories(histories);
   };
 
   const handleCreateChatHistory = async () => {
     if (newChatName.trim()) {
-      await createChatHistory(newChatName.trim());
+      await MazsAI.createChatHistory(newChatName.trim());
       setNewChatName('');
       loadChatHistories();
     }
   };
 
   const handleRenameChatHistory = async (id: string, newName: string) => {
-    await renameChatHistory(id, newName);
+    await MazsAI.renameChatHistory(id, newName);
     loadChatHistories();
   };
 
   const handleDeleteChatHistory = async (id: string) => {
-    await deleteChatHistory(id);
+    await MazsAI.deleteChatHistory(id);
     loadChatHistories();
   };
 
@@ -548,10 +580,11 @@ const MazsAIChat: React.FC = () => {
   const checkForUpdates = () => {
     setIsCheckingForUpdates(true);
     setUpdateStatus(null);
+
     // Simulate an API call or actual update check
     setTimeout(() => {
       setIsCheckingForUpdates(false);
-      const isUpToDate = Math.random() > 0.5;
+      const isUpToDate = true; // Assume the app is up to date
       setUpdateStatus(isUpToDate ? 'up-to-date' : 'update-available');
     }, 2000);
   };
@@ -563,9 +596,71 @@ const MazsAIChat: React.FC = () => {
     localStorage.setItem('userAvatar', newAvatar);
   };
 
+  const renderFAQSection = () => (
+    <div
+      className="bg-gray-100 dark:bg-black rounded-lg p-4 mb-4"
+      role="region"
+      aria-labelledby="faq-section"
+    >
+      <h3
+        id="faq-section"
+        className="text-lg font-semibold text-gray-800 dark:text-white mb-2"
+      >
+        Frequently Asked Questions
+      </h3>
+      <ul className="space-y-2">
+        <li className="text-black dark:text-gray-300">
+          <strong>Q:</strong> How do I reset the conversation?
+          <br />
+          <strong>A:</strong> Click on the refresh icon at the top-right corner.
+        </li>
+        <li className="text-black dark:text-gray-300">
+          <strong>Q:</strong> Can I change the theme?
+          <br />
+          <strong>A:</strong> Yes, go to Settings and select Light or Dark theme.
+        </li>
+        {/* Add more FAQs as needed */}
+      </ul>
+    </div>
+  );
+
+  const renderShortcutsModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-11/12 max-w-md shadow-lg overflow-y-auto max-h-[90vh]">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+            Keyboard Shortcuts
+          </h2>
+          <button
+            onClick={() => setIsShortcutsModalOpen(false)}
+            className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
+            aria-label="Close Shortcuts"
+          >
+            <FiX size={24} />
+          </button>
+        </div>
+        <ul className="space-y-2">
+          <li className="flex justify-between">
+            <span className="text-black dark:text-gray-300">Send Message:</span>
+            <span className="text-gray-800 dark:text-white font-medium">
+              Enter / Ctrl + Enter
+            </span>
+          </li>
+          <li className="flex justify-between">
+            <span className="text-black dark:text-gray-300">Open Settings:</span>
+            <span className="text-gray-800 dark:text-white font-medium">
+              Alt + S
+            </span>
+          </li>
+          {/* Add more shortcuts as needed */}
+        </ul>
+      </div>
+    </div>
+  );
+
   const renderUpdateSection = () => (
     <div
-      className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 mb-4"
+      className="bg-gray-100 dark:bg-black rounded-lg p-4 mb-4"
       role="region"
       aria-labelledby="version-information"
     >
@@ -590,6 +685,7 @@ const MazsAIChat: React.FC = () => {
             isCheckingForUpdates ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           disabled={isCheckingForUpdates}
+          aria-label="Check for Updates"
         >
           {isCheckingForUpdates ? (
             <span className="flex items-center">
@@ -626,18 +722,18 @@ const MazsAIChat: React.FC = () => {
   );
 
   const renderSettings = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
+    <div className="fixed inset-0 bg-white dark:bg-black bg-opacity-75 flex items-center justify-center z-50">
       <div
-        className="bg-white dark:bg-gray-800 rounded-lg p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-xl relative transform transition-transform duration-300 scale-100 sm:w-11/12 md:w-3/4 lg:w-2/3"
+        className="bg-black rounded-lg p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-xl"
         style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily }}
       >
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
+          <h2 className="text-3xl font-bold dark:text-white text-white">
             Settings
           </h2>
           <button
             onClick={() => setShowSettings(false)}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
+            className="text-gray-400 hover:text-gray-200 transition-colors duration-200"
             aria-label="Close Settings"
           >
             <FiX size={28} />
@@ -646,7 +742,7 @@ const MazsAIChat: React.FC = () => {
         {renderUpdateSection()}
         <div className="space-y-8">
           <div>
-            <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-lg font-medium text-gray-300 mb-2">
               Font Size
             </label>
             <div className="flex items-center space-x-4">
@@ -657,88 +753,97 @@ const MazsAIChat: React.FC = () => {
                 value={fontSize}
                 onChange={(e) => handleFontSizeChange(Number(e.target.value))}
                 className="w-full"
+                aria-label="Font Size"
               />
-              <span className="text-lg font-medium text-gray-600 dark:text-gray-400 w-12 text-center">
+              <span className="text-lg font-medium text-gray-400 w-12 text-center">
                 {fontSize}px
               </span>
             </div>
           </div>
           <div>
-            <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-lg font-medium text-gray-300 mb-2">
               User Avatar
             </label>
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-full text-3xl">
+              <div className="w-16 h-16 flex items-center justify-center bg-white dark:bg-black rounded-full text-3xl">
                 {userAvatar}
               </div>
               <button
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                 className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 text-lg"
+                aria-label="Change Avatar"
               >
                 Change Avatar
               </button>
             </div>
             {showEmojiPicker && (
-              <div className="absolute mt-4 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4">
+              <div className="absolute mt-4 z-50 bg-white dark:bg-black rounded-lg shadow-lg p-4">
                 <EmojiPicker onEmojiClick={handleEmojiClick} />
               </div>
             )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-lg font-medium text-gray-300 mb-2">
                 Send Key
               </label>
               <select
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-lg"
+                className="w-full p-3 border border-gray-600 rounded-md bg-white text-black dark:bg-black dark:text-white text-lg"
                 value={sendKey}
                 onChange={(e) => handleSendKeyChange(e.target.value)}
+                aria-label="Send Key"
               >
                 <option>Enter</option>
                 <option>Ctrl + Enter</option>
               </select>
             </div>
             <div>
-              <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-lg font-medium text-gray-300 mb-2">
                 Theme
               </label>
               <select
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-lg transition-colors duration-300"
+                className="w-full p-3 border border-gray-600 rounded-md bg-white text-black dark:bg-black dark:text-white text-lg transition-colors duration-300"
                 onChange={(e) => setIsDarkMode(e.target.value === 'Dark')}
                 value={isDarkMode ? 'Dark' : 'Light'}
+                aria-label="Theme Selection"
               >
                 <option>Light</option>
                 <option>Dark</option>
               </select>
             </div>
             <div>
-              <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-lg font-medium text-gray-300 mb-2">
                 Language
               </label>
               <select
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-lg"
+                className="w-full p-3 border border-gray-600 rounded-md bg-white text-black dark:bg-black dark:text-white text-lg"
                 value={language}
                 onChange={(e) => handleLanguageChange(e.target.value)}
+                aria-label="Language Selection"
               >
                 <option>English</option>
                 <option>Spanish</option>
                 <option>French</option>
+                {/* Add more languages as needed */}
               </select>
             </div>
             <div>
-              <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-lg font-medium text-gray-300 mb-2">
                 Chat Font Family
               </label>
               <select
                 value={chatFontFamily}
                 onChange={(e) => handleChatFontFamilyChange(e.target.value)}
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-lg"
+                className="w-full p-3 border border-gray-600 rounded-md bg-white text-black dark:bg-black dark:text-white text-lg"
+                aria-label="Chat Font Family"
               >
                 <option value="Arial, sans-serif">Arial</option>
                 <option value="'Courier New', Courier, monospace">Courier New</option>
                 <option value="'Georgia', serif">Georgia</option>
                 <option value="'Times New Roman', Times, serif">Times New Roman</option>
                 <option value="'Verdana', sans-serif">Verdana</option>
+                <option value="monospace">Monospace</option>
+                {/* Add more font options as needed */}
               </select>
             </div>
           </div>
@@ -748,9 +853,10 @@ const MazsAIChat: React.FC = () => {
                 type="checkbox"
                 checked={autoGenerateTitle}
                 onChange={(e) => handleAutoGenerateTitleChange(e.target.checked)}
-                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-600 rounded"
+                aria-label="Auto Generate Title"
               />
-              <label className="ml-3 block text-lg text-gray-700 dark:text-gray-300">
+              <label className="ml-3 block text-lg text-gray-300">
                 Auto Generate Title
               </label>
             </div>
@@ -759,69 +865,70 @@ const MazsAIChat: React.FC = () => {
                 type="checkbox"
                 checked={sendPreviewBubble}
                 onChange={(e) => handleSendPreviewBubbleChange(e.target.checked)}
-                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-600 rounded"
+                aria-label="Send Preview Bubble"
               />
-              <label className="ml-3 block text-lg text-gray-700 dark:text-gray-300">
+              <label className="ml-3 block text-lg text-gray-300">
                 Send Preview Bubble
               </label>
             </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label className="ml-3 block text-lg text-gray-700 dark:text-gray-300">
-                Mask Splash Screen
-              </label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label className="ml-3 block text-lg text-gray-700 dark:text-gray-300">
-                Hide Builtin Masks
-              </label>
-            </div>
+            {/* Add more settings options as needed */}
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
+            <h3 className="text-xl font-semibold text-white mb-2">
               System Information
             </h3>
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-lg text-gray-600 dark:text-gray-400">
+                <span className="text-lg text-gray-400">
                   Last Update:
                 </span>
-                <span className="text-lg font-medium text-gray-800 dark:text-white">
+                <span className="text-lg font-medium text-white">
                   Not synced yet
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-lg text-gray-600 dark:text-gray-400">
+                <span className="text-lg text-gray-400">
                   Local Data:
                 </span>
-                <span className="text-lg font-medium text-gray-800 dark:text-white">
+                <span className="text-lg font-medium text-white">
                   1 chat, 2 messages, 0 prompts, 0 masks
                 </span>
               </div>
             </div>
           </div>
+          <div className="flex justify-end space-x-4 mt-6">
+            <button
+              onClick={() => setIsFAQOpen(true)}
+              className="px-4 py-2 bg-white text-black dark:bg-black dark:text-white rounded-md hover:bg-gray-600 transition-colors duration-200"
+              aria-label="Open FAQ"
+            >
+              FAQ
+            </button>
+            <button
+              onClick={() => setIsShortcutsModalOpen(true)}
+              className="px-4 py-2 bg-white text-black dark:bg-black dark:text-white rounded-md hover:bg-gray-600 transition-colors duration-200"
+              aria-label="Open Shortcuts"
+            >
+              Shortcuts
+            </button>
+          </div>
         </div>
       </div>
+      {isFAQOpen && renderFAQSection()}
     </div>
   );
 
   const renderChatHistory = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-8 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl sm:max-w-sm md:max-w-md lg:max-w-lg">
+      <div className="bg-gray-800 rounded-lg p-8 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl sm:max-w-sm md:max-w-md lg:max-w-lg">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+          <h2 className="text-2xl font-bold text-white">
             Chat History
           </h2>
           <button
             onClick={() => setShowChatHistory(false)}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
+            className="text-gray-400 hover:text-gray-200 transition-colors duration-200"
           >
             <FiX size={24} />
           </button>
@@ -833,7 +940,7 @@ const MazsAIChat: React.FC = () => {
               value={newChatName}
               onChange={(e) => setNewChatName(e.target.value)}
               placeholder="New chat name"
-              className="flex-grow p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className="flex-grow p-3 border border-gray-600 rounded-lg bg-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
             />
             <button
               onClick={handleCreateChatHistory}
@@ -847,7 +954,7 @@ const MazsAIChat: React.FC = () => {
           {chatHistories.map((history) => (
             <li
               key={history.id}
-              className="bg-gray-50 dark:bg-gray-700 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg"
+              className="bg-black rounded-lg shadow-md transition-all duration-200 hover:shadow-lg"
             >
               {editingHistoryId === history.id ? (
                 <div className="flex items-center p-4">
@@ -855,7 +962,8 @@ const MazsAIChat: React.FC = () => {
                     type="text"
                     value={editingHistoryName}
                     onChange={(e) => setEditingHistoryName(e.target.value)}
-                    className="flex-grow p-2 border border-gray-300 dark:border-gray-600 "/>
+                    className="flex-grow p-2 border border-gray-600 bg-black text-white"
+                  />
                   <button
                     onClick={handleFinishEditHistory}
                     className="ml-2 p-2 text-green-500 hover:text-green-600 transition-colors duration-200"
@@ -871,27 +979,27 @@ const MazsAIChat: React.FC = () => {
                 </div>
               ) : (
                 <div className="flex items-center justify-between p-4">
-                  <span className="text-gray-800 dark:text-white font-medium truncate flex-grow">
+                  <span className="text-white font-medium truncate flex-grow">
                     {history.name}
                   </span>
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => handleSelectChatHistory(history.id)}
-                      className="p-2 text-blue-500 hover:text-blue-600 transition-colors duration-200 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900"
+                      className="p-2 text-blue-500 hover:text-blue-600 transition-colors duration-200 rounded-full hover:bg-gray-600"
                       title="Select Chat"
                     >
                       <FiCheck size={20} />
                     </button>
                     <button
                       onClick={() => handleStartEditHistory(history)}
-                      className="p-2 text-yellow-500 hover:text-yellow-600 transition-colors duration-200 rounded-full hover:bg-yellow-100 dark:hover:bg-yellow-900"
+                      className="p-2 text-yellow-500 hover:text-yellow-600 transition-colors duration-200 rounded-full hover:bg-gray-600"
                       title="Edit Chat Name"
                     >
                       <FiEdit size={20} />
                     </button>
                     <button
                       onClick={() => handleDeleteChatHistory(history.id)}
-                      className="p-2 text-red-500 hover:text-red-600 transition-colors duration-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900"
+                      className="p-2 text-red-500 hover:text-red-600 transition-colors duration-200 rounded-full hover:bg-gray-600"
                       title="Delete Chat"
                     >
                       <FiTrash2 size={20} />
@@ -903,7 +1011,7 @@ const MazsAIChat: React.FC = () => {
           ))}
         </ul>
         {chatHistories.length === 0 && (
-          <div className="text-center text-gray-500 dark:text-gray-400 mt-8">
+          <div className="text-center text-gray-400 mt-8">
             <FiArchive size={48} className="mx-auto mb-4" />
             <p>No chat histories yet. Create a new one to get started!</p>
           </div>
@@ -924,14 +1032,14 @@ const MazsAIChat: React.FC = () => {
   return (
     <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''} transition-colors duration-500`} role="main" aria-labelledby="chatbot-title">
       {/* Main Container */}
-      <div className="flex-1 bg-gray-100 dark:bg-gray-900 transition-colors duration-200 overflow-hidden pt-16">
-        <div className="max-w-7xl mx-auto p-4 h-full flex flex-col">
+      <div className="flex-1 bg-white dark:bg-black transition-colors duration-200 overflow-hidden pt-16">
+        <div className="max-w-7xl mx-auto p-6 h-full flex flex-col">
           {/* Header */}
-          <header className="flex justify-between items-center mb-6 sticky top-0 z-10 bg-gray-100 dark:bg-gray-900 py-4" role="banner">
-            <h1 id="chatbot-title" className="text-3xl font-bold text-gray-800 dark:text-white">
+          <header className="flex justify-between items-center mb-6 sticky top-0 z-10 bg-white dark:bg-black py-4 px-6" role="banner">
+            <h1 id="chatbot-title" className="text-3xl font-bold text-black dark:text-white">
               Mazs AI Lab
             </h1>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-4">
               <IconButton
                 onClick={() => setShowInfo(!showInfo)}
                 title="Info"
@@ -945,7 +1053,7 @@ const MazsAIChat: React.FC = () => {
                 ariaLabel="Reset Conversation"
               >
                 
-                <FiRefreshCw size={20} />
+                <FiFeather size={20} />
               </IconButton>
               <IconButton
                 onClick={toggleDarkMode}
@@ -979,7 +1087,7 @@ const MazsAIChat: React.FC = () => {
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.3 }}
-                className="mb-6 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg text-blue-800 dark:text-blue-200 shadow-md"
+                className="mb-6 p-4 bg-white dark:bg-black rounded-lg text-gray-100 shadow-md"
               >
                 <p className="text-sm">
                   Mazs AI v1.3.1 Anatra is an advanced chatbot powered by natural language processing and machine learning. It can assist you with information about GMTStudio, Theta platform, and AI WorkSpace.
@@ -989,11 +1097,11 @@ const MazsAIChat: React.FC = () => {
           </AnimatePresence>
 
           {/* Chat Container */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-800 rounded-lg shadow-xl">
+          <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-black rounded-lg shadow-xl">
             <div
               ref={chatContainerRef}
               className="flex-1 overflow-y-auto p-4 space-y-4"
-              style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily }}
+              style={{ fontSize: `${fontSize}px`, fontFamily: 'Inter, sans-serif' }}
             >
               <AnimatePresence>
                 {messages.map((message, index) => (
@@ -1003,19 +1111,15 @@ const MazsAIChat: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3, type: 'spring', stiffness: 300 }}
-                    className={`flex ${
-                      message.isUser ? 'justify-end' : 'justify-start'
-                    }`}
-                    onContextMenu={(e: React.MouseEvent) =>
-                      handleMessageContextMenu(e, index)
-                    }
+                    className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+                    onContextMenu={(e: React.MouseEvent) => handleMessageContextMenu(e, index)}
                   >
                     <div
                       className={`max-w-[70%] ${
                         message.isUser
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white'
-                      } rounded-lg p-4 shadow-md relative`}
+                          ? 'bg-white dark:bg-black text-black dark:text-white border border-dark dark:border-white'
+                          : 'bg-white dark:bg-black text-black dark:text-white border border-dark dark:border-white'
+                      } rounded-2xl p-4 shadow-md relative`}
                     >
                       {/* Message Header */}
                       <div className="flex items-center mb-2">
@@ -1024,7 +1128,7 @@ const MazsAIChat: React.FC = () => {
                             {!isEditingUserName && (
                               <button
                                 onClick={handleUserNameEdit}
-                                className="text-white hover:text-gray-200 dark:text-white dark:hover:text-gray-300 mr-2"
+                                className="text-white hover:text-gray-200 mr-2"
                               >
                                 <FiEdit size={12} />
                               </button>
@@ -1036,7 +1140,7 @@ const MazsAIChat: React.FC = () => {
                                   value={userName}
                                   onChange={handleUserNameChange}
                                   onBlur={handleUserNameSave}
-                                  className="bg-transparent border-b border-blue-600 dark:border-blue-400 focus:outline-none"
+                                  className="bg-transparent border-b border-blue-600 focus:outline-none"
                                 />
                               ) : (
                                 <>
@@ -1053,12 +1157,12 @@ const MazsAIChat: React.FC = () => {
                         )}
                       </div>
                       {/* Message Body */}
-                      <div className="markdown text-sm break-words">
+                      <div className="text-base leading-normal">
                         {message.isUser || !message.isTyping
                           ? message.text
                           : message.text.slice(0, currentTypingIndex)}
                         {!message.isUser && message.isTyping && (
-                          <span className="inline-block w-1 h-4 ml-1 bg-gray-800 dark:bg-white animate-pulse"></span>
+                          <span className="inline-block w-1 h-4 ml-1 bg-gray-100 animate-pulse"></span>
                         )}
                       </div>
                       {/* Message Footer */}
@@ -1068,14 +1172,14 @@ const MazsAIChat: React.FC = () => {
                           <div className="flex items-center space-x-2">
                             <button
                               onClick={() => copyToClipboard(message.text)}
-                              className="p-1 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
+                              className="p-1 rounded-full hover:bg-gray-600 transition-colors duration-200"
                               title="Copy to clipboard"
                             >
                               <FiCopy size={12} />
                             </button>
                             <button
                               onClick={() => regenerateResponseHandler(index)}
-                              className="p-1 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
+                              className="p-1 rounded-full hover:bg-gray-600 transition-colors duration-200"
                               title="Regenerate response"
                               disabled={isGenerating}
                             >
@@ -1100,17 +1204,17 @@ const MazsAIChat: React.FC = () => {
             </div>
 
             {/* Input Area */}
-            <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+            <div className="bg-gray-100 dark:bg-black p-4">
               {suggestions.length > 0 && messages.length === 1 && (
                 <div className="mb-4 hidden sm:block">
-                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  <h3 className="text-sm font-semibold text-black dark:text-gray-300 mb-2">
                     Suggestions:
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {suggestions.map((suggestion, index) => (
                       <button
                         key={index}
-                        className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 shadow-sm hover:shadow-md"
+                        className="px-3 py-1 bg-white text-black dark:bg-black dark:text-white rounded-full text-sm hover:bg-gray-600 transition-colors duration-200 shadow-sm hover:shadow-md border border-dark dark:border-white"
                         onClick={() => setInput(suggestion)}
                       >
                         {suggestion}
@@ -1128,7 +1232,7 @@ const MazsAIChat: React.FC = () => {
                     transition={{ duration: 0.3 }}
                     className="absolute bottom-full left-0 mb-2 z-10"
                   >
-                    <span className="inline-flex items-center p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white text-sm shadow-md">
+                    <span className="inline-flex items-center p-2 rounded-lg bg-white dark:bg-black text-black dark:text-white text-sm shadow-md border border-dark dark:border-white">
                       <span className="font-medium">User is typing</span>
                       <span className="ml-2 typing-indicator">
                         <span></span>
@@ -1138,7 +1242,7 @@ const MazsAIChat: React.FC = () => {
                     </span>
                   </motion.div>
                 )}
-                <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg shadow-inner hover:shadow-md transition-shadow duration-300">
+                <div className="flex items-center bg-white dark:bg-black rounded-lg shadow-inner hover:shadow-md transition-shadow duration-300 border border-dark dark:border-white">
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     className="p-2 text-blue-500 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full"
@@ -1158,17 +1262,17 @@ const MazsAIChat: React.FC = () => {
                       {attachedFiles.map((file, index) => (
                         <div
                           key={index}
-                          className="flex items-center bg-gray-200 dark:bg-gray-600 px-2 py-1 text-sm rounded-full shadow-sm hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200"
+                          className="flex items-center bg-gray-600 px-2 py-1 text-sm rounded-full shadow-sm hover:bg-gray-500 transition-colors duration-200"
                         >
-                          <span className="text-gray-500 dark:text-gray-400 mr-1">
+                          <span className="text-gray-400 mr-1">
                             {getFileIcon(file)}
                           </span>
-                          <span className="text-gray-600 dark:text-gray-300 truncate max-w-[120px]">
+                          <span className="text-gray-300 truncate max-w-[120px]">
                             {file.name} ({file.size / 1024} KB)
                           </span>
                           <button
                             onClick={() => clearAttachedFile(index)}
-                            className="ml-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-200 focus:outline-none"
+                            className="ml-1 text-gray-400 hover:text-red-500 transition-colors duration-200 focus:outline-none"
                             title="Remove file"
                           >
                             <FiX size={12} />
@@ -1189,17 +1293,17 @@ const MazsAIChat: React.FC = () => {
                           ? 'Add a message or send files...'
                           : 'Enter message to Mazs AI v1.3.1 anatra'
                       }
-                      className={`w-full p-2 bg-transparent text-gray-800 dark:text-white focus:outline-none resize-none min-h-[40px] max-h-[100px] ${
+                      className={`w-full p-2 bg-transparent text-white focus:outline-none resize-none min-h-[40px] max-h-[100px] ${
                         input.length > 1000 ? 'border-b-2 border-red-500' : ''
-                      } scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent`}
-                      style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily }}
+                      } scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent`}
+                      style={{ fontSize: `${fontSize}px`, fontFamily: 'Inter, sans-serif' }}
                     />
-                    <div className="flex justify-between items-center px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
+                    <div className="flex justify-between items-center px-2 py-1 text-xs text-gray-400">
                       <span className={`font-medium ${input.length > 1000 ? 'text-red-500' : ''}`}>
                         {input.length}/1000 characters
                       </span>
                       {input.length > 900 && (
-                        <span className="text-yellow-500 dark:text-yellow-400 animate-pulse">
+                        <span className="text-yellow-500 animate-pulse">
                           Approaching character limit
                         </span>
                       )}
@@ -1211,7 +1315,7 @@ const MazsAIChat: React.FC = () => {
                       className={`p-2 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full ${
                         isRecording
                           ? 'text-red-500 animate-pulse'
-                          : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+                          : 'text-blue-500 hover:text-blue-600'
                       }`}
                       title={isRecording ? 'Stop recording' : 'Start voice recording'}
                     >
@@ -1223,8 +1327,8 @@ const MazsAIChat: React.FC = () => {
                         isGenerating ||
                         (!input.trim() && attachedFiles.length === 0) ||
                         input.length > 1000
-                          ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
-                          : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+                          ? 'text-gray-600 cursor-not-allowed'
+                          : 'text-blue-500 hover:text-blue-600'
                       }`}
                       disabled={
                         isGenerating ||
@@ -1239,7 +1343,7 @@ const MazsAIChat: React.FC = () => {
                 </div>
                 {showVoiceRecorder && renderVoiceRecorder()}
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
+              <div className="text-xs text-gray-400 text-center mt-2">
                 <span className="font-medium">Mazs AI</span> can make mistakes. Please verify important information.
               </div>
             </div>
@@ -1260,30 +1364,30 @@ const MazsAIChat: React.FC = () => {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.1 }}
-          className="fixed bg-white dark:bg-gray-700 shadow-lg rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600"
+          className="fixed bg-white dark:bg-black shadow-lg rounded-lg overflow-hidden border border-gray-600"
           style={{ top: contextMenuPosition.y, left: contextMenuPosition.x }}
         >
           <button
             onClick={() => deleteMessage(selectedMessageIndex)}
-            className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
+            className="flex items-center w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-600 transition-colors duration-200"
           >
             <FiTrash2 className="mr-2" /> Delete Message
           </button>
           <button
             onClick={() => editMessage(selectedMessageIndex)}
-            className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
+            className="flex items-center w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-600 transition-colors duration-200"
           >
             <FiEdit className="mr-2" /> Edit Message
           </button>
           <button
             onClick={() => shareMessage(selectedMessageIndex)}
-            className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
+            className="flex items-center w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-600 transition-colors duration-200"
           >
             <FiShare className="mr-2" /> Share Message
           </button>
           <button
             onClick={closeContextMenu}
-            className="flex items-center w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
+            className="flex items-center w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-600 transition-colors duration-200"
           >
             <FiX className="mr-2" /> Cancel
           </button>
