@@ -25,7 +25,7 @@ class MultilayerPerceptron {
     activations: string[] = [],
     learningRate: number = 0.001,
     batchSize: number = 16,
-    epochs: number = 5,
+    epochs: number = 1,
     dropoutRate: number = 0.5,
     l2Lambda: number = 0.001
   ) {
@@ -2063,7 +2063,7 @@ const intents: Intent[] = [
 const network = new MultilayerPerceptron([10, 32, 64, 32, intents.length], ['relu', 'relu', 'relu', 'sigmoid']);
 
 function trainNetwork() {
-  const epochs = 25;
+  const epochs = 1;
   const learningRate = 0.1;
 
   for (let epoch = 0; epoch < epochs; epoch++) {
