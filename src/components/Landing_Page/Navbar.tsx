@@ -141,7 +141,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
               <NavLink key={item.name} href={item.path} label={item.name} icon={item.icon} isActive={location.pathname === item.path} />
             ))}
             <AuthButtons />
-            <Link to="/mazsai" className="flex px-3 py-2 rounded-md transition-colors duration-300 items-center text-blue-500 dark:text-gray-200 hover:bg-blue-300 hover:text-white dark:hover:bg-yellow-400 dark:hover:text-gray-900">
+            <Link to="https://mazs-ai-lab.vercel.app/" className="flex px-3 py-2 rounded-md transition-colors duration-300 items-center text-blue-500 dark:text-gray-200 hover:bg-blue-300 hover:text-white dark:hover:bg-yellow-400 dark:hover:text-gray-900">
               <FaSearch className="mr-2" /> <span className="ml-2">Mazs AI </span>
             </Link>
           </motion.div>

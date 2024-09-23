@@ -37,7 +37,6 @@ import NEWS16 from './components/News/NEWS16';
 import NEWS17 from './components/News/NEWS17';
 import Products from './components/Pages/Products';
 import Help from './components/Pages/Help';
-import MazsAI from './components/AI/MazsAI_UI'; 
 import LaunchGMTStudio from './components/Landing_Page/LaunchGMTStudio';
 import SystemStatus from './components/Pages/SystemStatus';
 import AdvancedSearch from './components/AI/AdvancedSearch';
@@ -127,7 +126,6 @@ const AppContent: React.FC = () => {
           <Route path="/help" element={<Help />} />
           <Route path="/system-status" element={<SystemStatus />} />
           <Route path="/advanced-search" element={<AdvancedSearch />} />
-          <Route path="/mazsai" element={<MazsAI />} />
         </Routes>
         {!isMazsAIPage && <Footer />}
       </main>

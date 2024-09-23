@@ -53,7 +53,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
       subItems: [
         {to: '/website-builder', label: 'Mazs AI Website Builder', icon: FaCode},
         {to: '/advanced-search', label: 'Mazs AI Search', icon: FaCode},
-        {to: '/mazsai', label: 'Mazs AI Lab', icon: FaCode},
       ],
     },
     { label: 'Research', icon: FaFlask, to: '/Research' },
