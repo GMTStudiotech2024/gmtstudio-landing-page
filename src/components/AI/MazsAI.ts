@@ -1,6 +1,7 @@
 import { aiResponses } from './AiResponse';
 import { knowledgeBase } from './KnowledgeBase';
 import { sentimentLexicon } from './sentimentLexicon';
+import nlp from 'compromise';
 interface Intent {
   patterns: string[];
   responses: string[];
@@ -23,8 +24,8 @@ class MultilayerPerceptron {
     layers: number[],
     activations: string[] = [],
     learningRate: number = 0.001,
-    batchSize: number = 32,
-    epochs: number = 100,
+    batchSize: number = 16,
+    epochs: number = 5,
     dropoutRate: number = 0.5,
     l2Lambda: number = 0.001
   ) {
@@ -419,9 +420,9 @@ class NaturalLanguageProcessor {
 
   // Enhanced Tokenization
   private tokenize(text: string): string[] {
-    return text.toLowerCase().match(/\b(\w+|[^\w\s])\b/g) || [];
+    const doc = nlp(text);
+    return doc.terms().out('array');
   }
-
   private updateIDF() {
     this.vocabulary.forEach(word => {
       const documentFrequency = this.documents.filter(doc => doc.includes(word)).length;
@@ -1897,14 +1898,14 @@ export function processChatbotQuery(query: string): string {
     }
   }
 
-  const { intent, entities, keywords, analysis, sentiment, topics } = nlp.understandQuery(query);
+  const { intent, entities, keywords, analysis, sentiment, topics } = mlp.understandQuery(query);
   console.log("Query Analysis:", analysis);
 
   // Update conversation history
-  nlp.updateConversationHistory('user', query);
+  mlp.updateConversationHistory('user', query);
 
   // Recognize entities in the query
-  const recognizedEntities = nlp.recognizeEntities(query);
+  const recognizedEntities = mlp.recognizeEntities(query);
   console.log("Recognized Entities:", recognizedEntities);
 
   // Extract confidence from the analysis
@@ -1913,48 +1914,48 @@ export function processChatbotQuery(query: string): string {
 
   // If confidence is very low, return an "I'm not sure" response
   if (confidence < 0.1) {
-    return nlp.generateComplexSentence("I'm not sure I understand", "uncertain response", 20);
+    return mlp.generateComplexSentence("I'm not sure I understand", "uncertain response", 20);
   }
 
   const matchedIntent = intents.find(i => i.patterns.includes(intent));
   if (matchedIntent) {
-    let response = nlp.generateResponse(intent, entities, keywords, topics, query);
+    let response = mlp.generateResponse(intent, entities, keywords, topics, query);
     
     if (!['hello', 'hi', 'hey', 'bye', 'goodbye', 'see you'].includes(intent)) {
-      const contextSentence = nlp.generateComplexSentence(keywords[0] || response.split(' ')[0], query, 500);
+      const contextSentence = mlp.generateComplexSentence(keywords[0] || response.split(' ')[0], query, 500);
       response += " " + contextSentence;
     }
 
     // Use GAN to refine the response
-    const responseVector = nlp.encodeToMeaningSpace(response);
-    const refinedVector = nlp.gan.refine(responseVector, response.split(' ').length);
-    const refinedResponse = nlp.decodeFromMeaningSpace(refinedVector);
+    const responseVector = mlp.encodeToMeaningSpace(response);
+    const refinedVector = mlp.gan.refine(responseVector, response.split(' ').length);
+    const refinedResponse = mlp.decodeFromMeaningSpace(refinedVector);
 
     // Use RL agent to improve the response
-    const improvedVector = nlp.rlAgent.improve(refinedVector, {
+    const improvedVector = mlp.rlAgent.improve(refinedVector, {
       intent,
       entities,
       keywords,
       sentiment,
       topics
     });
-    const improvedResponse = nlp.decodeFromMeaningSpace(improvedVector);
+    const improvedResponse = mlp.decodeFromMeaningSpace(improvedVector);
 
     // Combine the original, refined, and improved responses
     response = `${response} ${refinedResponse} ${improvedResponse}`;
 
     if (query.split(' ').length > 3) {
       if (sentiment.score < -0.5) {
-        response += " " + nlp.generateComplexSentence("I sense", "frustration concerns", 10);
+        response += " " + mlp.generateComplexSentence("I sense", "frustration concerns", 10);
       } else if (sentiment.score > 0.5) {
-        response += " " + nlp.generateComplexSentence("I'm glad", "positive specific discuss", 10);
+        response += " " + mlp.generateComplexSentence("I'm glad", "positive specific discuss", 10);
       }
     }
 
     const relevantTopics = topics.filter(topic => query.toLowerCase().includes(topic));
     relevantTopics.forEach(topic => {
-      if (nlp.knowledgeBase.has(topic)) {
-        const knowledgeResponse = nlp.generateComplexSentence(topic, nlp.knowledgeBase.get(topic)!, 15);
+      if (mlp.knowledgeBase.has(topic)) {
+        const knowledgeResponse = mlp.generateComplexSentence(topic, mlp.knowledgeBase.get(topic)!, 15);
         response += " " + knowledgeResponse;
       }
     });
@@ -1969,11 +1970,11 @@ export function processChatbotQuery(query: string): string {
     }
 
     // Update conversation history with AI response
-    nlp.updateConversationHistory('ai', response);
+    mlp.updateConversationHistory('ai', response);
 
     return response;
   } else {
-    return nlp.generateComplexSentence("I'm not sure I understand", query, 500);
+    return mlp.generateComplexSentence("I'm not sure I understand", query, 500);
   }
 }
 
@@ -2057,85 +2058,12 @@ const intents: Intent[] = [
     patterns: ['what can you do', 'what are your capabilities'],
     responses: ['I can answer questions about GMTStudio, provide information on various topics, and even tell jokes! How can I assist you today?'],
   },
-  {
-    patterns: ['favorite color', 'what color do you like'],
-    responses: ["As an AI, I don't have personal preferences, but I find all colors fascinating in their own way!"],
-  },
-  {
-    patterns: ['do you sleep', 'are you always awake'],
-    responses: ["I don't sleep as humans do. I'm always here and ready to help whenever you need me!"],
-  },
-  {
-    patterns: ["what's your name', 'who are you"],
-    responses: ["I'm an AI assistant created by GMTStudio. It's nice to meet you!"],
-  },
-  {
-    patterns: ['thank you', 'thanks'],
-    responses: ["You're welcome! I'm glad I could help.", "It's my pleasure to assist you!"],
-  },
-  {
-    patterns: ['goodbye', 'bye', 'see you later'],
-    responses: ['Goodbye! Feel free to chat with me again anytime.', "Take care! I'll be here if you need anything else."],
-  },
-  {
-    patterns: ['who are you ', 'what is your name', "you are who "],
-    responses: ["I'm an AI assistant created by GMTStudio, Which they named me Mazs AI, It's nice to meet you!"],
-  },
-  {
-    patterns: ['Artificial intelligence', 'Artificial intelligent',"AI"],
-    responses: ["Artificial intelligence (AI) refers to the simulation of human intelligence in machines that are programmed to think and learn like humans."],
-  },
-  {
-    patterns: ['What is the meaning of life', 'Purpose of existence'],
-    responses: ["The meaning of life is a philosophical question that has been debated for centuries. It's subjective and can vary from person to person."],
-  },
-  {
-    patterns: ['How to be happy', 'Keys to happiness'],
-    responses: ["Happiness often comes from pursuing meaningful goals, maintaining positive relationships, practicing gratitude, and taking care of your physical and mental health."],
-  },
-  {
-    patterns: ['Best way to learn a new language', 'Language learning tips'],
-    responses: ["Some effective ways to learn a new language include immersion, consistent practice, using language learning apps, watching movies or TV shows in that language, and finding a language exchange partner."],
-  },
-  {
-    patterns: ['How to start exercising', 'Beginner workout routine'],
-    responses: ["Start with simple exercises like walking, gradually increase intensity, set realistic goals, find activities you enjoy, and consider consulting with a fitness professional for personalized advice."],
-  },
-  {
-    patterns: ['How to manage stress', 'Stress relief techniques'],
-    responses: ["Effective stress management techniques include regular exercise, meditation, deep breathing exercises, maintaining a healthy diet, getting enough sleep, and seeking support from friends or professionals when needed."],
-  },
-  {
-    patterns: ['Tips for better sleep', 'How to improve sleep quality'],
-    responses: ["To improve sleep quality, maintain a consistent sleep schedule, create a relaxing bedtime routine, avoid screens before bed, ensure your bedroom is dark and cool, and limit caffeine and alcohol intake."],
-  },
-  {
-    patterns: ['How to make friends as an adult', 'Meeting new people'],
-    responses: ["To make friends as an adult, try joining clubs or groups related to your interests, volunteer, attend local events, use social apps, take classes, or participate in sports or fitness activities."],
-  },
-  {
-    patterns: ['How to save money', 'Budgeting tips'],
-    responses: ["To save money, create a budget, track your expenses, cut unnecessary costs, automate your savings, look for deals and discounts, and consider additional sources of income."],
-  },
-  {
-    patterns: ['How to be more productive', 'Increase productivity'],
-    responses: ["To increase productivity, prioritize tasks, use time management techniques like the Pomodoro method, minimize distractions, take regular breaks, and maintain a healthy work-life balance."],
-  },
-  {
-    patterns: ['How to improve communication skills', 'Better communication'],
-    responses: ["To improve communication skills, practice active listening, be clear and concise, pay attention to non-verbal cues, ask questions, show empathy, and seek feedback on your communication style."],
-  },
-  {
-    patterns: ['How to improve coding skills', 'coding tips','coding', ],
-    responses: ["To improve coding skills, practice regularly, learn new programming languages, participate in coding challenges, read documentation, and join coding communities."],
-
-  },
 ];
 
 const network = new MultilayerPerceptron([10, 32, 64, 32, intents.length], ['relu', 'relu', 'relu', 'sigmoid']);
 
 function trainNetwork() {
-  const epochs = 50;
+  const epochs = 25;
   const learningRate = 0.1;
 
   for (let epoch = 0; epoch < epochs; epoch++) {
@@ -2170,12 +2098,12 @@ function encodeInput(query: string): number[] {
   );
 }
 
-const nlp = new NaturalLanguageProcessor();
+const mlp = new NaturalLanguageProcessor();
 
 // Train the NLP model
 intents.forEach(intent => {
-  intent.patterns.forEach(pattern => nlp.trainOnText(pattern));
-  intent.responses.forEach(response => nlp.trainOnText(response));
+  intent.patterns.forEach(pattern => mlp.trainOnText(pattern));
+  intent.responses.forEach(response => mlp.trainOnText(response));
 });
 
 // Add this near the top of the file
@@ -2209,12 +2137,12 @@ export function getTypedResponse(response: string): Promise<string> {
 // Keep only one declaration of handleUserInput
 export function handleUserInput(userInput: string, targetLanguage?: string): Promise<string> {
   console.log("User:", userInput);
-  nlp.updateContext(userInput, []); // Provide an empty array as the second argument
+  mlp.updateContext(userInput, []); // Provide an empty array as the second argument
   return new Promise((resolve) => {
     setTimeout(() => {
       let response = processChatbotQuery(userInput);
       if (targetLanguage) {
-        response = nlp.translateText(response, targetLanguage);
+        response = mlp.translateText(response, targetLanguage);
       }
       getTypedResponse(response).then(resolve);
     }, 100); // Simulate a delay in processing
@@ -2224,7 +2152,7 @@ export function handleUserInput(userInput: string, targetLanguage?: string): Pro
 // Add the regenerateResponse function
 export function regenerateResponse(userInput: string): Promise<string> {
   console.log("Regenerating response for:", userInput);
-  nlp.updateContext(userInput, []);
+  mlp.updateContext(userInput, []);
   return new Promise((resolve) => {
     setTimeout(() => {
       const response = processChatbotQuery(userInput);
@@ -2375,7 +2303,7 @@ async function processTextFile(content: string): Promise<string> {
   const sentiment = calculateSentiment(content);
 
   // Generate a summary using the NLP model
-  const nlpSummary = nlp.generateComplexSentence(
+  const nlpSummary = mlp.generateComplexSentence(
     "The text file analysis reveals",
     `${words} words, ${sentenceCount} sentences, ${lines} lines, ${characters} characters, common words, ${sentiment} sentiment`,
     50
@@ -2405,7 +2333,7 @@ async function processJsonFile(content: string): Promise<string> {
   try {
     const jsonData = JSON.parse(content);
     const keys = Object.keys(jsonData);
-    const summary = nlp.generateComplexSentence("The JSON file contains", `${keys.length} top-level keys: ${keys.join(', ')}`, 50);
+    const summary = mlp.generateComplexSentence("The JSON file contains", `${keys.length} top-level keys: ${keys.join(', ')}`, 50);
     return `I've analyzed the JSON file. ${summary}`;
   } catch (error) {
     return "I encountered an error while parsing the JSON file. Please make sure it's valid JSON.";
