@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import {
   FiSend,
   FiMoon,
@@ -77,7 +78,6 @@ const MazsAIChat: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isTyping] = useState(false);
-  const [showInfo, setShowInfo] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [currentTypingIndex, setCurrentTypingIndex] = useState(0);
   const typingSpeed = 15; // milliseconds per character
@@ -1088,7 +1088,6 @@ const MazsAIChat: React.FC = () => {
                 Mazs AI Lab
                 <ChevronDownIcon className="w-5 h-5 ml-2" />
               </button>
-              
               {isDropdownOpen && (
                 <div className="absolute top-full left-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
                   <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
@@ -1115,9 +1114,9 @@ const MazsAIChat: React.FC = () => {
             </div>
             <div className="flex items-center space-x-4">
               <IconButton
-                onClick={() => setShowInfo(!showInfo)}
-                title="Info"
-                ariaLabel="Toggle information panel"
+                onClick={() => window.location.href = '/mazsapi'}
+                title="API Info"
+                ariaLabel="API Info"
               >
                 <FiInfo size={20} />
               </IconButton>
@@ -1151,23 +1150,6 @@ const MazsAIChat: React.FC = () => {
               </IconButton>
             </div>
           </header>
-
-          {/* Info Panel */}
-          <AnimatePresence>
-            {showInfo && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="mb-6 p-4 bg-white dark:bg-black rounded-lg text-gray-100 shadow-md"
-              >
-                <p className="text-sm">
-                  Mazs AI v1.3.5 Anatra is an advanced chatbot powered by natural language processing and machine learning. It can assist you with information about GMTStudio, Theta platform, and AI WorkSpace.
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           {/* Chat Container */}
           <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-black rounded-lg shadow-xl">

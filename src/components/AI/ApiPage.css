@@ -1,0 +1,78 @@
+.api-page {
+    display: flex;
+    font-family: Arial, sans-serif;
+  }
+  
+  .content {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .sidebar {
+    width: 300px;
+    border-left: 1px solid #ccc;
+    padding: 20px;
+    background-color: #f9f9f9;
+  }
+  
+  .tabs {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .tabs button {
+    padding: 10px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .tabs button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .tabs button.active {
+    font-weight: bold;
+    background-color: #e0e0e0;
+  }
+  
+  .tab-content {
+    margin-top: 20px;
+  }
+  
+  
+  .language-select {
+    margin-bottom: 10px;
+  }
+  
+  pre {
+    background: #272822;
+    color: #f8f8f2;
+    padding: 10px;
+    overflow: auto;
+    border-radius: 4px;
+  }
+  
+  code {
+    font-family: 'Courier New', Courier, monospace;
+  }
+  
+  .key-tab button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .key-tab p {
+    margin-top: 10px;
+    font-size: 18px;
+  }
+  
+  .key-tab code {
+    background-color: #e0e0e0;
+    padding: 2px 4px;
+    border-radius: 4px;
+  }

@@ -42,6 +42,7 @@ import SystemStatus from './components/Pages/SystemStatus';
 import AdvancedSearch from './components/AI/AdvancedSearch';
 import Login from './components/Pages/Login';
 import AIWebsiteGenerator from './components/AI/AIWebsiteGenerator';
+import MazsAPI from './components/AI/MazsAPI';
 import MazsAI from './components/AI/MazsAI_UI';
 import CustomCursor from './components/CustomCursor';
 
@@ -128,6 +129,7 @@ const AppContent: React.FC = () => {
           <Route path="/system-status" element={<SystemStatus />} />
           <Route path="/advanced-search" element={<AdvancedSearch />} />
           <Route path="/mazsai" element={<MazsAI/>} />
+          <Route path="/mazsapi" element={<MazsAPI/>} />
         </Routes>
         {!isMazsAIPage && <Footer />}
       </main>
