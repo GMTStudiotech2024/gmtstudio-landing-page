@@ -25,12 +25,14 @@ import {
   FiSettings,
   FiCheckCircle,
   FiAlertCircle,
+  FiZap,
+  FiClock,
 } from 'react-icons/fi';
+import { ChevronDownIcon } from '@heroicons/react/24/solid';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as MazsAI from './MazsAI';
 import EmojiPicker from 'emoji-picker-react';
 import './MazsAI_UI.css';
-
 interface Message {
   text: string;
   isUser: boolean;
@@ -78,7 +80,7 @@ const MazsAIChat: React.FC = () => {
   const [showInfo, setShowInfo] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [currentTypingIndex, setCurrentTypingIndex] = useState(0);
-  const typingSpeed = 24; // milliseconds per character
+  const typingSpeed = 15; // milliseconds per character
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
@@ -132,6 +134,12 @@ const MazsAIChat: React.FC = () => {
   // Added state for new features
   const [isFAQOpen, setIsFAQOpen] = useState(false);
   const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
+
+  // Additional States for Sidebar Navigation
+  const [currentSection, setCurrentSection] = useState<'home' | 'chatHistory' | 'settings' | 'faq'>('home');
+
+  // Dropdown state
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Effects
   useEffect(() => {
@@ -203,6 +211,14 @@ const MazsAIChat: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [updateStatus]);
+
+  useEffect(() => {
+    // Load theme from localStorage
+    const darkMode = localStorage.getItem('isDarkMode');
+    if (darkMode) {
+      setIsDarkMode(JSON.parse(darkMode));
+    }
+  }, []);
 
   // Helper Functions
   const scrollToBottom = () => {
@@ -323,6 +339,7 @@ const MazsAIChat: React.FC = () => {
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
+    localStorage.setItem('isDarkMode', JSON.stringify(!isDarkMode));
   };
 
   const resetConversation = () => {
@@ -724,11 +741,11 @@ const MazsAIChat: React.FC = () => {
   const renderSettings = () => (
     <div className="fixed inset-0 bg-white dark:bg-black bg-opacity-75 flex items-center justify-center z-50">
       <div
-        className="bg-black rounded-lg p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-xl"
+        className=" bg-white dark:bg-black rounded-lg p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-xl"
         style={{ fontSize: `${fontSize}px`, fontFamily: chatFontFamily }}
       >
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold dark:text-white text-white">
+          <h2 className="text-3xl font-bold dark:text-white text-black">
             Settings
           </h2>
           <button
@@ -899,13 +916,6 @@ const MazsAIChat: React.FC = () => {
           </div>
           <div className="flex justify-end space-x-4 mt-6">
             <button
-              onClick={() => setIsFAQOpen(true)}
-              className="px-4 py-2 bg-white text-black dark:bg-black dark:text-white rounded-md hover:bg-gray-600 transition-colors duration-200"
-              aria-label="Open FAQ"
-            >
-              FAQ
-            </button>
-            <button
               onClick={() => setIsShortcutsModalOpen(true)}
               className="px-4 py-2 bg-white text-black dark:bg-black dark:text-white rounded-md hover:bg-gray-600 transition-colors duration-200"
               aria-label="Open Shortcuts"
@@ -1029,16 +1039,80 @@ const MazsAIChat: React.FC = () => {
     setIsResetModalOpen(true);
   };
 
+  const handleNavigate = (section: string) => {
+    setCurrentSection(section as 'home' | 'chatHistory' | 'settings' | 'faq');
+    // Handle opening modals or sections based on navigation
+    switch (section) {
+      case 'home':
+        // Close all modals or reset states if needed
+        setShowChatHistory(false);
+        setShowSettings(false);
+        setIsFAQOpen(false);
+        break;
+      case 'chatHistory':
+        setShowChatHistory(true);
+        break;
+      case 'settings':
+        setShowSettings(true);
+        break;
+      case 'faq':
+        setIsFAQOpen(true);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleOptionSelect = (option: string) => {
+    // Implement the logic for handling option selection
+    console.log(`Selected option: ${option}`);
+  };
+
   return (
-    <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''} transition-colors duration-500`} role="main" aria-labelledby="chatbot-title">
-      {/* Main Container */}
+    <div className={`flex h-screen ${isDarkMode ? 'dark' : ''} transition-colors duration-500`} role="main" aria-labelledby="chatbot-title">
+      
+      {/* Main Chat Container */}
       <div className="flex-1 bg-white dark:bg-black transition-colors duration-200 overflow-hidden pt-16">
-        <div className="max-w-7xl mx-auto p-6 h-full flex flex-col">
+        <div className="mx-auto h-full flex flex-col">
           {/* Header */}
           <header className="flex justify-between items-center mb-6 sticky top-0 z-10 bg-white dark:bg-black py-4 px-6" role="banner">
-            <h1 id="chatbot-title" className="text-3xl font-bold text-black dark:text-white">
-              Mazs AI Lab
-            </h1>
+            <div className="relative">
+              <button
+                onClick={toggleDropdown}
+                className="flex items-center text-2xl font-bold text-black dark:text-white border-none"
+              >
+                Mazs AI Lab
+                <ChevronDownIcon className="w-5 h-5 ml-2" />
+              </button>
+              
+              {isDropdownOpen && (
+                <div className="absolute top-full left-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
+                  <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                    <button
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                      role="menuitem"
+                      onClick={() => handleOptionSelect('MazsAIPlus')}
+                    >
+                      <FiZap className="mr-2 text-yellow-500" />
+                      Mazs AI
+                      <span className="text-red-500 ml-2">(Mazs AI Website)</span>
+                    </button>
+                    <button
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                      role="menuitem"
+                      onClick={() => handleOptionSelect('TemporaryChat')}
+                    >
+                      <FiClock className="mr-2 text-blue-500" />
+                      Temporary chat
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
             <div className="flex items-center space-x-4">
               <IconButton
                 onClick={() => setShowInfo(!showInfo)}
@@ -1052,7 +1126,6 @@ const MazsAIChat: React.FC = () => {
                 title="Reset Conversation"
                 ariaLabel="Reset Conversation"
               >
-                
                 <FiFeather size={20} />
               </IconButton>
               <IconButton
@@ -1100,7 +1173,7 @@ const MazsAIChat: React.FC = () => {
           <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-black rounded-lg shadow-xl">
             <div
               ref={chatContainerRef}
-              className="flex-1 overflow-y-auto p-4 space-y-4"
+              className="flex-1 overflow-y-auto pt-1 space-y-4"
               style={{ fontSize: `${fontSize}px`, fontFamily: 'Inter, sans-serif' }}
             >
               <AnimatePresence>
@@ -1164,6 +1237,18 @@ const MazsAIChat: React.FC = () => {
                         {!message.isUser && message.isTyping && (
                           <span className="inline-block w-1 h-4 ml-1 bg-gray-100 animate-pulse"></span>
                         )}
+
+                        {/* [Provided by Mazs AI] Link */}
+                        {!message.isUser && !message.isTyping && (
+                          <a
+                            href="https://mazs-ai-lab.vercel.app/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-blue-500 ml-2"
+                          >
+                            [Provided by Mazs AI]
+                          </a>
+                        )}
                       </div>
                       {/* Message Footer */}
                       <div className="mt-2 text-xs opacity-70 flex justify-between items-center">
@@ -1194,10 +1279,10 @@ const MazsAIChat: React.FC = () => {
               </AnimatePresence>
               {isLoading && (
                 <div className="flex justify-center items-center p-4">
-                  <div className="flex space-x-2">
-                    <div className="dot"></div>
-                    <div className="dot"></div>
-                    <div className="dot"></div>
+                  <div className="flex space-x-2 ">
+                    <div className="dot bg-black dark:bg-white"></div>
+                    <div className="dot bg-black dark:bg-white"></div>
+                    <div className="dot bg-black dark:bg-white"></div>
                   </div>
                 </div>
               )}
@@ -1268,7 +1353,7 @@ const MazsAIChat: React.FC = () => {
                             {getFileIcon(file)}
                           </span>
                           <span className="text-gray-300 truncate max-w-[120px]">
-                            {file.name} ({file.size / 1024} KB)
+                            {file.name} ({(file.size / 1024).toFixed(2)} KB)
                           </span>
                           <button
                             onClick={() => clearAttachedFile(index)}
@@ -1291,9 +1376,9 @@ const MazsAIChat: React.FC = () => {
                       placeholder={
                         attachedFiles.length > 0
                           ? 'Add a message or send files...'
-                          : 'Enter message to Mazs AI v1.3.5 anatra'
+                          : 'Enter message to Mazs AI v1.3.5 Anatra'
                       }
-                      className={`w-full p-2 bg-transparent text-white focus:outline-none resize-none min-h-[40px] max-h-[100px] ${
+                      className={`w-full p-2 bg-transparent text-black dark:text-white focus:outline-none resize-none min-h-[40px] max-h-[100px] ${
                         input.length > 1000 ? 'border-b-2 border-red-500' : ''
                       } scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent`}
                       style={{ fontSize: `${fontSize}px`, fontFamily: 'Inter, sans-serif' }}
@@ -1351,11 +1436,10 @@ const MazsAIChat: React.FC = () => {
         </div>
       </div>
 
-      {/* Settings Modal */}
+      {/* Modals and Other Components */}
       {showSettings && renderSettings()}
-
-      {/* Chat History Modal */}
       {showChatHistory && renderChatHistory()}
+      {isFAQOpen && renderFAQSection()}
 
       {/* Context Menu */}
       {showContextMenu && selectedMessageIndex !== null && (

@@ -14,7 +14,7 @@ class MultilayerPerceptron {
   private batchSize: number;
   private epochs: number;
 
-  constructor(layers: number[], activations: string[] = [], learningRate: number = 0.001, batchSize: number = 32, epochs: number = 25) {
+  constructor(layers: number[], activations: string[] = [], learningRate: number = 0.001, batchSize: number = 32, epochs: number = 1) {
     this.layers = layers;
     this.weights = [];
     this.biases = [];
@@ -333,16 +333,6 @@ class NaturalLanguageProcessor {
       ['love', 2], ['hate', -2], ['like', 1], ['dislike', -1], ['adore', 2],
       ['excited', 2], ['bored', -1], ['interested', 1], ['fascinating', 2], ['dull', -1],
       ['brilliant', 2], ['stupid', -2], ['smart', 1], ['clever', 1], ['foolish', -1],
-      ['beautiful', 2], ['ugly', -2], ['pretty', 1], ['handsome', 1], ['attractive', 1],
-      ['friendly', 1], ['mean', -1], ['kind', 1], ['cruel', -2], ['nice', 1],
-      ['helpful', 1], ['useless', -1], ['useful', 1], ['beneficial', 1], ['harmful', -1],
-      ['easy', 1], ['difficult', -1], ['simple', 1], ['complicated', -1], ['complex', -1],
-      ['fast', 1], ['slow', -1], ['quick', 1], ['efficient', 1], ['inefficient', -1],
-      ['expensive', -1], ['cheap', -1], ['affordable', 1], ['overpriced', -1], ['valuable', 1],
-      ['reliable', 1], ['unreliable', -1], ['trustworthy', 1], ['untrustworthy', -1], ['honest', 1],
-      ['innovative', 1], ['outdated', -1], ['modern', 1], ['ancient', -1], ['cutting-edge', 2],
-      ['joyful', 2], ['miserable', -2], ['optimistic', 2], ['pessimistic', -2], ['content', 1],
-      ['frustrated', -1], ['elated', 2], ['depressed', -2], ['hopeful', 1], ['anxious', -1]
     ]);
 
     // Expand knowledge base
@@ -352,147 +342,65 @@ class NaturalLanguageProcessor {
       ['machine learning', 'ML is a subset of AI that enables systems to learn and improve from experience.'],
       ['deep learning', 'Deep learning is a subset of ML using neural networks with multiple layers.'],
       ['natural language processing', 'NLP is a branch of AI that helps computers understand and interpret human language.'],
-      ['computer vision', 'Computer vision is an AI field that trains computers to interpret and understand visual information.'],
-      ['robotics', 'Robotics is a field that combines computer science and engineering to design and build robots.'],
-      ['blockchain', 'Blockchain is a decentralized, distributed ledger technology.'],
-      ['cryptocurrency', 'Cryptocurrency is a digital or virtual currency that uses cryptography for security.'],
-      ['internet of things', 'IoT refers to the interconnected network of physical devices embedded with electronics, software, and sensors.'],
-      ['5g', '5G is the fifth generation technology standard for cellular networks.'],
-      ['quantum computing', 'Quantum computing uses quantum-mechanical phenomena to perform computation.'],
-      ['augmented reality', 'AR is an interactive experience that combines the real world and computer-generated content.'],
-      ['virtual reality', 'VR is a simulated experience that can be similar to or completely different from the real world.'],
-      ['cloud computing', 'Cloud computing is the on-demand availability of computer system resources, especially data storage and computing power.'],
-      ['edge computing', 'Edge computing is a distributed computing paradigm that brings computation and data storage closer to the sources of data.'],
-      ['cybersecurity', 'Cybersecurity is the practice of protecting systems, networks, and programs from digital attacks.'],
-      ['data science', 'Data science is an interdisciplinary field that uses scientific methods, processes, algorithms and systems to extract knowledge from data.'],
-      ['big data', 'Big data refers to extremely large data sets that may be analyzed computationally to reveal patterns, trends, and associations.'],
-      ['devops', 'DevOps is a set of practices that combines software development and IT operations to shorten the systems development life cycle.'],
-      ['agile methodology', 'Agile is an iterative approach to software development that emphasizes flexibility, interactivity, and transparency.'],
-      ['gmtstudio', 'GMTStudio is a platform that offers various services, including an AI WorkSpace and a social media platform called Theta.'],
-      ['theta', 'Theta is a social media platform developed by GMTStudio, offering unique features for connecting and sharing content.'],
-      ['ai workspace', 'The AI WorkSpace is a powerful tool offered by GMTStudio for AI development, allowing users to train models and run experiments.'],
-      ['machine learning applications', 'Machine learning has various applications, including image recognition, natural language processing, and predictive analytics.'],
-      ['blockchain technology', 'Blockchain technology has applications beyond cryptocurrency, including supply chain management and secure voting systems.'],
-      ['internet of things applications', 'IoT applications include smart home devices, industrial automation, and connected healthcare systems.'],
-      ['5g impact', '5G technology is expected to revolutionize industries through faster data speeds and lower latency, enabling new applications like autonomous vehicles and remote surgery.'],
-      ['quantum computing potential', 'Quantum computing has the potential to solve complex problems in fields like cryptography, drug discovery, and financial modeling.'],
-      ['augmented reality applications', 'AR applications include interactive gaming experiences, virtual try-on for clothing and makeup, and enhanced navigation systems.'],
-      ['virtual reality in education', 'VR in education can provide immersive learning experiences, virtual field trips, and hands-on training simulations.'],
-      ['cloud computing benefits', 'Cloud computing offers benefits such as scalability, cost-efficiency, and improved collaboration for businesses.'],
-      ['cybersecurity best practices', 'Cybersecurity best practices include using strong passwords, enabling two-factor authentication, and keeping software up to date.'],
-      ['big data analytics', 'Big data analytics helps organizations gain insights from large datasets, improving decision-making and identifying trends.'],
-      ['artificial intelligence ethics', 'AI ethics involves considerations such as bias in algorithms, privacy concerns, and the impact of AI on employment.'],
-      ['renewable energy technologies', 'Renewable energy technologies include solar power, wind energy, hydroelectric power, and geothermal energy.'],
-      ['space exploration advancements', 'Recent space exploration advancements include reusable rockets, plans for Mars colonization, and the search for exoplanets.'],
-      ['genetic engineering applications', 'Genetic engineering has applications in agriculture, medicine, and environmental conservation.'],
-      ['nanotechnology innovations', 'Nanotechnology innovations include advanced materials, targeted drug delivery systems, and more efficient solar cells.'],
-      ['autonomous vehicles challenges', 'Challenges for autonomous vehicles include navigating complex traffic scenarios, ethical decision-making, and regulatory hurdles.'],
-      ['3d printing applications', '3D printing has applications in manufacturing, medicine, architecture, and even food production.'],
-      ["climate change", "Climate change refers to long-term shifts in global or regional climate patterns, often attributed to human activities increasing atmospheric CO2."],
-      ['biodiversity', 'Biodiversity is the variety of life on Earth at all levels, from genes to ecosystems, encompassing the evolutionary, ecological, and cultural processes that sustain life.'],
-      ['sustainable development', 'Sustainable development is an approach to economic growth that protects the environment and ensures social equity for present and future generations.'],
-      ['global health', 'Global health focuses on improving health and achieving health equity for all people worldwide, addressing both medical and social determinants of health.'],
-      ['cultural anthropology', 'Cultural anthropology is the study of human cultures, their beliefs, practices, values, ideas, technologies, economies and other domains of social and cognitive organization.'],
-      ['behavioral economics', 'Behavioral economics combines insights from psychology, judgment, decision making, and economics to generate a more accurate understanding of human behavior.'],
-      ['urban planning', 'Urban planning is a technical and political process concerned with the development and design of land use and the built environment in urban areas.'],
-      ['comparative literature', 'Comparative literature is an academic field dealing with the study of literature and cultural expression across linguistic, national, and disciplinary boundaries.'],
-      ['marine biology', 'Marine biology is the scientific study of organisms in the ocean or other marine bodies of water, including their behaviors and interactions with the environment.'],
-      ['geopolitics', "Geopolitics is the study of the effects of Earth's geography on politics and international relations, particularly with respect to foreign policy of different states."],
-      ['art history', 'Art history is the study of objects of art in their historical development and stylistic contexts, including genre, design, format, and style.'],
-      ['philosophy of science', 'Philosophy of science is a branch of philosophy concerned with the foundations, methods, and implications of science, including the natural sciences and social sciences.'],
-      ['linguistics', 'Linguistics is the scientific study of language, including its structure, evolution, and relationship to human behavior and the human brain.'],
-      ['public health', 'Public health is the science of protecting and improving the health of people and their communities through education, policy making and research for disease and injury prevention.'],
-      ['international relations', 'International relations is the study of the interactions among various actors in the international system, including states, international organizations, NGOs, and multinational corporations.'],
-      ["world history", "World history encompasses the study of human societies and their development across time and space, from ancient civilizations to modern globalization."],
-      ["economics", "Economics is the social science that studies the production, distribution, and consumption of goods and services."],
-      ["psychology", "Psychology is the scientific study of the mind and behavior, exploring how people think, feel, and act."],
-      ["sociology", "Sociology is the study of human society, social relationships, and institutions, examining how they shape and are shaped by individuals."],
-      ["political science", "Political science focuses on systems of government, political behavior, and the analysis of political issues and policies."],
-      ["environmental science", "Environmental science is an interdisciplinary field that integrates physical, biological, and information sciences to study and address environmental issues."],
-      ["astronomy", "Astronomy is the study of celestial objects, space, and the physical universe as a whole."],
-      ["geology", "Geology is the science that deals with the Earth's physical structure and substance, its history, and the processes that act on it."],
-      ["oceanography", "Oceanography is the study of the physical and biological aspects of the ocean."],
-      ["meteorology", "Meteorology is the scientific study of the atmosphere and weather patterns."],
-      ["nutrition", "Nutrition is the study of nutrients in food, how the body uses them, and the relationship between diet, health, and disease."],
-      ["archaeology", "Archaeology is the study of human history and prehistory through the excavation and analysis of artifacts and physical remains."],
-      ["music theory", "Music theory is the study of the fundamental elements of music including rhythm, harmony, and form."],
-      ["film studies", "Film studies involves the critical analysis of cinema, including its history, theory, and social impact."],
-      ["fashion design", "Fashion design is the art of applying design, aesthetics, and natural beauty to clothing and accessories."],
-      ["architecture", "Architecture is the art and science of designing and constructing buildings and other physical structures."],
-      ["game theory", "Game theory is the study of strategic decision-making in competitive scenarios."],
-      ["criminology", "Criminology is the scientific study of crime, including its causes, consequences, and control."],
-      ["epistemology", "Epistemology is the branch of philosophy concerned with the theory of knowledge."],
-      ["ethics", "Ethics is the branch of philosophy that involves systematizing, defending, and recommending concepts of right and wrong behavior."],
-      ["philosophy", "Philosophy is the study of the fundamental nature of reality, existence, knowledge, logic, and ethics."],
-      ["psychology", "Psychology is the scientific study of the mind and behavior, exploring how people think, feel, and act."],
-      ["sociology", "Sociology is the study of human society, social relationships, and institutions, examining how they shape and are shaped by individuals."],
-      ["political science", "Political science focuses on systems of government, political behavior, and the analysis of political issues and policies."],
-      ["environmental science", "Environmental science is an interdisciplinary field that integrates physical, biological, and information sciences to study and address environmental issues."],
-      ["astronomy", "Astronomy is the study of celestial objects, space, and the physical universe as a whole."],
-      ["economics", "Economics is the social science that studies the production, distribution, and consumption of goods and services."],
-      ["statistics", "Statistics is the study of the collection, analysis, interpretation, presentation, and organization of data."],
-      ['neural networks', 'Neural networks are a series of algorithms that attempt to recognize underlying relationships in a set of data through a process that mimics the way the human brain operates.'],
-      ['reinforcement learning', 'Reinforcement learning is an area of machine learning concerned with how agents ought to take actions in an environment to maximize some notion of cumulative reward.'],
-      ['transfer learning', 'Transfer learning is a machine learning method where a model developed for a particular task is reused as the starting point for a model on a second task.']
     ]);
 
     // Add basic AI responses
     this.aiResponses = new Map([
       ['greeting', [
-        "Hello! How can I assist you today?",
-        "Hi there! What would you like to know?",
-        "Greetings! I'm here to help. What's on your mind?",
-        "Welcome! How may I be of service?",
-        "Good day! What can I help you with?"
+        "Hello! How can I assist you today? Experience the latest Mazs AI model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Hi there! What would you like to know? Try out our newest features at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Greetings! I'm here to help. What's on your mind? Check out our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Welcome! How may I be of service? Experience the cutting-edge Mazs AI at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Good day! What can I help you with? Explore our newest capabilities at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
       ]],
       ['farewell', [
-        "Goodbye! Have a great day!",
-        "Take care! Feel free to return if you have more questions.",
-        "Farewell! It was a pleasure assisting you.",
-        "Until next time! Stay curious!",
-        "Bye for now! Remember, I'm always here if you need information."
+        "Goodbye! Have a great day! Don't forget to try our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Take care! Feel free to return if you have more questions. Experience our newest features at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Farewell! It was a pleasure assisting you. Explore more with our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Until next time! Stay curious and check out our latest AI advancements at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Bye for now! Remember, I'm always here if you need information. Try our newest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
       ]],
       ['thanks', [
-        "You're welcome! I'm glad I could help.",
-        "It's my pleasure to assist you!",
-        "I'm happy I could be of help. Is there anything else you'd like to know?",
-        "Anytime! Don't hesitate to ask if you have more questions.",
-        "I'm here to help! Feel free to ask about any other topics you're curious about."
+        "You're welcome! I'm glad I could help. Experience even more with our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "It's my pleasure to assist you! Discover our newest features at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "I'm happy I could be of help. Is there anything else you'd like to know? Try our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Anytime! Don't hesitate to ask if you have more questions. Explore our cutting-edge AI at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "I'm here to help! Feel free to ask about any other topics you're curious about. Check out our newest capabilities at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
       ]],
       ['confusion', [
-        "I apologize, but I'm not sure I understand. Could you please rephrase your question?",
-        "I'm having trouble grasping that. Can you explain it differently?",
-        "I'm afraid I didn't quite catch that. Could you provide more context?",
-        "Sorry, I'm a bit confused. Can you break down your question for me?",
-        "I want to help, but I'm not sure what you're asking. Can you try asking in a different way?"
+        "I apologize, but I'm not sure I understand. Could you please rephrase your question? For more advanced assistance, try our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "I'm having trouble grasping that. Can you explain it differently? Our newest model might be able to help better at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "I'm afraid I didn't quite catch that. Could you provide more context? For more sophisticated understanding, check out [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Sorry, I'm a bit confused. Can you break down your question for me? Our latest model might offer clearer insights at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "I want to help, but I'm not sure what you're asking. Can you try asking in a different way? For more advanced comprehension, visit [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
       ]],
       ['curiosity', [
-        "That's an interesting topic! Would you like to know more about it?",
-        "Fascinating question! I'd be happy to delve deeper into that subject.",
-        "Great inquiry! There's a lot to explore in that area. Where should we start?",
-        "You've piqued my interest! Shall we explore this topic further?",
-        "That's a thought-provoking question! I'd love to discuss it in more detail."
+        "That's an interesting topic! Would you like to know more about it? Explore deeper with our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Fascinating question! I'd be happy to delve deeper into that subject. For even more insights, try our newest AI at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Great inquiry! There's a lot to explore in that area. Where should we start? Discover more with our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "You've piqued my interest! Shall we explore this topic further? For a more advanced discussion, check out [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "That's a thought-provoking question! I'd love to discuss it in more detail. Engage with our cutting-edge AI for deeper insights at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
       ]],
       ['gmtstudio', [
-        "GMTStudio is a platform that offers various services, including an AI WorkSpace and a social media platform called Theta.",
-        "Theta is a social media platform developed by GMTStudio, offering unique features for connecting and sharing content.",
-        "The AI WorkSpace is a powerful tool offered by GMTStudio for AI development, allowing users to train models and run experiments.",
-        "GMTStudio is dedicated to providing innovative solutions in the field of AI and technology.",
-        "If you have any questions about GMTStudio or its services, feel free to ask!"
+        "GMTStudio is a platform that offers various services, including an AI WorkSpace and a social media platform called Theta. Experience our latest AI model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Theta is a social media platform developed by GMTStudio, offering unique features for connecting and sharing content. Try our newest AI capabilities at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "The AI WorkSpace is a powerful tool offered by GMTStudio for AI development, allowing users to train models and run experiments. Explore our latest advancements at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "GMTStudio is dedicated to providing innovative solutions in the field of AI and technology. Check out our cutting-edge model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "If you have any questions about GMTStudio or its services, feel free to ask! Also, don't miss our latest AI model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
       ]],
       ['AI',[
-        "AI, or Artificial Intelligence, refers to the simulation of human intelligence in machines that are programmed to think and learn like humans.",
-        "There are various types of AI, including machine learning, deep learning, natural language processing, and computer vision.",
-        "AI has applications in fields such as healthcare, finance, education, and entertainment.",
-        "The development of AI has led to significant advancements in technology and automation.",
-        "If you have any questions about AI or its applications, feel free to ask!"
+        "AI, or Artificial Intelligence, refers to the simulation of human intelligence in machines that are programmed to think and learn like humans. Experience our latest AI model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "There are various types of AI, including machine learning, deep learning, natural language processing, and computer vision. Explore these concepts with our newest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "AI has applications in fields such as healthcare, finance, education, and entertainment. See AI in action at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "The development of AI has led to significant advancements in technology and automation. Witness these advancements firsthand at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "If you have any questions about AI or its applications, feel free to ask! Also, try our cutting-edge AI model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
       ]],
       ['Mazs AI',[
-        "Mazs AI is a powerful AI system developed by GMTStudio, designed to provide advanced natural language processing and machine learning capabilities.",
-        "Mazs AI can be used for a wide range of applications, including chatbots, virtual assistants, and language translation.",
-        "Mazs AI is built on cutting-edge technology, including neural networks and deep learning algorithms.",
-        "Mazs AI is designed to be highly customizable, allowing developers to tailor it to their specific needs.",
-        "If you have any questions about Mazs AI or its capabilities, feel free to ask!"
+        "Mazs AI is a powerful AI system developed by GMTStudio, designed to provide advanced natural language processing and machine learning capabilities. Experience it yourself at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Mazs AI can be used for a wide range of applications, including chatbots, virtual assistants, and language translation. Try out these features at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Mazs AI is built on cutting-edge technology, including neural networks and deep learning algorithms. Explore this technology at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "Mazs AI is designed to be highly customizable, allowing developers to tailor it to their specific needs. See its flexibility in action at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
+        "If you have any questions about Mazs AI or its capabilities, feel free to ask! And don't forget to check out our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
       ]],      
     ]);
 
@@ -1408,7 +1316,7 @@ class GAN {
     return vector.map(v => String.fromCharCode(Math.floor(v * 26) + 97)).join('');
   }
 
-  train(realData: number[][], epochs: number = 25, batchSize: number = 32) {
+  train(realData: number[][], epochs: number = 1, batchSize: number = 32) {
     for (let epoch = 0; epoch < epochs; epoch++) {
       // Train discriminator
       const realBatch = this.getBatch(realData, batchSize);
@@ -1621,13 +1529,13 @@ export function processChatbotQuery(query: string): string {
   }
 }
 
-console.log("Mazs AI v1.1 with advanced NLP and contextual analysis capabilities initialized!");
+console.log("Mazs AI v1.3.5 with advanced NLP and contextual analysis capabilities initialized!");
 
 
 const intents: Intent[] = [
   {
     patterns: ['hello', 'hi', 'hey','hola','bonjour'],
-    responses: ['Hello! How can I help you today?', 'Hi there! What can I do for you?', 'Greetings! How may I assist you?'],
+    responses: ['Hello! How can I help you today? Check out our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)', 'Hi there! What can I do for you? Check out our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)', 'Greetings! How may I assist you? Check out our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)'],
   },
   {
     patterns: ['bye', 'goodbye', 'see you'],
@@ -1704,77 +1612,18 @@ const intents: Intent[] = [
   {
     patterns: ['favorite color', 'what color do you like'],
     responses: ["As an AI, I don't have personal preferences, but I find all colors fascinating in their own way!"],
+
   },
   {
-    patterns: ['do you sleep', 'are you always awake'],
-    responses: ["I don't sleep as humans do. I'm always here and ready to help whenever you need me!"],
-  },
-  {
-    patterns: ["what's your name', 'who are you"],
-    responses: ["I'm an AI assistant created by GMTStudio. It's nice to meet you!"],
-  },
-  {
-    patterns: ['thank you', 'thanks'],
-    responses: ["You're welcome! I'm glad I could help.", "It's my pleasure to assist you!"],
-  },
-  {
-    patterns: ['goodbye', 'bye', 'see you later'],
-    responses: ['Goodbye! Feel free to chat with me again anytime.', "Take care! I'll be here if you need anything else."],
-  },
-  {
-    patterns: ['who are you ', 'what is your name', "you are who "],
-    responses: ["I'm an AI assistant created by GMTStudio, Which they named me Mazs AI, It's nice to meet you!"],
-  },
-  {
-    patterns: ['Artificial intelligence', 'Artificial intelligent',"AI"],
-    responses: ["Artificial intelligence (AI) refers to the simulation of human intelligence in machines that are programmed to think and learn like humans."],
-  },
-  {
-    patterns: ['What is the meaning of life', 'Purpose of existence'],
-    responses: ["The meaning of life is a philosophical question that has been debated for centuries. It's subjective and can vary from person to person."],
-  },
-  {
-    patterns: ['How to be happy', 'Keys to happiness'],
-    responses: ["Happiness often comes from pursuing meaningful goals, maintaining positive relationships, practicing gratitude, and taking care of your physical and mental health."],
-  },
-  {
-    patterns: ['Best way to learn a new language', 'Language learning tips'],
-    responses: ["Some effective ways to learn a new language include immersion, consistent practice, using language learning apps, watching movies or TV shows in that language, and finding a language exchange partner."],
-  },
-  {
-    patterns: ['How to start exercising', 'Beginner workout routine'],
-    responses: ["Start with simple exercises like walking, gradually increase intensity, set realistic goals, find activities you enjoy, and consider consulting with a fitness professional for personalized advice."],
-  },
-  {
-    patterns: ['How to manage stress', 'Stress relief techniques'],
-    responses: ["Effective stress management techniques include regular exercise, meditation, deep breathing exercises, maintaining a healthy diet, getting enough sleep, and seeking support from friends or professionals when needed."],
-  },
-  {
-    patterns: ['Tips for better sleep', 'How to improve sleep quality'],
-    responses: ["To improve sleep quality, maintain a consistent sleep schedule, create a relaxing bedtime routine, avoid screens before bed, ensure your bedroom is dark and cool, and limit caffeine and alcohol intake."],
-  },
-  {
-    patterns: ['How to make friends as an adult', 'Meeting new people'],
-    responses: ["To make friends as an adult, try joining clubs or groups related to your interests, volunteer, attend local events, use social apps, take classes, or participate in sports or fitness activities."],
-  },
-  {
-    patterns: ['How to save money', 'Budgeting tips'],
-    responses: ["To save money, create a budget, track your expenses, cut unnecessary costs, automate your savings, look for deals and discounts, and consider additional sources of income."],
-  },
-  {
-    patterns: ['How to be more productive', 'Increase productivity'],
-    responses: ["To increase productivity, prioritize tasks, use time management techniques like the Pomodoro method, minimize distractions, take regular breaks, and maintain a healthy work-life balance."],
-  },
-  {
-    patterns: ['How to improve communication skills', 'Better communication'],
-    responses: ["To improve communication skills, practice active listening, be clear and concise, pay attention to non-verbal cues, ask questions, show empathy, and seek feedback on your communication style."],
-  },
+    patterns: ['Quack ', 'quack'],
+    responses: ["Quack ", "Quack Quack", "I'm sorry, I can't answer that.", "Quack Quack Quack"],
+  }
 ];
 
 const network = new MultilayerPerceptron([10, 32, 64, 32, intents.length], ['relu', 'relu', 'relu', 'sigmoid']);
 
 function trainNetwork() {
-  const epochs = 25;
+  const epochs = 1;
   const learningRate = 0.5;
 
   for (let epoch = 0; epoch < epochs; epoch++) {

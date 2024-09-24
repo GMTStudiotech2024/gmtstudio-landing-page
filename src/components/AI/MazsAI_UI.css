@@ -38,7 +38,6 @@
 .dot {
     width: 20px;
     height: 20px;
-    background-color: #fff; /* Adjust to fit your theme */
     border-radius: 50%;
     opacity: 0.6;
     animation: bounce 1.4s infinite ease-in-out;
