@@ -423,3 +423,19 @@ button:hover {
     scrollbar-width: none;  /* Firefox */
   }
 }
+.typewriter {
+  overflow: hidden;
+  border-right: .15em solid transparent;
+  white-space: nowrap;
+  margin: 0 auto;
+  letter-spacing: .15em;
+}
+
+.cursor {
+  animation: blink-caret .75s step-end infinite;
+}
+
+@keyframes blink-caret {
+  from, to { color: transparent }
+  50% { color: currentColor; }
+}

@@ -163,6 +163,7 @@ const NavLink: React.FC<{ href: string; label: string; icon: React.ReactNode; is
   >
     <Link
       to={href}
+      aria-current={isActive ? 'page' : undefined}
       className={`flex px-3 py-2 rounded-md transition-colors duration-300 items-center ${
         isActive ? 'bg-blue-500 text-white dark:bg-yellow-400 dark:text-gray-900' : 'text-blue-300 dark:text-gray-200 hover:bg-blue-500 hover:text-white dark:hover:bg-yellow-400 dark:hover:text-gray-900'
       }`}
@@ -178,7 +179,7 @@ const SearchButton: React.FC<{ onSearchClick: () => void }> = ({ onSearchClick }
     className="p-2 text-purple-600 dark:text-purple-400 hover:bg-purple-100 hover:text-purple-800 dark:hover:bg-purple-900 dark:hover:text-purple-200 transition-colors duration-300 rounded-md flex items-center"
     aria-label="AI Search"
   >
-    <svg className="w-5 h-5 mr-1" viewBox="0 0 24 24" fill="currentColor">
+    <svg className="w-5 h-5 mr-1" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
       <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
       <path d="M12 8v8M8 12h8"/>
@@ -308,7 +309,7 @@ const MegaMenu: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, 
         exit={{ opacity: 0, y: -20 }}
         className="absolute top-full left-0 w-full bg-white dark:bg-gray-900 shadow-lg"
       >
-        <div className="container mx-auto px-4 py-6 grid grid-cols-4 gap-8">
+        <div className="container mx-auto px-4 py-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           <div>
             <h3 className="font-bold mb-2 text-gray-800 dark:text-white">Products</h3>
             <ul className="space-y-2">
@@ -319,7 +320,7 @@ const MegaMenu: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, 
           </div>
           {/* Add more sections as needed */}
         </div>
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" aria-label="Close Mega Menu">
           <FaTimes />
         </button>
       </motion.div>

@@ -214,11 +214,16 @@ const Latest: React.FC = () => {
   };
 
   return (
-    <section id="blog" className="pt-20 bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-black min-h-screen">
+    <section 
+      id="blog" 
+      className="pt-20 bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-black min-h-screen"
+      aria-labelledby="latest-news-heading"
+    >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="mb-16 text-center">
           <motion.h1
+            id="latest-news-heading"
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -227,9 +232,8 @@ const Latest: React.FC = () => {
             Latest <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">News</span>
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            // ... existing props
+            aria-describedby="latest-news-description"
             className="text-xl text-gray-600 dark:text-gray-300"
           >
             Stay updated with the latest developments and insights from GMTStudio
@@ -239,13 +243,18 @@ const Latest: React.FC = () => {
         {/* Category and Search Controls */}
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-center">
           {/* Categories */}
-          <div className="flex flex-wrap justify-center mb-4 sm:mb-0">
+          <div 
+            className="flex flex-wrap justify-center mb-4 sm:mb-0" 
+            role="group" 
+            aria-label="Blog Categories"
+          >
             {categories.map((category, index) => (
               <motion.button
                 key={index}
                 onClick={() => setSelectedCategory(category)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                aria-pressed={selectedCategory === category}
                 aria-label={`Filter by ${category}`}
                 className={`mx-2 my-1 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   selectedCategory === category
@@ -262,7 +271,11 @@ const Latest: React.FC = () => {
           <div className="flex items-center">
             {/* Search Input */}
             <div className="relative mr-4">
+              <label htmlFor="search-posts" className="sr-only">
+                Search posts
+              </label>
               <input
+                id="search-posts"
                 type="text"
                 placeholder="Search posts..."
                 value={searchTerm}
@@ -287,10 +300,7 @@ const Latest: React.FC = () => {
         {/* Blog Posts */}
         <AnimatePresence>
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            // ... existing props
             className={isGridView ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10" : "space-y-8"}
           >
             {currentPosts.map((post, index) => (
@@ -300,6 +310,8 @@ const Latest: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className={`relative flex ${isGridView ? 'flex-col' : 'flex-row'} rounded-3xl bg-white dark:bg-gray-800 shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105`}
+                role="article"
+                aria-labelledby={`post-title-${index}`}
               >
                 {/* Post Image */}
                 <div className={`relative ${isGridView ? 'h-64' : 'w-1/3 h-full'} overflow-hidden rounded-3xl ${isGridView ? 'rounded-b-none' : 'rounded-l-3xl rounded-r-none'}`}>
@@ -325,7 +337,7 @@ const Latest: React.FC = () => {
                   </div>
 
                   {/* Post Title */}
-                  <h5 className="mb-3 text-2xl font-bold text-gray-900 dark:text-white">
+                  <h5 id={`post-title-${index}`} className="mb-3 text-2xl font-bold text-gray-900 dark:text-white">
                     {post.title}
                   </h5>
 
@@ -369,7 +381,9 @@ const Latest: React.FC = () => {
             {/* Posts Per Page Selector */}
             <div className="flex items-center mb-4 sm:mb-0">
               <span className="mr-4 text-gray-700 dark:text-gray-300 font-medium">Posts per page:</span>
+              <label htmlFor="posts-per-page" className="sr-only">Select number of posts per page</label>
               <select
+                id="posts-per-page"
                 value={postsPerPage}
                 onChange={handlePostsPerPageChange}
                 className="p-3 rounded-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
