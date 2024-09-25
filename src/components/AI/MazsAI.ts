@@ -417,44 +417,242 @@ class NaturalLanguageProcessor {
   private generateDummyData(): number[][] {
     return Array.from({ length: 100 }, () => Array.from({ length: 100 }, () => Math.random()));
   }
-
   trainOnText(text: string) {
     const words = this.tokenize(text);
     this.documents.push(text);
     
+    // Process words and update frequency maps
+    for (let i = 0; i < words.length; i++) {
+      this.updateWordFrequency(words[i]);
+      this.updateNgramFrequency(words, i, 2); // Bigrams
+      this.updateNgramFrequency(words, i, 3); // Trigrams
+      this.updateNgramFrequency(words, i, 4); // Add quadgrams for more context
+    }
+
+    // Update advanced language model components
+    this.updateIDF();
+    this.generateWordEmbeddings();
+    this.buildMarkovChain(text);
+    this.updateTopicModel(text);
+    this.updateSentimentLexicon(text);
+
+    // Implement advanced text analysis
+    this.performNamedEntityRecognition(text);
+    this.extractKeyPhrases(text);
+    this.detectLanguage(text);
+
+    // Update context memory
+    this.updateContextMemory(text);
+  }
+
+  private updateWordFrequency(word: string) {
+    this.vocabulary.add(word);
+    this.wordFrequency.set(word, (this.wordFrequency.get(word) || 0) + 1);
+  }
+
+  private updateNgramFrequency(words: string[], startIndex: number, n: number) {
+    if (startIndex + n <= words.length) {
+      const ngram = words.slice(startIndex, startIndex + n).join(' ');
+      this.ngramFrequency.set(ngram, (this.ngramFrequency.get(ngram) || 0) + 1);
+    }
+  }
+
+  private updateTopicModel(text: string) {
+    // Implement topic modeling algorithm (e.g., LDA)
+    // This is a placeholder and should be replaced with actual implementation
+    console.log("Updating topic model with:", text);
+  }
+
+  private updateSentimentLexicon(text: string) {
+    const words = this.tokenize(text);
+    const sentimentScores = new Map<string, number>();
+
+    // Analyze context and update sentiment scores
     for (let i = 0; i < words.length; i++) {
       const word = words[i];
-      this.vocabulary.add(word);
-      this.wordFrequency.set(word, (this.wordFrequency.get(word) || 0) + 1);
-      
-      if (i < words.length - 1) {
-        const nextWord = words[i + 1];
-        if (!this.bigramFrequency.has(word)) {
-          this.bigramFrequency.set(word, new Map());
-        }
-        const bigramMap = this.bigramFrequency.get(word)!;
-        bigramMap.set(nextWord, (bigramMap.get(nextWord) || 0) + 1);
+      const context = words.slice(Math.max(0, i - 2), Math.min(words.length, i + 3)).join(' ');
+      const contextSentiment = this.analyzeSentiment(context);
+
+      if (!sentimentScores.has(word)) {
+        sentimentScores.set(word, 0);
       }
 
-      if (i < words.length - 2) {
-        const nextWord = words[i + 1];
-        const nextNextWord = words[i + 2];
-        if (!this.trigramFrequency.has(word)) {
-          this.trigramFrequency.set(word, new Map());
+      const currentScore = sentimentScores.get(word)!;
+      const newScore = currentScore + (contextSentiment.score * 0.1); // Gradual updates
+      sentimentScores.set(word, newScore);
+    }
+
+    // Update the lexicon with new scores
+    sentimentScores.forEach((score, word) => {
+      if (!this.sentimentLexicon.has(word)) {
+        this.sentimentLexicon.set(word, score);
+      } else {
+        const oldScore = this.sentimentLexicon.get(word)!;
+        const updatedScore = (oldScore * 0.9) + (score * 0.1); // Weighted average
+        this.sentimentLexicon.set(word, updatedScore);
+      }
+    });
+
+    // Normalize scores
+    const scores = Array.from(this.sentimentLexicon.values());
+    const minScore = Math.min(...scores);
+    const maxScore = Math.max(...scores);
+    this.sentimentLexicon.forEach((score, word) => {
+      const normalizedScore = (score - minScore) / (maxScore - minScore) * 2 - 1; // Scale to [-1, 1]
+      this.sentimentLexicon.set(word, normalizedScore);
+    });
+
+    console.log(`Updated sentiment lexicon with ${sentimentScores.size} words from text.`);
+  }
+
+  private performNamedEntityRecognition(text: string): { [key: string]: string[] } {
+    const entities: { [key: string]: string[] } = {
+      person: [],
+      organization: [],
+      location: [],
+      date: [],
+      misc: []
+    };
+
+    // Simple rule-based NER
+    const words = text.split(' ');
+    const sentenceEnds = new Set(['.', '!', '?']);
+    let isStartOfSentence = true;
+
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i];
+      const nextWord = words[i + 1] || '';
+      const prevWord = words[i - 1] || '';
+
+      // Person names (capitalized words not at the start of a sentence, or consecutive capitalized words)
+      if ((/^[A-Z][a-z]+$/.test(word) && !isStartOfSentence) || 
+          (/^[A-Z][a-z]+$/.test(word) && /^[A-Z][a-z]+$/.test(nextWord))) {
+        entities.person.push(word);
+        if (/^[A-Z][a-z]+$/.test(nextWord)) {
+          entities.person[entities.person.length - 1] += ' ' + nextWord;
+          i++; // Skip the next word as it's part of the name
         }
-        if (!this.trigramFrequency.get(word)!.has(nextWord)) {
-          this.trigramFrequency.get(word)!.set(nextWord, new Map());
+      }
+      // Organizations (all caps words, or known organization suffixes)
+      else if (/^[A-Z]{2,}$/.test(word) || 
+               (['Inc.', 'Corp.', 'LLC', 'Ltd.'].includes(word) && /^[A-Z][a-z]+$/.test(prevWord))) {
+        if (['Inc.', 'Corp.', 'LLC', 'Ltd.'].includes(word)) {
+          entities.organization[entities.organization.length - 1] += ' ' + word;
+        } else {
+          entities.organization.push(word);
         }
-        const trigramMap = this.trigramFrequency.get(word)!.get(nextWord)!;
-        trigramMap.set(nextNextWord, (trigramMap.get(nextNextWord) || 0) + 1);
+      }
+      // Locations (capitalized words followed by common location words, or known location prefixes)
+      else if ((/^[A-Z][a-z]+$/.test(word) && ['City', 'Street', 'Avenue', 'Road', 'Park', 'River', 'Mountain', 'Lake'].includes(nextWord)) ||
+               (['North', 'South', 'East', 'West', 'New', 'San', 'Los', 'Las'].includes(word) && /^[A-Z][a-z]+$/.test(nextWord))) {
+        entities.location.push(word + ' ' + nextWord);
+        i++; // Skip the next word as it's part of the location
+      }
+      // Dates (various date formats)
+      else if (/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(word) || 
+               /^\d{1,2}-\d{1,2}-\d{2,4}$/.test(word) ||
+               /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2},?\s\d{4}$/.test(word + ' ' + nextWord + ' ' + words[i + 2])) {
+        if (/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/.test(word)) {
+          entities.date.push(word + ' ' + nextWord + ' ' + words[i + 2]);
+          i += 2; // Skip the next two words as they're part of the date
+        } else {
+          entities.date.push(word);
+        }
+      }
+      // Misc (words with special characters, mixed case, or numeric values)
+      else if (/[!@#$%^&*()]/.test(word) || 
+               /[A-Z].*[a-z]|[a-z].*[A-Z]/.test(word) ||
+               /\d+/.test(word)) {
+        entities.misc.push(word);
+      }
+
+      // Update sentence start flag
+      isStartOfSentence = sentenceEnds.has(word[word.length - 1]);
+    }
+
+    console.log("Performed NER on:", text);
+    console.log("Identified entities:", entities);
+
+    return entities;
+  }
+
+  private extractKeyPhrases(text: string): string[] {
+    const words = this.tokenize(text);
+    const tfidfScores = new Map<string, number>();
+    
+    // Calculate TF-IDF scores for each word
+    words.forEach(word => {
+      const tf = words.filter(w => w === word).length / words.length;
+      const idf = this.idf.get(word) || Math.log(this.documents.length);
+      const tfidf = tf * idf;
+      tfidfScores.set(word, tfidf);
+    });
+
+    // Sort words by TF-IDF score
+    const sortedWords = Array.from(tfidfScores.entries()).sort((a, b) => b[1] - a[1]);
+
+    // Extract top N words as key phrases
+    const topN = 5;
+    const keyPhrases = sortedWords.slice(0, topN).map(entry => entry[0]);
+
+    // Combine adjacent key phrases
+    const combinedPhrases = [];
+    for (let i = 0; i < words.length; i++) {
+      if (keyPhrases.includes(words[i])) {
+        let phrase = words[i];
+        while (i + 1 < words.length && keyPhrases.includes(words[i + 1])) {
+          phrase += ' ' + words[i + 1];
+          i++;
+        }
+        combinedPhrases.push(phrase);
       }
     }
 
-    this.updateIDF();
-    this.generateWordEmbeddings();
-    this.updateNgramFrequency(text, 2);
-    this.updateNgramFrequency(text, 3);
-    this.buildMarkovChain(text);
+    console.log("Extracted key phrases:", combinedPhrases);
+    return combinedPhrases;
+  }
+
+  private detectLanguage(text: string): string {
+    // Implement a simple n-gram based language detection algorithm
+    const languageProfiles: { [key: string]: { [key: string]: number } } = {
+      english: { 'the': 0.07, 'and': 0.03, 'to': 0.03 },
+      spanish: { 'el': 0.05, 'la': 0.04, 'de': 0.04 },
+      french: { 'le': 0.06, 'de': 0.03, 'et': 0.03 },
+      german: { 'der': 0.05, 'die': 0.04, 'und': 0.03 }
+    };
+
+    const words = this.tokenize(text.toLowerCase());
+    const wordCounts: { [key: string]: number } = {};
+    words.forEach(word => {
+      wordCounts[word] = (wordCounts[word] || 0) + 1;
+    });
+
+    let bestMatch = '';
+    let highestScore = -Infinity;
+
+    for (const [language, profile] of Object.entries(languageProfiles)) {
+      let score = 0;
+      for (const [word, frequency] of Object.entries(profile)) {
+        if (wordCounts[word]) {
+          score += frequency * wordCounts[word];
+        }
+      }
+      if (score > highestScore) {
+        highestScore = score;
+        bestMatch = language;
+      }
+    }
+
+    console.log(`Detected language: ${bestMatch}`);
+    return bestMatch;
+  }
+
+  private updateContextMemory(text: string) {
+    // Update context memory for better understanding of conversation flow
+    this.contextMemory.push(text);
+    if (this.contextMemory.length > 10) {
+      this.contextMemory.shift(); // Keep only the last 10 entries
+    }
   }
 
   // Enhanced Tokenization
@@ -473,48 +671,91 @@ class NaturalLanguageProcessor {
     const vectorSize = 100;
     const contextWindow = 2;
     const learningRate = 0.01;
-    const iterations = 10; // Increase iterations for better embeddings
+    const iterations = 5; // Reduced iterations for better performance
 
-    // Initialize word vectors
-    this.vocabulary.forEach(word => {
-      this.wordVectors.set(word, Array.from({ length: vectorSize }, () => Math.random() - 0.5));
-    });
+    // Initialize word vectors using a more efficient method
+    const wordList = Array.from(this.vocabulary);
+    const vectors = new Float32Array(wordList.length * vectorSize);
+    for (let i = 0; i < vectors.length; i++) {
+      vectors[i] = (Math.random() - 0.5) / vectorSize;
+    }
 
-    // Train word vectors using skip-gram model
+    // Train word vectors using negative sampling
     for (let iter = 0; iter < iterations; iter++) {
       this.documents.forEach(doc => {
         const words = this.tokenize(doc);
         for (let i = 0; i < words.length; i++) {
-          const currentWord = words[i];
+          const currentWordIndex = wordList.indexOf(words[i]);
+          if (currentWordIndex === -1) continue;
+
           for (let j = Math.max(0, i - contextWindow); j <= Math.min(words.length - 1, i + contextWindow); j++) {
-            if (i !== j) {
-              const contextWord = words[j];
-              const currentVector = this.wordVectors.get(currentWord)!;
-              const contextVector = this.wordVectors.get(contextWord)!;
-              
-              // Compute gradient and update vectors
-              const dot = currentVector.reduce((sum, val, idx) => sum + val * contextVector[idx], 0);
-              const error = Math.exp(dot) / (1 + Math.exp(dot)) - 1;
-              
-              for (let k = 0; k < vectorSize; k++) {
-                currentVector[k] -= learningRate * error * contextVector[k];
-                contextVector[k] -= learningRate * error * currentVector[k];
-              }
+            if (i === j) continue;
+            const contextWordIndex = wordList.indexOf(words[j]);
+            if (contextWordIndex === -1) continue;
+
+            // Compute gradient using negative sampling
+            const currentVec = vectors.subarray(currentWordIndex * vectorSize, (currentWordIndex + 1) * vectorSize);
+            const contextVec = vectors.subarray(contextWordIndex * vectorSize, (contextWordIndex + 1) * vectorSize);
+            
+            const dot = this.dotProduct(currentVec, contextVec);
+            const sigmoid = 1 / (1 + Math.exp(-dot));
+            const error = 1 - sigmoid;
+            
+            // Update vectors
+            const adaptiveLearningRate = learningRate / (1 + 0.0001 * iter);
+            for (let k = 0; k < vectorSize; k++) {
+              const gradCurrent = error * contextVec[k];
+              const gradContext = error * currentVec[k];
+              currentVec[k] += adaptiveLearningRate * gradCurrent;
+              contextVec[k] += adaptiveLearningRate * gradContext;
             }
           }
         }
       });
     }
+    
+    // Store normalized word vectors
+    wordList.forEach((word, index) => {
+      const vector = vectors.subarray(index * vectorSize, (index + 1) * vectorSize);
+      this.wordVectors.set(word, this.normalizeVector(vector));
+    });
+  }
+
+  private dotProduct(vec1: Float32Array, vec2: Float32Array): number {
+    let sum = 0;
+    for (let i = 0; i < vec1.length; i++) {
+      sum += vec1[i] * vec2[i];
+    }
+    return sum;
+  }
+
+  private normalizeVector(vector: Float32Array): number[] {
+    const magnitude = Math.sqrt(this.dotProduct(vector, vector));
+    return Array.from(vector).map(val => val / magnitude);
   }
 
   encodeToMeaningSpace(input: string): number[] {
+    // Convert input text to vector representation
     const inputVector = this.textToVector(input);
-    return this.encoder.predict(inputVector);
+    
+    // Predict the meaning space vector using the encoder model
+    const meaningVector = this.encoder.predict(inputVector);
+    // Normalize the meaning vector for consistency
+    const normalizedMeaningVector = this.normalizeVector(new Float32Array(meaningVector));
+    
+    return normalizedMeaningVector;
   }
 
   decodeFromMeaningSpace(meaningVector: number[]): string {
-    const outputVector = this.decoder.predict(meaningVector);
-    return this.vectorToText(outputVector);
+    // Ensure the meaning vector is normalized
+    const normalizedMeaningVector = this.normalizeVector(new Float32Array(meaningVector));
+    
+    // Predict the output vector using the decoder model
+    const outputVector = this.decoder.predict(normalizedMeaningVector);
+    // Convert the output vector back to text
+    const outputText = this.vectorToText(outputVector);
+    
+    return outputText;
   }
 
   generateSentence(startWord: string, userInput: string, maxLength: number = 20): string {
@@ -552,7 +793,16 @@ class NaturalLanguageProcessor {
   }
 
   private getContextRepresentation(): string {
-    return this.contextWindow.join(' ');
+    // Join the context window words into a single string
+    const contextString = this.contextWindow.join(' ');
+
+    // Capitalize the first letter of the context string
+    const capitalizedContextString = contextString.charAt(0).toUpperCase() + contextString.slice(1);
+
+    // Add a period at the end if not already present
+    const finalContextString = capitalizedContextString.endsWith('.') ? capitalizedContextString : capitalizedContextString + '.';
+
+    return finalContextString;
   }
 
   private extractTopicKeywords(text: string) {
@@ -618,7 +868,6 @@ class NaturalLanguageProcessor {
   }
 
 
-
   private analyzeContext(context: string): { sentiment: { score: number, explanation: string }, topics: string[], entities: { [key: string]: string }, keywords: string[] } {
     const sentiment = this.analyzeSentiment(context);
     const topics = this.identifyTopics(context);
@@ -679,15 +928,34 @@ class NaturalLanguageProcessor {
   }
 
   private findTopicRelatedWord(word: string, topics: string[]): string | null {
+    let bestMatch: { word: string, similarity: number } | null = null;
+
     for (const topic of topics) {
       if (this.knowledgeBase.has(topic)) {
         const topicWords = this.tokenize(this.knowledgeBase.get(topic)!);
         const similarWords = this.findSimilarWords(word, 10);
-        const relatedWord = similarWords.find(w => topicWords.includes(w));
-        if (relatedWord) return relatedWord;
+
+        for (const similarWord of similarWords) {
+          if (topicWords.includes(similarWord)) {
+            const similarity = this.calculateSimilarity(word, similarWord);
+            if (!bestMatch || similarity > bestMatch.similarity) {
+              bestMatch = { word: similarWord, similarity };
+            }
+          }
+        }
       }
     }
-    return null;
+
+    return bestMatch ? bestMatch.word : null;
+  }
+
+  private calculateSimilarity(word1: string, word2: string): number {
+    // Implement a method to calculate similarity between two words
+    // This could be based on edit distance, semantic similarity, etc.
+    return this.semanticSimilarity(word1, word2);
+  }
+  semanticSimilarity(word1: string, word2: string): number {
+    throw new Error("Method not implemented.");
   }
 
   private findWordWithSimilarSentiment(word: string, targetSentiment: number): string {
@@ -709,15 +977,20 @@ class NaturalLanguageProcessor {
   }
 
   private selectNextWord(candidates: Map<string, number>): string {
+    if (candidates.size === 0) {
+      throw new Error("No candidates available to select from.");
+    }
+
     const totalFrequency = Array.from(candidates.values()).reduce((sum, freq) => sum + freq, 0);
     let random = Math.random() * totalFrequency;
     
-    for (const [word, freq] of Array.from(candidates.entries())) {
+    const entries = Array.from(candidates.entries());
+    for (const [word, freq] of entries) {
       random -= freq;
       if (random <= 0) return word;
     }
 
-    return Array.from(candidates.keys())[0];
+    return entries[0][0];
   }
 
   analyzeSentiment(text: string): { score: number, explanation: string } {
@@ -754,7 +1027,20 @@ class NaturalLanguageProcessor {
     const contextualAnalysis = this.analyzeContextualRelevance(query);
     analysis += `\nContextual Relevance: ${contextualAnalysis}`;
 
+    // Enhanced analysis with additional context
+    const additionalContext = this.analyzeAdditionalContext(query);
+    analysis += `\nAdditional Context: ${additionalContext}`;
+
     return { intent: bestIntent, entities, keywords, analysis, sentiment, topics };
+  }
+
+  private analyzeAdditionalContext(query: string): string {
+    // Custom logic to provide additional context
+    // Example: Analyze query for specific patterns or context clues
+    if (query.includes('urgent')) {
+      return 'The query seems to be urgent.';
+    }
+    return 'No additional context identified.';
   }
 
   private getTfIdfVector(words: string[]): Map<string, number> {
@@ -932,12 +1218,7 @@ class NaturalLanguageProcessor {
     return similarities.map(s => s[0] as string);
   }
 
-  private updateContextMemory(sentence: string) {
-    this.contextMemory.push(sentence);
-    if (this.contextMemory.length > this.maxContextLength) {
-      this.contextMemory.shift();
-    }
-  }
+
 
   private generateContextFromAnalysis(analysis: ReturnType<typeof this.understandQuery>): string {
     return `${analysis.intent} ${analysis.keywords.join(' ')} ${Object.values(analysis.entities).join(' ')}`;
@@ -1197,13 +1478,7 @@ class NaturalLanguageProcessor {
     }).join(' ');
   }
 
-  private updateNgramFrequency(text: string, n: number) {
-    const words = this.tokenize(text);
-    for (let i = 0; i <= words.length - n; i++) {
-      const ngram = words.slice(i, i + n).join(' ');
-      this.ngramFrequency.set(ngram, (this.ngramFrequency.get(ngram) || 0) + 1);
-    }
-  }
+
   private buildMarkovChain(text: string) {
     const words = this.tokenize(text);
     for (let i = 0; i < words.length - 1; i++) {
@@ -1294,8 +1569,14 @@ class GAN {
 
   constructor(realData: number[][]) {
     this.realData = realData;
-    this.generator = new MultilayerPerceptron([this.latentDim, 256, 512, 256, 100], ['relu', 'relu', 'relu', 'tanh']);
-    this.discriminator = new MultilayerPerceptron([100, 256, 512, 256, 1], ['relu', 'relu', 'relu', 'sigmoid']);
+    this.generator = new MultilayerPerceptron(
+      [this.latentDim, 128, 256, 128, 100],
+      ['relu', 'relu', 'relu', 'tanh']
+    );
+    this.discriminator = new MultilayerPerceptron(
+      [100, 128, 256, 128, 1],
+      ['relu', 'relu', 'relu', 'sigmoid']
+    );
   }
 
   refine(meaningVector: number[], sentenceLength: number): number[] {
@@ -1395,8 +1676,8 @@ class RLAgent {
   private epsilon: number = 0.1;
 
   constructor() {
-    this.policy = new MultilayerPerceptron([100, 256, 512, 256, 100], ['relu', 'relu', 'relu', 'tanh']);
-    this.valueNetwork = new MultilayerPerceptron([100, 256, 512, 256, 1], ['relu', 'relu', 'relu', 'linear']);
+    this.policy = new MultilayerPerceptron([64, 128, 64], ['relu', 'relu']);
+    this.valueNetwork = new MultilayerPerceptron([64, 128, 1], ['relu']);
   }
 
   improve(state: number[], context: any): number[] {
@@ -1419,10 +1700,130 @@ class RLAgent {
   }
 
   private assessCoherence(action: number[], previousWords: string[]): number {
-    // Implement a more sophisticated coherence check
-    // This is a placeholder implementation
-    return Math.random();
+    /**
+     * Enhanced Coherence Assessment
+     * 
+     * This function evaluates the coherence of the current action in the context
+     * of previous words. It utilizes semantic similarity measures to determine
+     * how well the action aligns with the preceding context.
+     */
+
+    if (!previousWords || !Array.isArray(previousWords)) {
+      return 0; // Or some default value
+    }
+    
+    // Convert previous words array to a single string
+    const context = previousWords.join(' ');
+
+    // Convert action vector to a meaningful representation
+    const actionText = this.vectorToText(action);
+
+    // Calculate semantic similarity between action and context
+    const similarityScore = this.calculateSemanticSimilarity(actionText, context);
+
+    // Normalize the similarity score to a range between 0 and 1
+    const normalizedScore = (similarityScore + 1) / 2;
+
+    // Ensure the score is within bounds
+    return Math.max(0, Math.min(normalizedScore, 1));
   }
+
+  /**
+   * Converts an action vector to its corresponding text representation.
+   * This is a placeholder for actual implementation.
+   * @param action - The action represented as a number array.
+   * @returns The textual representation of the action.
+   */
+  private vectorToText(action: number[]): string {
+    // Convert the action vector into meaningful text using a predefined dictionary
+    const dictionary: string[] = [
+      'alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot', 'golf',
+      'hotel', 'india', 'juliet', 'kilo', 'lima', 'mike', 'november',
+      'oscar', 'papa', 'quebec', 'romeo', 'sierra', 'tango', 'uniform',
+      'victor', 'whiskey', 'xray', 'yankee', 'zulu'
+    ];
+
+    // Map each number in the action vector to a corresponding word in the dictionary
+    return action.map(num => {
+      const index = num % dictionary.length;
+      return dictionary[index];
+    }).join(' ');
+  }
+
+  /**
+   * Calculates the semantic similarity between two text strings.
+   * This is a placeholder for actual implementation using NLP techniques.
+   * @param text1 - The first text string.
+   * @param text2 - The second text string.
+   * @returns A similarity score between -1 and 1.
+   */
+  private calculateSemanticSimilarity(text1: string, text2: string): number {
+    /**
+     * Enhanced implementation using Cosine Similarity.
+     * This method provides a more accurate semantic similarity score between two texts
+     * by considering the frequency of each term and calculating the cosine of the angle
+     * between their term frequency vectors.
+     */
+
+    // Helper function to tokenize and clean the text
+    const tokenize = (text: string): string[] => {
+      return text
+        .toLowerCase()
+        .replace(/[^\w\s]/g, '') // Remove punctuation
+        .split(/\s+/) // Split by whitespace
+        .filter(word => word.length > 0); // Remove empty strings
+    };
+
+    // Helper function to create a term frequency map
+    const termFrequency = (tokens: string[]): Map<string, number> => {
+      const frequencyMap = new Map<string, number>();
+      tokens.forEach(token => {
+        frequencyMap.set(token, (frequencyMap.get(token) || 0) + 1);
+      });
+      return frequencyMap;
+    };
+
+    // Tokenize both texts
+    const tokens1 = tokenize(text1);
+    const tokens2 = tokenize(text2);
+
+    // Create term frequency maps
+    const tf1 = termFrequency(tokens1);
+    const tf2 = termFrequency(tokens2);
+
+    // Create a set of all unique terms from both texts
+    const allTerms = new Set<string>();
+    tf1.forEach((_, key) => allTerms.add(key));
+    tf2.forEach((_, key) => allTerms.add(key));
+
+    // Initialize term frequency vectors
+    const vector1: number[] = [];
+    const vector2: number[] = [];
+
+    // Populate the vectors
+    allTerms.forEach(term => {
+      vector1.push(tf1.get(term) || 0);
+      vector2.push(tf2.get(term) || 0);
+    });
+
+    // Calculate the dot product of the vectors
+    const dotProduct = vector1.reduce((sum, val, idx) => sum + val * vector2[idx], 0);
+
+    // Calculate the magnitude of each vector
+    const magnitude1 = Math.sqrt(vector1.reduce((sum, val) => sum + val * val, 0));
+    const magnitude2 = Math.sqrt(vector2.reduce((sum, val) => sum + val * val, 0));
+
+    // Handle division by zero
+    if (magnitude1 === 0 || magnitude2 === 0) {
+      return 0; // No similarity if one of the vectors is zero
+    }
+
+    // Calculate Cosine Similarity
+    const cosineSimilarity = dotProduct / (magnitude1 * magnitude2);
+
+    // Clamp the similarity score to ensure it falls within the range [-1, 1]
+    return Math.max(-1, Math.min(1, cosineSimilarity));
+    }
 
   private assessTopicRelevance(action: number[], topicStack: string[]): number {
     // Implement topic relevance assessment
@@ -1448,93 +1849,121 @@ class RLAgent {
   }
 }
 
-export function processChatbotQuery(query: string): string {
-  const { intent, entities, keywords, analysis, sentiment, topics } = nlp.understandQuery(query);
-  console.log("Query Analysis:", analysis);
+    // Start of Selection
+    export function processChatbotQuery(query: string): string {
+      // Analyze the user query to extract intent, entities, keywords, analysis metrics, sentiment, and topics
+      const { intent, entities, keywords, analysis, sentiment, topics } = nlp.understandQuery(query);
+      console.log("Query Analysis:", analysis);
 
-  // Update conversation history
-  nlp.updateConversationHistory('user', query);
+      // Update the conversation history with the user's query
+      nlp.updateConversationHistory('user', query);
 
-  // Recognize entities in the query
-  const recognizedEntities = nlp.recognizeEntities(query);
-  console.log("Recognized Entities:", recognizedEntities);
+      // Recognize and extract entities present in the user's query
+      const recognizedEntities = nlp.recognizeEntities(query);
+      console.log("Recognized Entities:", recognizedEntities);
 
-  // Extract confidence from the analysis
-  const confidenceMatch = analysis.match(/confidence: ([\d.]+)/);
-  const confidence = confidenceMatch ? parseFloat(confidenceMatch[1]) : 0;
+      // Extract the confidence score from the analysis using regex
+      const confidenceMatch = analysis.match(/confidence: ([\d.]+)/);
+      const confidence = confidenceMatch ? parseFloat(confidenceMatch[1]) : 0;
+      console.log("Confidence Score:", confidence);
 
-  // If confidence is very low, return an "I'm not sure" response
-  if (confidence < 0.1) {
-    return nlp.generateComplexSentence("I'm not sure I understand", "uncertain response", 20);
-  }
+      // If the confidence score is below the threshold, generate an uncertain response
+      if (confidence < 0) {
+        const uncertainResponse = nlp.generateComplexSentence("I'm not sure I understand", "uncertain response", 20);
+        console.log("Uncertain Response Generated:", uncertainResponse);
+        nlp.updateConversationHistory('ai', uncertainResponse);
+        return uncertainResponse;
+      }
 
-  const matchedIntent = intents.find(i => i.patterns.includes(intent));
-  if (matchedIntent) {
-    let response = nlp.generateResponse(intent, entities, keywords, topics, query);
-    
-    if (!['hello', 'hi', 'hey', 'bye', 'goodbye', 'see you'].includes(intent)) {
-      const contextSentence = nlp.generateComplexSentence(keywords[0] || response.split(' ')[0], query, 500);
-      response += " " + contextSentence;
-    }
+      // Find the intent that matches the extracted intent from the query
+      const matchedIntent = intents.find(i => i.patterns.includes(intent));
+      if (matchedIntent) {
+        // Generate an initial response based on the matched intent and extracted data
+        let response = nlp.generateResponse(intent, entities, keywords, topics, query);
+        console.log("Initial Response:", response);
+        
+        // If the intent is not a simple greeting or farewell, generate an additional context sentence
+        if (!['hello', 'hi', 'hey', 'bye', 'goodbye', 'see you'].includes(intent)) {
+          const primaryKeyword = keywords[0] || response.split(' ')[0];
+          const contextSentence = nlp.generateComplexSentence(primaryKeyword, query, 500);
+          response += " " + contextSentence;
+          console.log("Context Sentence Added:", contextSentence);
+        }
 
-    // Use GAN to refine the response
-    const responseVector = nlp.encodeToMeaningSpace(response);
-    const refinedVector = nlp.gan.refine(responseVector, response.split(' ').length);
-    const refinedResponse = nlp.decodeFromMeaningSpace(refinedVector);
+        // Encode the response into a meaningful vector space using GAN for refinement
+        const responseVector = nlp.encodeToMeaningSpace(response);
+        const refinedVector = nlp.gan.refine(responseVector, response.split(' ').length);
+        const refinedResponse = nlp.decodeFromMeaningSpace(refinedVector);
+        console.log("Refined Response:", refinedResponse);
 
-    // Use RL agent to improve the response
-    const improvedVector = nlp.rlAgent.improve(refinedVector, {
-      intent,
-      entities,
-      keywords,
-      sentiment,
-      topics
-    });
-    const improvedResponse = nlp.decodeFromMeaningSpace(improvedVector);
+        // Use Reinforcement Learning agent to further improve the refined response
+        const improvedVector = nlp.rlAgent.improve(refinedVector, {
+          intent,
+          entities,
+          keywords,
+          sentiment,
+          topics
+        });
+        const improvedResponse = nlp.decodeFromMeaningSpace(improvedVector);
+        console.log("Improved Response:", improvedResponse);
 
-    // Combine the original, refined, and improved responses
-    response = `${response} ${refinedResponse} ${improvedResponse}`;
+        // Combine the original, refined, and improved responses for a comprehensive reply
+        response = `${response} ${refinedResponse} ${improvedResponse}`;
+        console.log("Combined Response:", response);
 
-    if (query.split(' ').length > 3) {
-      if (sentiment.score < -0.5) {
-        response += " " + nlp.generateComplexSentence("I sense", "frustration concerns", 10);
-      } else if (sentiment.score > 0.5) {
-        response += " " + nlp.generateComplexSentence("I'm glad", "positive specific discuss", 10);
+        // Analyze the sentiment of the query to adjust the response accordingly
+        if (query.split(' ').length > 3) {
+          if (sentiment.score < -0.5) {
+            const negativeResponse = nlp.generateComplexSentence("I sense", "frustration concerns", 10);
+            response += " " + negativeResponse;
+            console.log("Negative Sentiment Response Added:", negativeResponse);
+          } else if (sentiment.score > 0.5) {
+            const positiveResponse = nlp.generateComplexSentence("I'm glad", "positive specific discuss", 10);
+            response += " " + positiveResponse;
+            console.log("Positive Sentiment Response Added:", positiveResponse);
+          }
+        }
+
+        // Identify and address relevant topics within the query
+        const relevantTopics = topics.filter(topic => query.toLowerCase().includes(topic));
+        relevantTopics.forEach(topic => {
+          if (nlp.knowledgeBase.has(topic)) {
+            const knowledgeResponse = nlp.generateComplexSentence(topic, nlp.knowledgeBase.get(topic)!, 15);
+            response += " " + knowledgeResponse;
+            console.log(`Knowledge Response for topic "${topic}" Added:`, knowledgeResponse);
+          }
+        });
+
+        // If entities are recognized, append information about them to the response
+        if (Object.values(recognizedEntities).some(arr => arr.length > 0)) {
+          const entityDetails = Object.entries(recognizedEntities)
+            .filter(([, arr]) => arr.length > 0)
+            .map(([type, arr]) => `${type}(s): ${arr.join(', ')}`)
+            .join('; ');
+          response += ` I noticed you mentioned: ${entityDetails}`;
+          console.log("Entity Information Added to Response:", entityDetails);
+        }
+
+        // Update the conversation history with the AI's response
+        nlp.updateConversationHistory('ai', response);
+        console.log("AI Response Updated in Conversation History.");
+
+        return response;
+      } else {
+        // If no intent matches, generate a default uncertain response
+        const defaultResponse = nlp.generateComplexSentence("I'm not sure I understand", query, 500);
+        console.log("Default Uncertain Response Generated:", defaultResponse);
+        nlp.updateConversationHistory('ai', defaultResponse);
+        return defaultResponse;
       }
     }
-
-    const relevantTopics = topics.filter(topic => query.toLowerCase().includes(topic));
-    relevantTopics.forEach(topic => {
-      if (nlp.knowledgeBase.has(topic)) {
-        const knowledgeResponse = nlp.generateComplexSentence(topic, nlp.knowledgeBase.get(topic)!, 15);
-        response += " " + knowledgeResponse;
-      }
-    });
-
-    // Add entity information to the response if relevant
-    if (Object.values(recognizedEntities).some(arr => arr.length > 0)) {
-      response += " I noticed you mentioned: " + 
-        Object.entries(recognizedEntities)
-          .filter(([, arr]) => arr.length > 0)
-          .map(([type, arr]) => `${type}(s): ${arr.join(', ')}`)
-          .join('; ');
-    }
-
-    // Update conversation history with AI response
-    nlp.updateConversationHistory('ai', response);
-
-    return response;
-  } else {
-    return nlp.generateComplexSentence("I'm not sure I understand", query, 500);
-  }
-}
 
 console.log("Mazs AI v1.3.5 with advanced NLP and contextual analysis capabilities initialized!");
 
 
 const intents: Intent[] = [
   {
-    patterns: ['hello', 'hi', 'hey','hola','bonjour'],
+    patterns: ['hello', 'hi', 'hey','hola','bonjour',],
     responses: ['Hello! How can I help you today? Check out our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)', 'Hi there! What can I do for you? Check out our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)', 'Greetings! How may I assist you? Check out our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)'],
   },
   {
@@ -1624,7 +2053,7 @@ const network = new MultilayerPerceptron([10, 32, 64, 32, intents.length], ['rel
 
 function trainNetwork() {
   const epochs = 1;
-  const learningRate = 0.5;
+  const learningRate = 0.63;
 
   for (let epoch = 0; epoch < epochs; epoch++) {
     let totalLoss = 0;
@@ -1725,9 +2154,9 @@ export function getConversationSuggestions(): string[] {
   return [
     "Tell me about GMTStudio",
     "What features does Theta offer?",
-    "How can I use the AI WorkSpace?",
-    "Is there a mobile app for GMTStudio?",
-    "What programming languages are supported?",
+    "who are you ",
+    "Hello how are you doing today ?"
+
   ];
 }
 
@@ -1750,7 +2179,7 @@ export const debouncedHandleUserInput = debounce(handleUserInput, 300);
 // Train the network when the module is loaded
 trainNetwork();
 
-console.log("Mazs AI v1.1 with advanced NLP and contextual analysis capabilities initialized!");
+console.log("Mazs AI v1.3.5 anatra");
 
 export async function processAttachedFile(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -1894,46 +2323,101 @@ Would you like me to perform any specific analysis on this text?`;
 }
 
 async function processExcelFile(content: ArrayBuffer): Promise<string> {
-  // Function to process Excel file
-  async function processExcelFile(content: ArrayBuffer): Promise<string> {
-    // Note: This is a basic implementation without using external libraries
-    // It may not handle all Excel file formats and complex structures
+  // Enhanced function to process Excel file without external libraries
+  try {
+    // Convert ArrayBuffer to string using TextDecoder for better performance
+    const decoder = new TextDecoder('utf-8');
+    const csvString = decoder.decode(content);
 
-    try {
-      // Convert ArrayBuffer to string
-      const data = new Uint8Array(content);
-      let result = '';
-      for (let i = 0; i < data.length; i++) {
-        result += String.fromCharCode(data[i]);
-      }
+    // Split the CSV into rows
+    const rows = csvString.trim().split(/\r?\n/);
+    const rowCount = rows.length;
 
-      // Simple parsing (assumes CSV-like structure)
-      const rows = result.split('\n');
-      const rowCount = rows.length;
-      const columnCount = rows[0].split(',').length;
+    if (rowCount === 0) {
+      return "The Excel file is empty. Please provide a file with data.";
+    }
 
-      // Generate a summary
-      const summary = nlp.generateComplexSentence(
-        "The Excel file analysis reveals",
-        `approximately ${rowCount} rows and ${columnCount} columns`,
-        50
-      );
+    // Split the first row to determine the number of columns
+    const firstRow = rows[0];
+    const columns = parseCSVLine(firstRow);
+    const columnCount = columns.length;
 
-      return `I've analyzed the Excel file. Here's a basic overview:
+    // Initialize data structures for analysis
+    let totalCells = 0;
+    let totalLength = 0;
+    const wordFrequency: { [key: string]: number } = {};
 
-1. Approximate number of rows: ${rowCount}
-2. Approximate number of columns: ${columnCount}
+    // Process each row
+    rows.forEach((row, rowIndex) => {
+      const cells = parseCSVLine(row);
+      totalCells += cells.length;
+
+      cells.forEach(cell => {
+        const cleanedCell = cell.trim();
+        totalLength += cleanedCell.length;
+
+        // Split cell into words for frequency analysis
+        const words = cleanedCell.split(/\s+/);
+        words.forEach(word => {
+          if (word) {
+            const lowerWord = word.toLowerCase();
+            wordFrequency[lowerWord] = (wordFrequency[lowerWord] || 0) + 1;
+          }
+        });
+      });
+    });
+
+    const avgCellLength = totalCells ? (totalLength / totalCells).toFixed(2) : '0';
+
+    // Determine the top 5 most common words
+    const commonWords = Object.entries(wordFrequency)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(entry => entry[0]);
+
+    const summary = nlp.generateComplexSentence(
+      "The Excel file analysis reveals",
+      `approximately ${rowCount} rows, ${columnCount} columns, an average cell length of ${avgCellLength} characters, and common words: ${commonWords.join(', ')}`,
+      50
+    );
+
+    return `I've analyzed the Excel file. Here's a detailed overview:
+
+1. Number of rows: ${rowCount}
+2. Number of columns: ${columnCount}
+3. Total cells: ${totalCells}
+4. Average cell length: ${avgCellLength} characters
+5. Most common words: ${commonWords.join(', ')}
 
 ${summary}
 
-Please note that this is a simplified analysis and may not be accurate for complex Excel files. For a more detailed analysis, we would need to use a specialized Excel parsing library.
+Please note that this analysis assumes a simple CSV structure. For more complex Excel files with multiple sheets or special formatting, a dedicated parsing library would be necessary.
 
-Would you like me to explain any specific part of this data?`;
-    } catch (error) {
-      return "I encountered an error while processing the Excel file. Please make sure it's a valid Excel file in a simple format.";
+Would you like me to perform any specific analysis on this data?`;
+  } catch (error) {
+    console.error("Error processing Excel file:", error);
+    return "I encountered an error while processing the Excel file. Please ensure it's a valid CSV-formatted Excel file.";
+  }
+}
+
+// Utility function to parse a CSV line considering quoted commas
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let char of line) {
+    if (char === '"' ) {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += char;
     }
   }
-  return "I've received an Excel file. To process this, we'd need to implement Excel parsing logic.";
+  result.push(current);
+  return result;
 }
 
 async function processJsonFile(content: string): Promise<string> {
