@@ -164,13 +164,6 @@ const EggHuntGame: React.FC = () => {
 
   const handleEggClick = () => {
     if (isEggDisabled || !selectedEggType) return;
-
-    // Prevent interaction if no eggs left
-    if (eggInventory[selectedEggType.id] <= 0) {
-      setMessage(`You don't have any ${selectedEggType.name}s left.`);
-      return;
-    }
-
     setIsEggDisabled(true);
 
     if (eggState === 'initial') {
@@ -180,17 +173,14 @@ const EggHuntGame: React.FC = () => {
         setIsEggDisabled(false);
       }, 2000);
     } else if (eggState === 'cracked') {
+      // Decrease the egg count here
+      setEggInventory((prevInventory) => ({
+        ...prevInventory,
+        [selectedEggType.id]: Math.max((prevInventory[selectedEggType.id] || 0) - 1, 0),
+      }));
+
       setEggState('shiver-fried');
       setTimeout(() => {
-        // Decrease the egg count here after action completes
-        setEggInventory((prevInventory) => {
-          const newCount = Math.max((prevInventory[selectedEggType.id] || 1) - 1, 0);
-          return {
-            ...prevInventory,
-            [selectedEggType.id]: newCount,
-          };
-        });
-
         // Calculate outcome based on probabilities
         const randomNum = Math.random() * 100;
         if (randomNum < selectedEggType.winChance) {
@@ -231,8 +221,9 @@ const EggHuntGame: React.FC = () => {
         // Reset after action completes
         setTimeout(() => {
           setEggState('initial');
-          setSelectedEggType(null);
+          // Do not reset selectedEggType here
           setMessage('');
+          setIsEggDisabled(false); // Make sure to enable the egg
         }, 3000);
       }, 2000);
     }
@@ -270,11 +261,11 @@ const EggHuntGame: React.FC = () => {
     const result = outcomes[Math.floor(Math.random() * outcomes.length)];
     if (result === 'Win') {
       const winnings = 50;
-      setFunds(funds + winnings);
+      setFunds((prevFunds) => prevFunds + winnings);
       setSlotResult(`You won $${winnings}!`);
     } else if (result === 'Jackpot') {
       const winnings = 500;
-      setFunds(funds + winnings);
+      setFunds((prevFunds) => prevFunds + winnings);
       setSlotResult(`Jackpot! You won $${winnings}!`);
     } else {
       setSlotResult('You lost on the slot machine.');
@@ -318,7 +309,9 @@ const EggHuntGame: React.FC = () => {
           <div
             key={egg.id}
             className={`flex flex-col items-center m-2 ${
-              eggInventory[egg.id] > 0 ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed'
+              eggInventory[egg.id] > 0
+                ? 'cursor-pointer'
+                : 'opacity-50 cursor-not-allowed'
             }`}
             onClick={() => eggInventory[egg.id] > 0 && handleEggSelect(egg)}
           >
