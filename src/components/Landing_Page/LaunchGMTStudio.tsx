@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
+import { TbSparkles } from "react-icons/tb";
+
 
 const LaunchMazsAI: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,8 +22,8 @@ const LaunchMazsAI: React.FC = () => {
     let currentIndex = 0;
     let isDeleting = false;
     let text = '';
-    let typingSpeed = 200;
-    let pauseEnd = 1000;
+    let typingSpeed = 75;
+    let pauseEnd = 2000;
 
     const type = () => {
       const current = languages[currentIndex];
@@ -36,12 +37,12 @@ const LaunchMazsAI: React.FC = () => {
 
       if (!isDeleting && text === current.text) {
         isDeleting = true;
-        typingSpeed = 100;
+        typingSpeed = 75;
         setTimeout(type, pauseEnd);
       } else if (isDeleting && text === '') {
         isDeleting = false;
         currentIndex = (currentIndex + 1) % languages.length;
-        typingSpeed = 100;
+        typingSpeed = 75;
         setTimeout(type, 500);
       } else {
         setTimeout(type, typingSpeed);
@@ -104,7 +105,7 @@ const LaunchMazsAI: React.FC = () => {
               className="absolute right-2 top-1/2 transform -translate-y-1/2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full"
               aria-label="Submit question"
             >
-              <ChevronRightIcon className="w-6 h-6 text-gray-400 hover:text-gray-600 transition-colors duration-200" />
+              <TbSparkles className="w-6 h-6 dark:text-white dark:hover:text-gray-100 text-black hover:text-gray-900 transition-colors duration-200" />
             </button>
           </div>
           {error && (

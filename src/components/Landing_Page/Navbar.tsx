@@ -79,9 +79,8 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
       icon: <FiCodesandbox />,
       isDropdown: true,
       subItems: [
-        { name: 'AI Workspace', path: '/products/ai-workspace' },
-        { name: 'Data Analytics', path: '/products/data-analytics' },
-        { name: 'Machine Learning', path: '/products/machine-learning' },
+        { name: 'Mazs AI lab preview', path: '/mazsai' },
+        { name: 'Mazs AI', path: 'https://mazs-ai-lab.vercel.app/' },
       ],
     },
     { name: 'Mazs AI', path: '/mazsai', icon: <GrChat /> },
