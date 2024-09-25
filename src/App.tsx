@@ -45,6 +45,7 @@ import AIWebsiteGenerator from './components/AI/AIWebsiteGenerator';
 import MazsAPI from './components/AI/MazsAPI';
 import MazsAI from './components/AI/MazsAI_UI';
 import CustomCursor from './components/CustomCursor';
+import EggHunt from './components/Pages/EggHunt';
 
 const AppContent: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -130,6 +131,7 @@ const AppContent: React.FC = () => {
           <Route path="/advanced-search" element={<AdvancedSearch />} />
           <Route path="/mazsai" element={<MazsAI/>} />
           <Route path="/mazsapi" element={<MazsAPI/>} />
+          <Route path="/egg-hunter" element={<EggHunt />} />
         </Routes>
         {!isMazsAIPage && <Footer />}
       </main>

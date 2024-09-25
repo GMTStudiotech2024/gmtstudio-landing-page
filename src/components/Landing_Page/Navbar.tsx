@@ -10,6 +10,7 @@ import { TbHomeSignal } from 'react-icons/tb';
 import { LiaFlaskSolid } from 'react-icons/lia';
 import { GrChat } from 'react-icons/gr';
 import { FiCodesandbox } from "react-icons/fi";
+import { TbEggCracked } from 'react-icons/tb';
 
 interface NavbarProps {
   onSearchClick: () => void;
@@ -29,6 +30,8 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { scrollYProgress } = useViewportScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 1]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showEasterEgg, setShowEasterEgg] = useState(false);
 
   const handleScroll = useCallback(() => {
     setScrollPosition(window.pageYOffset);
@@ -54,6 +57,19 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
     setIsNotificationOpen(!isNotificationOpen);
     setIsOpen(false);
   };
+
+  const handleSearchClick = () => {
+    if (searchTerm.trim() === '/is') {
+      setShowEasterEgg(true);
+      setSearchTerm('');
+      return;
+    }
+    if (searchTerm.trim() === '') {
+      return;
+    }
+    onSearchClick();
+  };
+
 
   const menuVariants = {
     hidden: { opacity: 0, y: -20 },
@@ -102,78 +118,146 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
   }, [handleKeyDown]);
 
   return (
-    <motion.nav
-      style={{ opacity }}
-      className={`fixed w-full z-50 transition-all duration-300 backdrop-blur-md ${
-        scrollPosition > 50 ? 'bg-white/90 dark:bg-gray-900/90 shadow-sm' : 'bg-transparent'
-      }`}
-      role="navigation"
-      aria-label="Main Navigation"
-    >
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="text-2xl font-extrabold bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-cyan-600 dark:to-blue-600"
-        >
-          <Link to="/" aria-label="GMTStudio Home">GMTStudio</Link>
-        </motion.div>
-
-        {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-4 lg:space-x-6 items-center text-blue-800 dark:text-gray-200">
-          {navItems.map((item) =>
-            item.isDropdown ? (
-              <DropdownMenu key={item.name} item={item} isActive={location.pathname === item.path} />
-            ) : (
-              <NavLink key={item.name} href={item.path} label={item.name} icon={item.icon} isActive={location.pathname === item.path} />
-            )
-          )}
-          <SearchInput onSearchClick={onSearchClick} />
-          <NotificationButton toggleNotificationMenu={toggleNotificationMenu} isNotificationOpen={isNotificationOpen} notifications={notifications} />
-          <AuthButtons />
-          <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-        </div>
-
-        {/* Mobile Menu Toggle */}
-        <div className="md:hidden flex items-center space-x-2">
-          <button onClick={toggleMenu} className="text-xl text-blue-800 dark:text-white p-2" aria-label="Toggle menu" aria-expanded={isOpen}>
-            {isOpen ? <FaTimes /> : <FaBars />}
-          </button>
-          <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-        </div>
-      </div>
-
-      {/* Mobile Menu Dropdown */}
-      <AnimatePresence>
-        {isOpen && (
+    <>
+      <motion.nav
+        style={{ opacity }}
+        className={`fixed w-full z-50 transition-all duration-300 backdrop-blur-md ${
+          scrollPosition > 50 ? 'bg-white/90 dark:bg-gray-900/90 shadow-sm' : 'bg-transparent'
+        }`}
+        role="navigation"
+        aria-label="Main Navigation"
+      >
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <motion.div
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            variants={menuVariants}
-            className="md:hidden bg-white dark:bg-gray-900 shadow-md rounded-b-lg p-4 space-y-2"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="text-2xl font-extrabold bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-cyan-600 dark:to-blue-600"
           >
+            <Link to="/" aria-label="GMTStudio Home">GMTStudio</Link>
+          </motion.div>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex space-x-4 lg:space-x-6 items-center text-blue-800 dark:text-gray-200">
             {navItems.map((item) =>
               item.isDropdown ? (
-                <DropdownMenu key={item.name} item={item} isActive={location.pathname.startsWith('/Products')} isMobile />
+                <DropdownMenu key={item.name} item={item} isActive={location.pathname === item.path} />
               ) : (
                 <NavLink key={item.name} href={item.path} label={item.name} icon={item.icon} isActive={location.pathname === item.path} />
               )
             )}
-            <SearchInput onSearchClick={onSearchClick} isMobile />
-            <AuthButtons isMobile />
+            <SearchInput
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onSearchClick={handleSearchClick}
+            />
+            <NotificationButton toggleNotificationMenu={toggleNotificationMenu} isNotificationOpen={isNotificationOpen} notifications={notifications} />
+            <AuthButtons />
+            <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+          </div>
+
+          {/* Mobile Menu Toggle */}
+          <div className="md:hidden flex items-center space-x-2">
+            <button onClick={toggleMenu} className="text-xl text-blue-800 dark:text-white p-2" aria-label="Toggle menu" aria-expanded={isOpen}>
+              {isOpen ? <FaTimes /> : <FaBars />}
+            </button>
+            <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+          </div>
+        </div>
+
+        {/* Mobile Menu Dropdown */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={menuVariants}
+              className="md:hidden bg-white dark:bg-gray-900 shadow-md rounded-b-lg p-4 space-y-2"
+            >
+              {navItems.map((item) =>
+                item.isDropdown ? (
+                  <DropdownMenu key={item.name} item={item} isActive={location.pathname.startsWith('/Products')} isMobile />
+                ) : (
+                  <NavLink key={item.name} href={item.path} label={item.name} icon={item.icon} isActive={location.pathname === item.path} />
+                )
+              )}
+              <SearchInput
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onSearchClick={handleSearchClick}
+                isMobile
+              />
+              <AuthButtons isMobile />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Notification Dropdown */}
+        <NotificationDropdown
+          isNotificationOpen={isNotificationOpen}
+          toggleNotificationMenu={toggleNotificationMenu}
+          notifications={notifications}
+          markAllAsRead={markAllAsRead}
+        />
+      </motion.nav>
+
+      {/* Easter Egg Modal */}
+      <AnimatePresence>
+      {showEasterEgg && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="text-white text-center ">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ rotate: 360, scale: 1 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 260,
+                  damping: 20,
+                }}
+                className="mb-5"
+              >
+                <TbEggCracked className="w-24 h-24 mx-auto" />
+              </motion.div>
+              <motion.h2
+                className="text-3xl font-bold mb-4"
+                initial={{ y: 50 }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                You found an easter egg! there are more hidden around the site.
+              </motion.h2>
+              <motion.p
+                className="text-lg mb-8"
+                initial={{ y: 50 }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.7 }}
+              >
+                clue : Help is the best way to search for life
+              </motion.p>
+              <motion.p
+              className="text-[10px] mb-8"
+              initial={{ y: 50 }}
+              animate={{ y: 0 }}
+              transition={{ duration: 0.7 }}
+              >
+                do not forget about slash.
+              </motion.p>
+              <button
+                onClick={() => setShowEasterEgg(false)}
+                className="px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-full text-white font-semibold"
+              >
+                close 
+              </button>
+            </div>
           </motion.div>
         )}
-      </AnimatePresence>
 
-      {/* Notification Dropdown */}
-      <NotificationDropdown
-        isNotificationOpen={isNotificationOpen}
-        toggleNotificationMenu={toggleNotificationMenu}
-        notifications={notifications}
-        markAllAsRead={markAllAsRead}
-      />
-    </motion.nav>
+      </AnimatePresence>
+    </>
   );
 };
 
@@ -258,13 +342,21 @@ const DropdownMenu: React.FC<{
 };
 
 // SearchInput Component
-const SearchInput: React.FC<{ onSearchClick: () => void; isMobile?: boolean }> = ({ onSearchClick, isMobile }) => {
+const SearchInput: React.FC<{
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSearchClick: () => void;
+  isMobile?: boolean;
+}> = ({ value, onChange, onSearchClick, isMobile }) => {
   return (
     <div className={`relative ${isMobile ? 'mt-2' : ''}`}>
       <input
         type="text"
         placeholder="Search..."
         className="pl-10 pr-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none w-full"
+        value={value}
+        onChange={onChange}
+        aria-label="AI Search Input"
       />
       <button
         onClick={onSearchClick}

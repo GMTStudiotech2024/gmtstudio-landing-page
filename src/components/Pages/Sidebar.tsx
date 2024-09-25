@@ -205,7 +205,9 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
       >
         {isOpen ? <FaChevronLeft /> : <FaChevronRight />}
       </motion.button>
+      
     </motion.div>
+
   );
 };
 

@@ -90,7 +90,9 @@ class MultilayerPerceptron {
       }
       activation = this.batchNormalize(newActivation);
     }
-    return activation;
+    // Convert confidence scores to binary values (0 or 1)
+    const threshold = 0.5; // Set your desired threshold here
+    return activation.map((score) => (score >= threshold ? 1 : 0));
   }
 
   // Modify the train method to include dropout and advanced optimizers
@@ -1875,7 +1877,7 @@ class RLAgent {
       console.log("Confidence Score:", confidence);
 
       // If the confidence score is below the threshold, generate an uncertain response
-      if (confidence < 0) {
+      if (confidence < 1) {
         const uncertainResponse = nlp.generateComplexSentence("I'm not sure I understand", "uncertain response", 20);
         console.log("Uncertain Response Generated:", uncertainResponse);
         nlp.updateConversationHistory('ai', uncertainResponse);
@@ -1920,11 +1922,11 @@ class RLAgent {
 
         // Analyze the sentiment of the query to adjust the response accordingly
         if (query.split(' ').length > 3) {
-          if (sentiment.score < -0.5) {
+          if (sentiment.score < 0) {
             const negativeResponse = nlp.generateComplexSentence("I sense", "frustration concerns", 10);
             response += " " + negativeResponse;
             console.log("Negative Sentiment Response Added:", negativeResponse);
-          } else if (sentiment.score > 0.5) {
+          } else if (sentiment.score > 0) {
             const positiveResponse = nlp.generateComplexSentence("I'm glad", "positive specific discuss", 10);
             response += " " + positiveResponse;
             console.log("Positive Sentiment Response Added:", positiveResponse);
@@ -2497,7 +2499,7 @@ export function getChatHistories(): Promise<ChatHistory[]> {
     }, 100);
   });
 }
-
+      
 export function createChatHistory(name: string): Promise<void> {
   return new Promise((resolve) => {
     // Simulating an API call

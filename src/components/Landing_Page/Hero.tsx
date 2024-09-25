@@ -14,7 +14,8 @@ const Hero: React.FC = () => {
     "AI is included in this website. ",
     "The tech company that builds the future.",
     "Great, Marvelous, and Terrific.",
-    "The size of this website is 2.6 GB ! "
+    "The size of this website is 2.6 GB ! ",
+    "look closely to find things and type in the input box below"
   ];
 
   const handleScroll = useCallback(() => {

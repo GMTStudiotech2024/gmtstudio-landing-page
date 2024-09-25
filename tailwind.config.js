@@ -6,7 +6,12 @@ module.exports = {
     './public/index.html',
   ],
   theme: {
-    extend: {},
+    extend: {
+      boxShadow: {
+        glow: '0 0 10px rgba(0, 0, 0, 0.5)',
+        'glow-blue': '0 0 10px #3B82F6',
+      },
+    },
   },
   plugins: [],
 };
