@@ -14,7 +14,7 @@ class MultilayerPerceptron {
   private batchSize: number;
   private epochs: number;
 
-  constructor(layers: number[], activations: string[] = [], learningRate: number = 0.001, batchSize: number = 32, epochs: number = 1) {
+  constructor(layers: number[], activations: string[] = [], learningRate: number = 0.001, batchSize: number = 64, epochs: number = 10) {
     this.layers = layers;
     this.weights = [];
     this.biases = [];
@@ -139,7 +139,7 @@ class MultilayerPerceptron {
   }
 
   // Modify the batchTrain method to include L2 regularization
-  batchTrain(inputs: number[][], targets: number[][], learningRate: number = 0.001, batchSize: number = 32, lambda: number = 0.01) {
+  batchTrain(inputs: number[][], targets: number[][], learningRate: number = 0.001, batchSize: number = 64, lambda: number = 0.01) {
     for (let i = 0; i < inputs.length; i += batchSize) {
       const batchInputs = inputs.slice(i, i + batchSize);
       const batchTargets = targets.slice(i, i + batchSize);
@@ -955,9 +955,14 @@ class NaturalLanguageProcessor {
     return this.semanticSimilarity(word1, word2);
   }
   semanticSimilarity(word1: string, word2: string): number {
-    throw new Error("Method not implemented.");
-  }
-
+    if (!this.wordVectors.has(word1) || !this.wordVectors.has(word2)) {
+        return 0;
+    }
+    const vec1 = this.wordVectors.get(word1)!;
+    const vec2 = this.wordVectors.get(word2)!;
+    const similarity = this.cosineSimilarity(vec1, vec2);
+    return similarity;
+}
   private findWordWithSimilarSentiment(word: string, targetSentiment: number): string {
     const similarWords = this.findSimilarWords(word, 10);
     return similarWords.find(w => {
@@ -1006,7 +1011,10 @@ class NaturalLanguageProcessor {
     
     intents.forEach(intent => {
       const intentVector = this.getTfIdfVector(intent.patterns.join(' ').split(/\s+/));
-      const similarity = this.cosineSimilarity(queryVector, intentVector);
+      const similarity = this.cosineSimilarity(
+        Array.from(queryVector.values()),
+        Array.from(intentVector.values())
+      );
       if (similarity > maxSimilarity) {
         maxSimilarity = similarity;
         bestIntent = intent.patterns[0];
@@ -1058,23 +1066,23 @@ class NaturalLanguageProcessor {
     return tfidf;
   }
 
-  private cosineSimilarity(vec1: Map<string, number>, vec2: Map<string, number>): number {
+  private cosineSimilarity(vec1: number[], vec2: number[]): number {
     let dotProduct = 0;
-    let mag1 = 0;
-    let mag2 = 0;
-
-    vec1.forEach((val1, key) => {
-      const val2 = vec2.get(key) || 0;
-      dotProduct += val1 * val2;
-      mag1 += val1 * val1;
-    });
-
-    vec2.forEach((val2) => {
-      mag2 += val2 * val2;
-    });
-
-    return dotProduct / (Math.sqrt(mag1) * Math.sqrt(mag2));
-  }
+    let magnitudeA = 0;
+    let magnitudeB = 0;
+    for (let i = 0; i < vec1.length; i++) {
+        dotProduct += vec1[i] * vec2[i];
+        magnitudeA += vec1[i] ** 2;
+        magnitudeB += vec2[i] ** 2;
+    }
+    magnitudeA = Math.sqrt(magnitudeA);
+    magnitudeB = Math.sqrt(magnitudeB);
+    if (magnitudeA === 0 || magnitudeB === 0) {
+        return 0;
+    } else {
+        return dotProduct / (magnitudeA * magnitudeB);
+    }
+}
 
   private extractEntities(query: string): { [key: string]: string } {
     // Enhanced entity extraction logic
@@ -1211,7 +1219,7 @@ class NaturalLanguageProcessor {
 
     const wordVector = this.wordVectors.get(word)!;
     const similarities = Array.from(this.wordVectors.entries())
-      .map(([w, vec]) => [w, this.cosineSimilarity(new Map(vec.map((v, i) => [i.toString(), v])), new Map(wordVector.map((v, i) => [i.toString(), v])))])
+      .map(([w, vec]) => [w, this.cosineSimilarity(vec, wordVector)])
       .sort((a, b) => (b[1] as number) - (a[1] as number))
       .slice(1, n + 1);  // Exclude the word itself
 
@@ -1227,10 +1235,9 @@ class NaturalLanguageProcessor {
   private analyzeContextualRelevance(query: string): string {
     const queryVector = this.getTfIdfVector(this.tokenize(query));
     const contextVector = this.getTfIdfVector(this.tokenize(this.contextMemory.join(' ')));
-    const similarity = this.cosineSimilarity(queryVector, contextVector);
+    const similarity = this.cosineSimilarity(Array.from(queryVector.values()), Array.from(contextVector.values()));
     return `Similarity to context: ${similarity.toFixed(2)}`;
   }
-
   private updateWordProbabilities(sentence: string) {
     const words = this.tokenize(sentence);
     const decayFactor = 0.9;
@@ -1597,7 +1604,7 @@ class GAN {
     return vector.map(v => String.fromCharCode(Math.floor(v * 26) + 97)).join('');
   }
 
-  train(realData: number[][], epochs: number = 1, batchSize: number = 32) {
+  train(realData: number[][], epochs: number = 10, batchSize: number = 64) {
     for (let epoch = 0; epoch < epochs; epoch++) {
       // Train discriminator
       const realBatch = this.getBatch(realData, batchSize);
@@ -2052,7 +2059,7 @@ const intents: Intent[] = [
 const network = new MultilayerPerceptron([10, 32, 64, 32, intents.length], ['relu', 'relu', 'relu', 'sigmoid']);
 
 function trainNetwork() {
-  const epochs = 1;
+  const epochs = 10;
   const learningRate = 0.63;
 
   for (let epoch = 0; epoch < epochs; epoch++) {
