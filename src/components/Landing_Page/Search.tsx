@@ -35,6 +35,7 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
     { title: "Theta Social Media Platform", link: "https://theta-plum.vercel.app/" },
     { title: "Mazs AI Website Generator", link: "/website-builder" },
     { title: "Mazs AI", link: "https://mazs-ai-lab.vercel.app/" },
+    { title: "Help", link: "/help" },
   ], []);
 
   const handleSearch = useCallback(async () => {
