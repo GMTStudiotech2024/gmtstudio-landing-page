@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSearch, FaCalendarAlt, FaUser, FaTags, FaChevronLeft, FaChevronRight, FaThLarge, FaList } from 'react-icons/fa';
+import {
+  FaSearch,
+  FaCalendarAlt,
+  FaUser,
+  FaTags,
+  FaChevronLeft,
+  FaChevronRight,
+  FaThLarge,
+  FaList,
+  FaRegComments,
+} from 'react-icons/fa';
 import blogImage1 from '../assets/images/MazsAiPic.png';
 import blogImage2 from '../assets/images/blog2.png';
 import blogImage3 from '../assets/images/Story.jpg';
@@ -186,15 +196,19 @@ const Latest: React.FC = () => {
   const [postsPerPage, setPostsPerPage] = useState(6);
   const [isGridView, setIsGridView] = useState(true);
 
-  const categories = useMemo(() => ['All', ...Array.from(new Set(blogPosts.map(post => post.category)))], []);
+  const categories = useMemo(
+    () => ['All', ...Array.from(new Set(blogPosts.map((post) => post.category)))],
+    []
+  );
 
   const filteredPosts = useMemo(() => {
     return blogPosts
-      .filter(post => selectedCategory === 'All' || post.category === selectedCategory)
-      .filter(post =>
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.author.toLowerCase().includes(searchTerm.toLowerCase())
+      .filter((post) => selectedCategory === 'All' || post.category === selectedCategory)
+      .filter(
+        (post) =>
+          post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          post.author.toLowerCase().includes(searchTerm.toLowerCase())
       );
   }, [selectedCategory, searchTerm]);
 
@@ -208,14 +222,29 @@ const Latest: React.FC = () => {
     setCurrentPage(1);
   }, [selectedCategory, searchTerm]);
 
-  const handlePostsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setPostsPerPage(Number(e.target.value));
-    setCurrentPage(1);
+  // Handle keyboard navigation for pagination
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'ArrowRight') {
+      if (currentPage < Math.ceil(filteredPosts.length / postsPerPage)) {
+        paginate(currentPage + 1);
+      }
+    } else if (e.key === 'ArrowLeft') {
+      if (currentPage > 1) {
+        paginate(currentPage - 1);
+      }
+    }
   };
 
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown as any);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown as any);
+    };
+  }, [currentPage, filteredPosts]);
+
   return (
-    <section 
-      id="blog" 
+    <section
+      id="blog"
       className="pt-20 bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-black min-h-screen"
       aria-labelledby="latest-news-heading"
     >
@@ -229,10 +258,15 @@ const Latest: React.FC = () => {
             transition={{ duration: 0.5 }}
             className="text-6xl font-bold text-gray-900 dark:text-white mb-4"
           >
-            Latest <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">News</span>
+            Latest{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+              News
+            </span>
           </motion.h1>
           <motion.p
-            // ... existing props
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
             aria-describedby="latest-news-description"
             className="text-xl text-gray-600 dark:text-gray-300"
           >
@@ -243,9 +277,9 @@ const Latest: React.FC = () => {
         {/* Category and Search Controls */}
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-center">
           {/* Categories */}
-          <div 
-            className="flex flex-wrap justify-center mb-4 sm:mb-0" 
-            role="group" 
+          <div
+            className="flex flex-wrap justify-center mb-4 sm:mb-0"
+            role="group"
             aria-label="Blog Categories"
           >
             {categories.map((category, index) => (
@@ -283,7 +317,10 @@ const Latest: React.FC = () => {
                 className="pl-10 pr-4 py-2 rounded-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-md"
                 aria-label="Search posts"
               />
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <FaSearch
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                aria-hidden="true"
+              />
             </div>
 
             {/* View Toggle Button */}
@@ -292,7 +329,11 @@ const Latest: React.FC = () => {
               aria-label={`Switch to ${isGridView ? 'list' : 'grid'} view`}
               className="p-2 bg-white dark:bg-gray-700 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              {isGridView ? <FaList className="text-gray-600 dark:text-gray-300" /> : <FaThLarge className="text-gray-600 dark:text-gray-300" />}
+              {isGridView ? (
+                <FaList className="text-gray-600 dark:text-gray-300" aria-hidden="true" />
+              ) : (
+                <FaThLarge className="text-gray-600 dark:text-gray-300" aria-hidden="true" />
+              )}
             </button>
           </div>
         </div>
@@ -300,21 +341,36 @@ const Latest: React.FC = () => {
         {/* Blog Posts */}
         <AnimatePresence>
           <motion.div
-            // ... existing props
-            className={isGridView ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10" : "space-y-8"}
+            layout
+            className={
+              isGridView
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10'
+                : 'space-y-8'
+            }
           >
             {currentPosts.map((post, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={`relative flex ${isGridView ? 'flex-col' : 'flex-row'} rounded-3xl bg-white dark:bg-gray-800 shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105`}
+                className={`relative flex ${
+                  isGridView ? 'flex-col' : 'flex-row'
+                } rounded-3xl bg-white dark:bg-gray-800 shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105`}
                 role="article"
                 aria-labelledby={`post-title-${index}`}
               >
                 {/* Post Image */}
-                <div className={`relative ${isGridView ? 'h-64' : 'w-1/3 h-full'} overflow-hidden rounded-3xl ${isGridView ? 'rounded-b-none' : 'rounded-l-3xl rounded-r-none'}`}>
+                <div
+                  className={`relative ${
+                    isGridView ? 'h-64' : 'w-1/3 h-full'
+                  } overflow-hidden rounded-3xl ${
+                    isGridView
+                      ? 'rounded-b-none'
+                      : 'rounded-l-3xl rounded-r-none'
+                  }`}
+                >
                   <img
                     src={post.image}
                     alt={post.title}
@@ -337,14 +393,15 @@ const Latest: React.FC = () => {
                   </div>
 
                   {/* Post Title */}
-                  <h5 id={`post-title-${index}`} className="mb-3 text-2xl font-bold text-gray-900 dark:text-white">
+                  <h5
+                    id={`post-title-${index}`}
+                    className="mb-3 text-2xl font-bold text-gray-900 dark:text-white"
+                  >
                     {post.title}
                   </h5>
 
                   {/* Post Excerpt */}
-                  <p className="mb-4 text-gray-700 dark:text-gray-300">
-                    {post.excerpt}
-                  </p>
+                  <p className="mb-4 text-gray-700 dark:text-gray-300">{post.excerpt}</p>
 
                   {/* Post Actions */}
                   <div className="flex justify-between items-center">
@@ -375,24 +432,14 @@ const Latest: React.FC = () => {
               aria-label="Previous Page"
               className="mb-4 sm:mb-0 px-6 py-3 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              <FaChevronLeft />
+              <FaChevronLeft aria-hidden="true" />
             </button>
 
-            {/* Posts Per Page Selector */}
+            {/* Page Indicators */}
             <div className="flex items-center mb-4 sm:mb-0">
-              <span className="mr-4 text-gray-700 dark:text-gray-300 font-medium">Posts per page:</span>
-              <label htmlFor="posts-per-page" className="sr-only">Select number of posts per page</label>
-              <select
-                id="posts-per-page"
-                value={postsPerPage}
-                onChange={handlePostsPerPageChange}
-                className="p-3 rounded-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
-                aria-label="Select number of posts per page"
-              >
-                <option value={6}>6</option>
-                <option value={12}>12</option>
-                <option value={24}>24</option>
-              </select>
+              <span className="text-gray-700 dark:text-gray-300 font-medium">
+                Page {currentPage} of {Math.ceil(filteredPosts.length / postsPerPage)}
+              </span>
             </div>
 
             {/* Next Page Button */}
@@ -402,13 +449,26 @@ const Latest: React.FC = () => {
               aria-label="Next Page"
               className="px-6 py-3 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              <FaChevronRight />
+              <FaChevronRight aria-hidden="true" />
             </button>
           </div>
         )}
+
+        {/* Feedback Button */}
+        <div className="mt-8 text-center">
+          <button
+            onClick={() => {
+              // Open feedback modal (to be implemented)
+            }}
+            className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-semibold transition-all hover:from-pink-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <FaRegComments className="mr-2" aria-hidden="true" />
+            Give Feedback
+          </button>
+        </div>
       </div>
     </section>
   );
-}
+};
 
 export default Latest;

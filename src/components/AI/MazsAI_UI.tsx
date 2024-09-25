@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   FiSend,
-  FiMoon,
-  FiSun,
-  FiInfo,
-  FiFeather,
   FiLoader,
   FiPaperclip,
   FiX,
@@ -19,15 +15,17 @@ import {
   FiTrash2,
   FiEdit,
   FiShare,
-  FiArchive,
   FiPlus,
   FiCheck,
-  FiSettings,
   FiCheckCircle,
   FiAlertCircle,
   FiZap,
   FiClock,
 } from 'react-icons/fi';
+import { TbApi, TbHistory  } from "react-icons/tb";
+import { LuPaintbrush } from "react-icons/lu";
+import { RiSettings3Line } from "react-icons/ri";
+
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as MazsAI from './MazsAI';
@@ -337,10 +335,6 @@ const MazsAIChat: React.FC = () => {
     }
   };
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    localStorage.setItem('isDarkMode', JSON.stringify(!isDarkMode));
-  };
 
   const resetConversation = () => {
     setMessages([]);
@@ -989,7 +983,7 @@ const MazsAIChat: React.FC = () => {
         </ul>
         {chatHistories.length === 0 && (
           <div className="text-center text-gray-400 mt-8">
-            <FiArchive size={48} className="mx-auto mb-4" />
+            <TbHistory size={48} className="mx-auto mb-4" />
             <p>No chat histories yet. Create a new one to get started!</p>
           </div>
         )}
@@ -1062,35 +1056,28 @@ const MazsAIChat: React.FC = () => {
                 title="API Info"
                 ariaLabel="API Info"
               >
-                <FiInfo size={20} />
+                <TbApi size={20} />
               </IconButton>
               <IconButton
                 onClick={resetConversationWithConfirmation}
                 title="Reset Conversation"
                 ariaLabel="Reset Conversation"
               >
-                <FiFeather size={20} />
-              </IconButton>
-              <IconButton
-                onClick={toggleDarkMode}
-                title="Toggle Dark Mode"
-                ariaLabel="Toggle Dark Mode"
-              >
-                {isDarkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
+                <LuPaintbrush size={20} />
               </IconButton>
               <IconButton
                 onClick={() => setShowChatHistory(!showChatHistory)}
                 title="Chat History"
                 ariaLabel="Chat History"
               >
-                <FiArchive size={20} />
+                <TbHistory size={20} />
               </IconButton>
               <IconButton
                 onClick={() => setShowSettings(!showSettings)}
                 title="Settings"
                 ariaLabel="Settings"
               >
-                <FiSettings size={20} />
+                <RiSettings3Line size={20} />
               </IconButton>
             </div>
           </header>

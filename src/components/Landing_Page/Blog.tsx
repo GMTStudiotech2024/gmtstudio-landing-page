@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
-import { FaChevronDown, FaSearch, FaTags, FaCalendarAlt, FaUser, FaEye, FaShare, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-  import Beta from '../assets/images/cool_design.png'
-  import MazsAI12 from '../assets/images/MazsAI_v1.2.0.png'
-  import MazsAI11 from '../assets/images/MazsAI_v1.1.0.png'
+import { 
+  FaChevronDown, FaSearch, FaTags, FaCalendarAlt, FaUser, 
+  FaEye, FaShareAlt, FaChevronLeft, FaChevronRight, FaRegHeart 
+} from 'react-icons/fa';
+import Beta from '../assets/images/cool_design.png';
+import MazsAI12 from '../assets/images/MazsAI_v1.2.0.png';
+import MazsAI11 from '../assets/images/MazsAI_v1.1.0.png';
+
 const blogPosts = [
   {
     image:MazsAI12,
@@ -49,6 +53,7 @@ const Blog: React.FC = () => {
   const [sortBy, setSortBy] = useState('date');
   const categories = ['All', ...Array.from(new Set(blogPosts.map(post => post.category)))];
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [showMore, setShowMore] = useState(6); // Number of posts to show initially
 
   const controls = useAnimation();
 
@@ -76,13 +81,23 @@ const Blog: React.FC = () => {
     setFilteredPosts(filtered);
   }, [selectedCategory, searchTerm, sortBy]);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % filteredPosts.length);
-    }, 5000); // Change slide every 5 seconds
+  // Implement lazy loading of images
+  const [imagesLoaded, setImagesLoaded] = useState(false);
 
-    return () => clearInterval(timer);
-  }, [filteredPosts.length]);
+  useEffect(() => {
+    const imgPromises = filteredPosts.map(post => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = post.image;
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+    });
+
+    Promise.all(imgPromises).then(() => {
+      setImagesLoaded(true);
+    });
+  }, [filteredPosts]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -101,12 +116,8 @@ const Blog: React.FC = () => {
     }
   };
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % filteredPosts.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + filteredPosts.length) % filteredPosts.length);
+  const loadMore = () => {
+    setShowMore(prev => prev + 6);
   };
 
   return (
@@ -134,6 +145,7 @@ const Blog: React.FC = () => {
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                aria-label={`Filter by ${category}`}
               >
                 <FaTags className="inline-block mr-2" />
                 {category}
@@ -148,13 +160,15 @@ const Blog: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-3 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                aria-label="Search posts"
               />
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" aria-hidden="true" />
             </div>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-white rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              aria-label="Sort posts"
             >
               <option value="date">Sort by Date</option>
               <option value="views">Sort by Views</option>
@@ -169,21 +183,30 @@ const Blog: React.FC = () => {
             initial="hidden"
             animate="visible"
           >
-            {filteredPosts.map((post, index) => (
+            {filteredPosts.slice(0, showMore).map((post, index) => (
               <motion.div 
                 key={index} 
-                className="bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-xl flex flex-col h-full"
+                className="bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl flex flex-col h-full"
                 variants={itemVariants}
+                tabIndex={0}
+                aria-label={`Read more about ${post.title}`}
               >
                 <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src={post.image} 
-                    alt={post.title} 
-                    className="w-full h-full object-cover"
-                  />
+                  {imagesLoaded ? (
+                    <img 
+                      src={post.image} 
+                      alt={post.title} 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-300 animate-pulse"></div>
+                  )}
                   <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black opacity-60"></div>
-                  <div className="absolute bottom-4 left-4 right-4">
+                  <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
                     <span className="text-white text-sm font-semibold bg-blue-500 px-2 py-1 rounded-full">{post.category}</span>
+                    <button className="text-white hover:text-red-500 transition-colors" aria-label="Like post">
+                      <FaRegHeart />
+                    </button>
                   </div>
                 </div>
                 <div className="p-6 flex-grow flex flex-col">
@@ -204,6 +227,7 @@ const Blog: React.FC = () => {
                   <Link 
                     to={post.link}
                     className="text-blue-400 font-medium hover:underline"
+                    aria-label={`Read more about ${post.title}`}
                   >
                     Read More
                   </Link>
@@ -215,80 +239,19 @@ const Blog: React.FC = () => {
               </motion.div>
             ))}
           </motion.div>
+        </AnimatePresence>
 
-          {/* Mobile Slider */}
-          <div className="md:hidden relative">
-            <motion.div
-              className="overflow-hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+        {showMore < filteredPosts.length && (
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={loadMore}
+              className="px-6 py-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
             >
-              <motion.div
-                className="flex transition-transform ease-in-out duration-300"
-                initial={false}
-                animate={{ x: `-${currentSlide * 100}%` }}
-              >
-                {filteredPosts.map((post, index) => (
-                  <div key={index} className="w-full flex-shrink-0">
-                    <div className="relative flex w-full flex-col rounded-xl bg-gray-400 bg-clip-border text-gray-900 shadow-lg dark:bg-gray-900 dark:text-white">
-                      <div className="relative mx-4 -mt-6 h-56 overflow-hidden rounded-xl bg-gradient-to-r from-red-500 to-orange-500">
-                        <img 
-                          src={post.image} 
-                          alt={post.title} 
-                          className="w-full h-full object-cover transition-transform duration-300 ease-in-out transform hover:scale-110"
-                        />
-                        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                          <span className="text-white text-lg font-bold">{post.category}</span>
-                        </div>
-                      </div>
-                      <div className="p-8">
-                        <div className="flex justify-between items-center mb-2">
-                          <p className="text-gray-400 text-sm flex items-center">
-                            <FaCalendarAlt className="mr-2" /> {post.date}
-                          </p>
-                          <p className="text-gray-400 text-sm flex items-center">
-                            <FaEye className="mr-2" /> {post.views} views
-                          </p>
-                        </div>
-                        <h5 className="mb-2 text-2xl font-semibold leading-snug tracking-normal text-white">
-                          {post.title}
-                        </h5>
-                        <p className="mb-4 text-gray-200 dark:text-gray-200">
-                          {post.excerpt}
-                        </p>
-                        <div className="flex justify-between items-center">
-                          <p className="text-gray-400 text-sm flex items-center">
-                            <FaUser className="mr-2" /> {post.author}
-                          </p>
-                          <p className="text-gray-400 text-sm">{post.readTime}</p>
-                        </div>
-                        <div className="mt-4 flex justify-between items-center">
-                          <Link 
-                            to={post.link}
-                            className="inline-block rounded-lg bg-gradient-to-r from-red-500 to-orange-500 py-3 px-6 text-center text-base font-bold uppercase text-white transition-all hover:shadow-lg focus:shadow-none hover:from-orange-500 hover:to-red-500"
-                          >
-                            Read More
-                          </Link>
-                          <button className="text-gray-400 hover:text-white transition-colors duration-200">
-                            <FaShare />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </motion.div>
-            </motion.div>
-            <button onClick={prevSlide} className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
-              <FaChevronLeft />
-            </button>
-            <button onClick={nextSlide} className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
-              <FaChevronRight />
+              Load More
             </button>
           </div>
-        </AnimatePresence>
-        
+        )}
+
         <motion.div 
           className="flex justify-center mt-10"
           initial={{ opacity: 0, y: 20 }}

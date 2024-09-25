@@ -64,9 +64,9 @@ const LaunchMazsAI: React.FC = () => {
 
   return (
     <section className="min-h-screen flex items-center justify-center bg-white dark:bg-black text-black dark:text-white px-4">
-      <div className="max-w-4xl w-full mx-auto text-center space-y-8">
+      <div className="max-w-4xl w-full mx-auto text-center space-y-8 px-4 sm:px-6 lg:px-8">
         <motion.h1
-          className="text-5xl sm:text-6xl font-bold mb-4 h-24"
+          className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 h-24"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -75,7 +75,7 @@ const LaunchMazsAI: React.FC = () => {
           <span className="cursor">|</span>
         </motion.h1>
         <motion.p
-          className="text-xl mb-6"
+          className="text-lg sm:text-xl mb-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -94,7 +94,7 @@ const LaunchMazsAI: React.FC = () => {
             <input
               type="text"
               placeholder="Ask MazsAI a question..."
-              className="w-full py-3 px-4 bg-white text-black dark:bg-black rounded-full dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-black dark:border-white"
+              className="w-full py-2 px-4 bg-white text-black dark:bg-black rounded-full dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-black dark:border-white"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               aria-label="Ask MazsAI a question"

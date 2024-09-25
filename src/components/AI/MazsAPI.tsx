@@ -1,5 +1,6 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { processChatbotQuery } from './MazsAI';
+import { EyeIcon, EyeSlashIcon, PlayIcon, ChartBarIcon } from '@heroicons/react/24/solid';
 
 type ApiUsage = {
   requests: number;
@@ -16,6 +17,8 @@ const ApiPage: React.FC = () => {
   const [playgroundResult, setPlaygroundResult] = useState<string>('');
   const [displayedResult, setDisplayedResult] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [temperature, setTemperature] = useState(0.7);
+  const [responseMetrics, setResponseMetrics] = useState({ tokens: 0, time: 0 });
 
   // Load apiKey from localStorage on mount
   useEffect(() => {
@@ -100,7 +103,7 @@ print(response.json())
     return Math.min((apiUsage.requests / apiUsage.limit) * 100, 100);
   }, [apiUsage]);
 
-  const handlePlaygroundSubmit = async () => {
+  const handlePlaygroundSubmit = useCallback(async () => {
     if (!apiKey) {
       alert('Please enter a valid API Key to use the playground.');
       return;
@@ -117,15 +120,28 @@ print(response.json())
       requests: prev.requests + 1,
     }));
 
+    const startTime = performance.now();
+
     // Use MazsAI to process the query
     const response = processChatbotQuery(playgroundInput);
+
+    const endTime = performance.now();
+    const responseTime = Math.round(endTime - startTime);
+
+    // Calculate token count (this is a simple example, you may need a more sophisticated method)
+    const tokenCount = response.split(/\s+/).length;
+
+    setResponseMetrics({
+      tokens: tokenCount,
+      time: responseTime
+    });
 
     // Initialize typing animation
     setPlaygroundResult(response);
     setDisplayedResult('');
     setIsTyping(true);
     setPlaygroundInput('');
-  };
+  }, [apiKey, playgroundInput, setApiUsage, setResponseMetrics, setPlaygroundResult, setDisplayedResult, setIsTyping, setPlaygroundInput]);
 
   // Typing animation effect
   useEffect(() => {
@@ -150,11 +166,11 @@ print(response.json())
   // For example, import 'SF Pro Display' font if available
 
   return (
-    <div className="api-page min-h-screen bg-white dark:bg-black text-gray-800 dark:text-gray-100">
+    <div className="api-page min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black text-gray-800 dark:text-gray-100">
       <div className="container mx-auto py-12 px-6 sm:px-8 lg:px-10 pt-20">
         {/* Tabs */}
         <div
-          className="tabs flex justify-center space-x-16 mb-12 border-b border-gray-200 dark:border-gray-800"
+          className="tabs flex justify-center space-x-8 mb-12 border-b border-gray-200 dark:border-gray-800"
           role="tablist"
         >
           {['api', 'key', 'playground'].map((tab) => (
@@ -165,8 +181,8 @@ print(response.json())
               onClick={() => setActiveTab(tab as 'api' | 'key' | 'playground')}
               className={`text-lg font-semibold pb-2 transition-colors duration-300 ${
                 activeTab === tab
-                  ? 'text-blue-500 border-b-2 border-blue-500'
-                  : 'text-gray-500 hover:text-blue-500'
+                  ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400'
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -258,11 +274,11 @@ print(response.json())
             </div>
           )}
           {activeTab === 'playground' && (
-            <div className="playground-tab bg-gray-50 dark:bg-gray-900 rounded-xl shadow-lg p-8">
-              <h3 className="text-3xl font-semibold mb-6 text-gray-800 dark:text-gray-100">Playground</h3>
+            <div className="playground-tab bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+              <h3 className="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-100">AI Playground</h3>
               <div className="flex flex-col space-y-8">
-                <div className="flex flex-col md:flex-row md:space-x-8">
-                  <div className="flex-1 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-6">
                     <div>
                       <label
                         htmlFor="api-key"
@@ -270,14 +286,26 @@ print(response.json())
                       >
                         API Key
                       </label>
-                      <input
-                        type="text"
-                        id="api-key"
-                        value={apiKey}
-                        onChange={(e) => setApiKey(e.target.value)}
-                        placeholder="Enter your API Key"
-                        className="w-full p-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 transition"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showApiKey ? "text" : "password"}
+                          id="api-key"
+                          value={apiKey}
+                          onChange={(e) => setApiKey(e.target.value)}
+                          placeholder="Enter your API Key"
+                          className="w-full p-4 pr-12 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        />
+                        <button
+                          onClick={toggleShowApiKey}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                        >
+                          {showApiKey ? (
+                            <EyeIcon className="h-6 w-6 text-gray-400" />
+                          ) : (
+                            <EyeSlashIcon className="h-6 w-6 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                     <div>
                       <label
@@ -288,10 +316,9 @@ print(response.json())
                       </label>
                       <select
                         id="model"
-                        className="w-full p-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 transition"
+                        className="w-full p-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                       >
                         <option value="Mazs AI v1.3.5 anatra">Mazs AI v1.3.5 anatra</option>
-                        {/* Add other model options here */}
                       </select>
                     </div>
                     <div>
@@ -307,32 +334,69 @@ print(response.json())
                         onChange={(e) => setPlaygroundInput(e.target.value)}
                         placeholder="Enter your query"
                         rows={5}
-                        className="w-full p-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 transition"
+                        className="w-full p-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="temperature"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      >
+                        Temperature: {temperature}
+                      </label>
+                      <input
+                        type="range"
+                        id="temperature"
+                        min="0"
+                        max="1"
+                        step="0.1"
+                        value={temperature}
+                        onChange={(e) => setTemperature(parseFloat(e.target.value))}
+                        className="w-full"
                       />
                     </div>
                   </div>
-                  <div className="flex-1 mt-8 md:mt-0">
-                    <label
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
-                      Result
-                    </label>
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-md shadow-sm h-full overflow-auto">
-                      <p className="text-gray-800 dark:text-gray-100 whitespace-pre-wrap">
-                        {displayedResult || 'Result will appear here'}
-                      </p>
+                  <div className="space-y-6">
+                    <div>
+                      <label
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      >
+                        Result
+                      </label>
+                      <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-inner h-64 overflow-auto border border-gray-200 dark:border-gray-700">
+                        <p className="text-gray-800 dark:text-gray-100 whitespace-pre-wrap font-mono">
+                          {displayedResult || 'Result will appear here'}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <label
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      >
+                        Response Metrics
+                      </label>
+                      <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg shadow-inner border border-gray-200 dark:border-gray-700">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Tokens: {responseMetrics.tokens}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Response Time: {responseMetrics.time}ms
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
                 <div className="flex justify-between items-center mt-6">
                   <button
                     onClick={handlePlaygroundSubmit}
-                    className="bg-blue-500 text-white py-3 px-8 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300 transition"
+                    className="bg-blue-600 text-white py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition transform hover:scale-105 flex items-center"
                     disabled={!apiKey || apiUsage.requests >= apiUsage.limit}
                   >
-                    Submit
+                    <PlayIcon className="h-5 w-5 mr-2" />
+                    Run
                   </button>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
+                    <ChartBarIcon className="h-5 w-5 mr-2" />
                     Requests: {apiUsage.requests} / {apiUsage.limit}
                   </div>
                 </div>
