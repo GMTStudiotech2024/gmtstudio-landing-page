@@ -45,20 +45,39 @@ const eventVariants = {
 
 const UpcomingEvents: React.FC = () => {
   const [expandedEvent, setExpandedEvent] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredEvents = eventsData.filter(event =>
+    event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    event.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <section className="upcoming-events py-24 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-black">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2 
-          className="text-4xl font-bold mb-16 text-center text-gray-900 dark:text-white"
+          className="text-4xl font-bold mb-12 text-center text-gray-900 dark:text-white"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           Upcoming Events
         </motion.h2>
+        
+        {/* Search Box */}
+        <div className="mb-8 flex justify-center">
+          <input
+            type="text"
+            placeholder="Search events..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full max-w-md px-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Search events"
+          />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {eventsData.map((event, index) => (
+          {filteredEvents.map((event, index) => (
             <motion.div
               key={index}
               className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
@@ -71,23 +90,26 @@ const UpcomingEvents: React.FC = () => {
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-full ${event.color}`}>
-                    <event.icon className={`h-6 w-6 ${event.textColor}`} />
+                    <event.icon className={`h-6 w-6 ${event.textColor}`} aria-hidden="true" />
                   </div>
                   <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{event.date}</span>
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{event.title}</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">{event.description}</p>
                 <motion.button 
-                  className="w-full mt-4 px-4 py-2 rounded-full bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors duration-300"
+                  className="w-full mt-4 px-4 py-2 rounded-full bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onClick={() => setExpandedEvent(expandedEvent === index ? null : index)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  aria-expanded={expandedEvent === index}
+                  aria-controls={`event-details-${index}`}
                 >
                   {expandedEvent === index ? 'Less Info' : 'More Info'}
                 </motion.button>
                 <AnimatePresence>
                   {expandedEvent === index && (
                     <motion.div
+                      id={`event-details-${index}`}
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
@@ -95,15 +117,15 @@ const UpcomingEvents: React.FC = () => {
                       className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
                     >
                       <div className="flex items-center mb-2">
-                        <MapPinIcon className="h-5 w-5 text-gray-400 mr-2" />
+                        <MapPinIcon className="h-5 w-5 text-gray-400 mr-2" aria-hidden="true" />
                         <p className="text-gray-700 dark:text-gray-300">{event.location}</p>
                       </div>
                       <div className="flex items-center mb-2">
-                        <ClockIcon className="h-5 w-5 text-gray-400 mr-2" />
+                        <ClockIcon className="h-5 w-5 text-gray-400 mr-2" aria-hidden="true" />
                         <p className="text-gray-700 dark:text-gray-300">{event.time}</p>
                       </div>
                       <div className="flex items-center">
-                        <UserGroupIcon className="h-5 w-5 text-gray-400 mr-2" />
+                        <UserGroupIcon className="h-5 w-5 text-gray-400 mr-2" aria-hidden="true" />
                         <p className="text-gray-700 dark:text-gray-300">Expected Attendees: {event.attendees}</p>
                       </div>
                     </motion.div>

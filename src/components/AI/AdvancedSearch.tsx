@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { processChatbotQuery, getConversationSuggestions } from './MazsAI';
-import { FaSearch, FaLightbulb, FaFilter, FaSort, FaImage, FaHistory, FaTimes, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaSearch, FaLightbulb, FaFilter, FaSort, FaImage, FaHistory, FaTimes, FaChevronDown, FaChevronUp, FaTimesCircle } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AdvancedSearch: React.FC = () => {
@@ -20,6 +20,7 @@ const AdvancedSearch: React.FC = () => {
   const [sortBy, setSortBy] = useState<'relevance' | 'date'>('relevance');
   const [imageResults, setImageResults] = useState<any[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   useEffect(() => {
     setSuggestions(getConversationSuggestions());
@@ -27,7 +28,15 @@ const AdvancedSearch: React.FC = () => {
     if (savedHistory) {
       setSearchHistory(JSON.parse(savedHistory));
     }
+
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setIsDarkMode(prefersDark);
   }, []);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle('dark', !isDarkMode);
+  };
 
   const searchWikidata = async (query: string) => {
     const url = `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(query)}&language=en&format=json&origin=*`;
@@ -106,7 +115,6 @@ const AdvancedSearch: React.FC = () => {
     setTypingResult('');
     setImageResults([]);
     
-    // Simulate different search types
     let searchResults;
     switch (searchType) {
       case 'web':
@@ -130,7 +138,6 @@ const AdvancedSearch: React.FC = () => {
     setResults([searchResults]);
     setIsLoading(false);
 
-    // Update search history
     const updatedHistory = [query, ...searchHistory.slice(0, 4)];
     setSearchHistory(updatedHistory);
     localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
@@ -146,8 +153,10 @@ const AdvancedSearch: React.FC = () => {
   };
 
   const clearHistory = () => {
-    setSearchHistory([]);
-    localStorage.removeItem('searchHistory');
+    if (window.confirm('Are you sure you want to clear your search history?')) {
+      setSearchHistory([]);
+      localStorage.removeItem('searchHistory');
+    }
   };
 
   const toggleResultExpansion = (index: number) => {
@@ -155,16 +164,26 @@ const AdvancedSearch: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-in-out pt-20">
+    <div className={`min-h-screen ${isDarkMode ? 'dark' : ''} bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-in-out pt-20`}>
       <div className="max-w-4xl mx-auto">
-        <motion.h1 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-5xl font-bold text-gray-900 dark:text-white mb-12 text-center tracking-tight"
-        >
-          Mazs Search
-        </motion.h1>
+        <div className="flex items-center justify-between mb-12">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-5xl font-bold text-gray-900 dark:text-white tracking-tight"
+          >
+            Mazs Search
+          </motion.h1>
+          <button
+            onClick={toggleDarkMode}
+            className="text-gray-500 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition duration-300"
+            aria-label="Toggle Dark Mode"
+          >
+            {isDarkMode ? '☀️' : '🌙'}
+          </button>
+        </div>
+
         <form onSubmit={handleSearch} className="mb-12 relative">
           <div className="flex items-center backdrop-blur-md bg-white/30 dark:bg-gray-800/30 rounded-full py-3 px-6 shadow-lg focus-within:ring-2 focus-within:ring-blue-500 transition duration-300">
             <FaSearch className="text-gray-400 mr-3" />
@@ -187,7 +206,6 @@ const AdvancedSearch: React.FC = () => {
             </motion.button>
           </div>
           
-          {/* Search type selector */}
           <div className="flex justify-center mt-6 space-x-4">
             {['web', 'images', 'news'].map((type) => (
               <motion.button
@@ -210,7 +228,6 @@ const AdvancedSearch: React.FC = () => {
             ))}
           </div>
 
-          {/* Filters and sorting */}
           <motion.div 
             className="mt-6"
             initial={{ opacity: 0 }}
@@ -261,7 +278,6 @@ const AdvancedSearch: React.FC = () => {
                         <option value="date">Date</option>
                       </select>
                     </div>
-                    {/* Add more filter options here */}
                   </div>
                 </motion.div>
               )}
@@ -269,7 +285,6 @@ const AdvancedSearch: React.FC = () => {
           </motion.div>
         </form>
 
-        {/* Results section */}
         <AnimatePresence>
           {results.length > 0 && (
             <motion.div
@@ -311,7 +326,6 @@ const AdvancedSearch: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* Suggested Queries section */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -337,7 +351,6 @@ const AdvancedSearch: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* Search History section */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
