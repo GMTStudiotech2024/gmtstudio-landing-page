@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaGlobe, FaRobot, FaUsers, FaBell, FaCheckCircle, FaExclamationTriangle, FaChartBar, FaServer, FaDatabase, FaCloud, FaCalendarAlt, FaCog, FaHistory, FaInfoCircle, FaArrowUp, FaArrowDown, FaExclamationCircle, FaQuestionCircle, FaTwitter, FaGithub, FaDiscord } from 'react-icons/fa';
+import { FaGlobe, FaRobot, FaUsers, FaBell, FaCheckCircle, FaExclamationTriangle, FaChartBar, FaServer, FaDatabase, FaCloud, FaCalendarAlt, FaCog, FaHistory, FaInfoCircle, FaArrowUp, FaArrowDown, FaQuestionCircle, FaTwitter, FaGithub, FaDiscord } from 'react-icons/fa';
 import { BiRefresh } from 'react-icons/bi';
 import Logo from '../assets/images/npc.png';
 import StatusBar from './StatusBar';
@@ -14,6 +14,7 @@ interface ServiceStatus {
   name: string;
   status: 'operational' | 'partial' | 'major';
   icon: React.ElementType;
+  description?: string;
 }
 
 const SystemStatus: React.FC = () => {
@@ -22,11 +23,36 @@ const SystemStatus: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'performance' | 'incidents'>('overview');
   const [services, setServices] = useState<ServiceStatus[]>([
-    { name: 'Website', status: 'operational', icon: FaGlobe },
-    { name: 'API', status: 'operational', icon: FaServer },
-    { name: 'Database', status: 'operational', icon: FaDatabase },
-    { name: 'AI Services', status: 'operational', icon: FaRobot },
-    { name: 'Cloud Storage', status: 'operational', icon: FaCloud },
+    {
+      name: 'Website',
+      status: 'operational',
+      icon: FaGlobe,
+      description: 'Main website is running smoothly.',
+    },
+    {
+      name: 'API',
+      status: 'operational',
+      icon: FaServer,
+      description: 'API servers are operational.',
+    },
+    {
+      name: 'Database',
+      status: 'operational',
+      icon: FaDatabase,
+      description: 'Database is functioning normally.',
+    },
+    {
+      name: 'AI Services',
+      status: 'operational',
+      icon: FaRobot,
+      description: 'AI services are running without issues.',
+    },
+    {
+      name: 'Cloud Storage',
+      status: 'operational',
+      icon: FaCloud,
+      description: 'Cloud storage is accessible.',
+    },
   ]);
 
   const [dailyStatus, setDailyStatus] = useState<Record<string, ('operational' | 'partial' | 'major')[]>>({

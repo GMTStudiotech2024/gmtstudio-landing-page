@@ -347,60 +347,60 @@ class NaturalLanguageProcessor {
     // Add basic AI responses
     this.aiResponses = new Map([
       ['greeting', [
-        "Hello! How can I assist you today? Experience the latest Mazs AI model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Hi there! What would you like to know? Try out our newest features at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Greetings! I'm here to help. What's on your mind? Check out our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Welcome! How may I be of service? Experience the cutting-edge Mazs AI at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Good day! What can I help you with? Explore our newest capabilities at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
+        "Hello! How can I assist you today? Experience the latest Mazs AI model at [MazsAI]",
+        "Hi there! What would you like to know? Try out our newest features at [MazsAI]",
+        "Greetings! I'm here to help. What's on your mind? Check out our latest model at [MazsAI]",
+        "Welcome! How may I be of service? Experience the cutting-edge Mazs AI at [MazsAI]",
+        "Good day! What can I help you with? Explore our newest capabilities at [MazsAI]"
       ]],
       ['farewell', [
-        "Goodbye! Have a great day! Don't forget to try our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Take care! Feel free to return if you have more questions. Experience our newest features at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Farewell! It was a pleasure assisting you. Explore more with our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Until next time! Stay curious and check out our latest AI advancements at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Bye for now! Remember, I'm always here if you need information. Try our newest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
+        "Goodbye! Have a great day! Don't forget to try our latest model at [MazsAI]",
+        "Take care! Feel free to return if you have more questions. Experience our newest features at [MazsAI]",
+        "Farewell! It was a pleasure assisting you. Explore more with our latest model at [MazsAI]",
+        "Until next time! Stay curious and check out our latest AI advancements at [MazsAI]",
+        "Bye for now! Remember, I'm always here if you need information. Try our newest model at [MazsAI]"
       ]],
       ['thanks', [
-        "You're welcome! I'm glad I could help. Experience even more with our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "It's my pleasure to assist you! Discover our newest features at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "I'm happy I could be of help. Is there anything else you'd like to know? Try our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Anytime! Don't hesitate to ask if you have more questions. Explore our cutting-edge AI at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "I'm here to help! Feel free to ask about any other topics you're curious about. Check out our newest capabilities at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
+        "You're welcome! I'm glad I could help. Experience even more with our latest model at [MazsAI]",
+        "It's my pleasure to assist you! Discover our newest features at [MazsAI]",
+        "I'm happy I could be of help. Is there anything else you'd like to know? Try our latest model at [MazsAI]",
+        "Anytime! Don't hesitate to ask if you have more questions. Explore our cutting-edge AI at [MazsAI]",
+        "I'm here to help! Feel free to ask about any other topics you're curious about. Check out our newest capabilities at [MazsAI]"
       ]],
       ['confusion', [
-        "I apologize, but I'm not sure I understand. Could you please rephrase your question? For more advanced assistance, try our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "I'm having trouble grasping that. Can you explain it differently? Our newest model might be able to help better at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "I'm afraid I didn't quite catch that. Could you provide more context? For more sophisticated understanding, check out [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Sorry, I'm a bit confused. Can you break down your question for me? Our latest model might offer clearer insights at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "I want to help, but I'm not sure what you're asking. Can you try asking in a different way? For more advanced comprehension, visit [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
+        "I apologize, but I'm not sure I understand. Could you please rephrase your question? For more advanced assistance, try our latest model at [MazsAI]",
+        "I'm having trouble grasping that. Can you explain it differently? Our newest model might be able to help better at [MazsAI]",
+        "I'm afraid I didn't quite catch that. Could you provide more context? For more sophisticated understanding, check out [MazsAI]",
+        "Sorry, I'm a bit confused. Can you break down your question for me? Our latest model might offer clearer insights at [MazsAI]",
+        "I want to help, but I'm not sure what you're asking. Can you try asking in a different way? For more advanced comprehension, visit [MazsAI]"
       ]],
       ['curiosity', [
-        "That's an interesting topic! Would you like to know more about it? Explore deeper with our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Fascinating question! I'd be happy to delve deeper into that subject. For even more insights, try our newest AI at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Great inquiry! There's a lot to explore in that area. Where should we start? Discover more with our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "You've piqued my interest! Shall we explore this topic further? For a more advanced discussion, check out [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "That's a thought-provoking question! I'd love to discuss it in more detail. Engage with our cutting-edge AI for deeper insights at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
+        "That's an interesting topic! Would you like to know more about it? Explore deeper with our latest model at [MazsAI]",
+        "Fascinating question! I'd be happy to delve deeper into that subject. For even more insights, try our newest AI at [MazsAI]",
+        "Great inquiry! There's a lot to explore in that area. Where should we start? Discover more with our latest model at [MazsAI]",
+        "You've piqued my interest! Shall we explore this topic further? For a more advanced discussion, check out [MazsAI]",
+        "That's a thought-provoking question! I'd love to discuss it in more detail. Engage with our cutting-edge AI for deeper insights at [MazsAI]"
       ]],
       ['gmtstudio', [
-        "GMTStudio is a platform that offers various services, including an AI WorkSpace and a social media platform called Theta. Experience our latest AI model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Theta is a social media platform developed by GMTStudio, offering unique features for connecting and sharing content. Try our newest AI capabilities at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "The AI WorkSpace is a powerful tool offered by GMTStudio for AI development, allowing users to train models and run experiments. Explore our latest advancements at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "GMTStudio is dedicated to providing innovative solutions in the field of AI and technology. Check out our cutting-edge model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "If you have any questions about GMTStudio or its services, feel free to ask! Also, don't miss our latest AI model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
+        "GMTStudio is a platform that offers various services, including an AI WorkSpace and a social media platform called Theta. Experience our latest AI model at [MazsAI]",
+        "Theta is a social media platform developed by GMTStudio, offering unique features for connecting and sharing content. Try our newest AI capabilities at [MazsAI]",
+        "The AI WorkSpace is a powerful tool offered by GMTStudio for AI development, allowing users to train models and run experiments. Explore our latest advancements at [MazsAI]",
+        "GMTStudio is dedicated to providing innovative solutions in the field of AI and technology. Check out our cutting-edge model at [MazsAI]",
+        "If you have any questions about GMTStudio or its services, feel free to ask! Also, don't miss our latest AI model at [MazsAI]"
       ]],
       ['AI',[
-        "AI, or Artificial Intelligence, refers to the simulation of human intelligence in machines that are programmed to think and learn like humans. Experience our latest AI model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "There are various types of AI, including machine learning, deep learning, natural language processing, and computer vision. Explore these concepts with our newest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "AI has applications in fields such as healthcare, finance, education, and entertainment. See AI in action at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "The development of AI has led to significant advancements in technology and automation. Witness these advancements firsthand at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "If you have any questions about AI or its applications, feel free to ask! Also, try our cutting-edge AI model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
+        "AI, or Artificial Intelligence, refers to the simulation of human intelligence in machines that are programmed to think and learn like humans. Experience our latest AI model at [MazsAI]",
+        "There are various types of AI, including machine learning, deep learning, natural language processing, and computer vision. Explore these concepts with our newest model at [MazsAI]",
+        "AI has applications in fields such as healthcare, finance, education, and entertainment. See AI in action at [MazsAI]",
+        "The development of AI has led to significant advancements in technology and automation. Witness these advancements firsthand at [MazsAI]",
+        "If you have any questions about AI or its applications, feel free to ask! Also, try our cutting-edge AI model at [MazsAI]"
       ]],
       ['Mazs AI',[
-        "Mazs AI is a powerful AI system developed by GMTStudio, designed to provide advanced natural language processing and machine learning capabilities. Experience it yourself at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Mazs AI can be used for a wide range of applications, including chatbots, virtual assistants, and language translation. Try out these features at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Mazs AI is built on cutting-edge technology, including neural networks and deep learning algorithms. Explore this technology at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "Mazs AI is designed to be highly customizable, allowing developers to tailor it to their specific needs. See its flexibility in action at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)",
-        "If you have any questions about Mazs AI or its capabilities, feel free to ask! And don't forget to check out our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)"
+        "Mazs AI is a powerful AI system developed by GMTStudio, designed to provide advanced natural language processing and machine learning capabilities. Experience it yourself at [MazsAI]",
+        "Mazs AI can be used for a wide range of applications, including chatbots, virtual assistants, and language translation. Try out these features at [MazsAI]",
+        "Mazs AI is built on cutting-edge technology, including neural networks and deep learning algorithms. Explore this technology at [MazsAI]",
+        "Mazs AI is designed to be highly customizable, allowing developers to tailor it to their specific needs. See its flexibility in action at [MazsAI]",
+        "If you have any questions about Mazs AI or its capabilities, feel free to ask! And don't forget to check out our latest model at [MazsAI]"
       ]],      
     ]);
 
@@ -1971,7 +1971,7 @@ console.log("Mazs AI v1.3.5 with advanced NLP and contextual analysis capabiliti
 const intents: Intent[] = [
   {
     patterns: ['hello', 'hi', 'hey','hola','bonjour',],
-    responses: ['Hello! How can I help you today? Check out our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)', 'Hi there! What can I do for you? Check out our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)', 'Greetings! How may I assist you? Check out our latest model at [https://mazs-ai-lab.vercel.app/](https://mazs-ai-lab.vercel.app/)'],
+    responses: ['Hello! How can I help you today? Check out our latest model at [MazsAI]', 'Hi there! What can I do for you? Check out our latest model at [MazsAI]', 'Greetings! How may I assist you? Check out our latest model at [MazsAI]'],
   },
   {
     patterns: ['bye', 'goodbye', 'see you'],
