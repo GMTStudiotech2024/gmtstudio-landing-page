@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import {
   FiSend,
   FiMoon,
@@ -132,11 +131,12 @@ const MazsAIChat: React.FC = () => {
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
   // Added state for new features
-  const [isFAQOpen, setIsFAQOpen] = useState(false);
-  const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
+  const [isFAQOpen] = useState(false);
+  const [, setIsShortcutsModalOpen] = useState(false);
 
   // Additional States for Sidebar Navigation
-  const [currentSection, setCurrentSection] = useState<'home' | 'chatHistory' | 'settings' | 'faq'>('home');
+  // eslint-disable-next-line no-empty-pattern
+  const [] = useState<'home' | 'chatHistory' | 'settings' | 'faq'>('home');
 
   // Dropdown state
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -641,39 +641,6 @@ const MazsAIChat: React.FC = () => {
     </div>
   );
 
-  const renderShortcutsModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-11/12 max-w-md shadow-lg overflow-y-auto max-h-[90vh]">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-            Keyboard Shortcuts
-          </h2>
-          <button
-            onClick={() => setIsShortcutsModalOpen(false)}
-            className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
-            aria-label="Close Shortcuts"
-          >
-            <FiX size={24} />
-          </button>
-        </div>
-        <ul className="space-y-2">
-          <li className="flex justify-between">
-            <span className="text-black dark:text-gray-300">Send Message:</span>
-            <span className="text-gray-800 dark:text-white font-medium">
-              Enter / Ctrl + Enter
-            </span>
-          </li>
-          <li className="flex justify-between">
-            <span className="text-black dark:text-gray-300">Open Settings:</span>
-            <span className="text-gray-800 dark:text-white font-medium">
-              Alt + S
-            </span>
-          </li>
-          {/* Add more shortcuts as needed */}
-        </ul>
-      </div>
-    </div>
-  );
 
   const renderUpdateSection = () => (
     <div
@@ -1039,29 +1006,6 @@ const MazsAIChat: React.FC = () => {
     setIsResetModalOpen(true);
   };
 
-  const handleNavigate = (section: string) => {
-    setCurrentSection(section as 'home' | 'chatHistory' | 'settings' | 'faq');
-    // Handle opening modals or sections based on navigation
-    switch (section) {
-      case 'home':
-        // Close all modals or reset states if needed
-        setShowChatHistory(false);
-        setShowSettings(false);
-        setIsFAQOpen(false);
-        break;
-      case 'chatHistory':
-        setShowChatHistory(true);
-        break;
-      case 'settings':
-        setShowSettings(true);
-        break;
-      case 'faq':
-        setIsFAQOpen(true);
-        break;
-      default:
-        break;
-    }
-  };
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
