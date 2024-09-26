@@ -366,6 +366,7 @@ class NaturalLanguageProcessor {
   private contextWindow: string[] = [];
   private maxContextWindowSize: number = 10;
   private topicKeywords: Set<string> = new Set();
+  
   private wordProbabilities: Map<string, Map<string, number>>;
   private conversationHistory: { role: 'user' | 'ai', content: string }[] = [];
   private sentimentModel: AdvancedSentimentModel;
@@ -1443,7 +1444,7 @@ class NaturalLanguageProcessor {
   updateContext(query: string) {
     this.conversationContext = query;
   }
-
+ 
   generateResponse(intent: string, entities: { [key: string]: string }, keywords: string[], topics: string[], userInput: string): string {
     let response = '';
 
