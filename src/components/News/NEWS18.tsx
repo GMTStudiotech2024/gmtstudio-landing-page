@@ -35,7 +35,7 @@ const NEWS18: React.FC = () => {
 
               <h2 className="text-2xl font-semibold mt-8 mb-4">Project Highlights</h2>
               <p>
-                 we updated Mazs AI to version 1.2.0, here are some key changes:
+                 we updated Mazs AI to version 1.3.5, here are some key changes:
                 <p>We have added Math solver to Mazs AI, which can solve math problem and generate math problem.</p>
                 <p>The three model Anatra, Canard, and pato are still exist but will not be available in official website. the original model will be Mazs AI v1.3.5 anatra, which is our enhanced version of the original model.</p>
                 </p>

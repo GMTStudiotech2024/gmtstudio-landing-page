@@ -1,6 +1,15 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { processChatbotQuery } from './MazsAI';
-import { EyeIcon, EyeSlashIcon, PlayIcon, ChartBarIcon } from '@heroicons/react/24/solid';
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  PlayIcon,
+  ChartBarIcon,
+  ClipboardIcon,
+  TrashIcon,
+  AdjustmentsHorizontalIcon,
+  LightBulbIcon,
+} from '@heroicons/react/24/solid';
 
 type ApiUsage = {
   requests: number;
@@ -19,6 +28,9 @@ const ApiPage: React.FC = () => {
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [temperature, setTemperature] = useState(0.7);
   const [responseMetrics, setResponseMetrics] = useState({ tokens: 0, time: 0 });
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const [maxTokens, setMaxTokens] = useState(100);
+  const [topP, setTopP] = useState(1);
 
   // Load apiKey from localStorage on mount
   useEffect(() => {
@@ -86,14 +98,20 @@ fetch('https://api.example.com/data', {
   headers: { 'Authorization': 'Bearer YOUR_API_KEY' }
 })
   .then(response => response.json())
-  .then(data => console.log(data));
+  .then(data => console.log(data))
+  .catch(error => console.error(error));
 `,
       python: `# Sample API Code in Python
 import requests
 
 headers = {'Authorization': 'Bearer YOUR_API_KEY'}
-response = requests.get('https://api.example.com/data', headers=headers)
-print(response.json())
+try:
+    response = requests.get('https://api.example.com/data', headers=headers)
+    response.raise_for_status()
+    data = response.json()
+    print(data)
+except requests.exceptions.RequestException as e:
+    print(e)
 `,
     }),
     []
@@ -121,7 +139,6 @@ print(response.json())
     }));
 
     const startTime = performance.now();
-
     // Use MazsAI to process the query
     const response = processChatbotQuery(playgroundInput);
 
@@ -133,7 +150,7 @@ print(response.json())
 
     setResponseMetrics({
       tokens: tokenCount,
-      time: responseTime
+      time: responseTime,
     });
 
     // Initialize typing animation
@@ -141,7 +158,7 @@ print(response.json())
     setDisplayedResult('');
     setIsTyping(true);
     setPlaygroundInput('');
-  }, [apiKey, playgroundInput, setApiUsage, setResponseMetrics, setPlaygroundResult, setDisplayedResult, setIsTyping, setPlaygroundInput]);
+  }, [apiKey, playgroundInput, temperature, maxTokens, topP]);
 
   // Typing animation effect
   useEffect(() => {
@@ -161,9 +178,6 @@ print(response.json())
       return () => clearInterval(interval);
     }
   }, [isTyping, playgroundResult]);
-
-  // Load any necessary custom fonts or styles for an Apple-like look
-  // For example, import 'SF Pro Display' font if available
 
   return (
     <div className="api-page min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black text-gray-800 dark:text-gray-100">
@@ -191,7 +205,7 @@ print(response.json())
         </div>
 
         {/* Tab Content */}
-        <div className="tab-content w-full max-w-4xl mx-auto mt-10">
+        <div className="tab-content w-full max-w-5xl mx-auto mt-10">
           {activeTab === 'api' && (
             <div className="api-tab">
               <div className="language-select mb-10 flex justify-center items-center">
@@ -222,7 +236,7 @@ print(response.json())
             <div className="key-tab text-center">
               <button
                 onClick={generateApiKey}
-                className="bg-blue-500 text-white py-3 px-12 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300 transition"
+                className="bg-blue-600 text-white py-3 px-12 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition transform hover:scale-105"
               >
                 Generate API Key
               </button>
@@ -235,21 +249,27 @@ print(response.json())
                     <button
                       onClick={toggleShowApiKey}
                       className="ml-4 text-gray-600 dark:text-gray-300 p-2 rounded hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      aria-label={showApiKey ? 'Hide API Key' : 'Show API Key'}
                     >
-                      {/* Use modern icons here */}
-                      {showApiKey ? 'Hide' : 'Show'}
+                      {showApiKey ? (
+                        <EyeSlashIcon className="h-6 w-6" />
+                      ) : (
+                        <EyeIcon className="h-6 w-6" />
+                      )}
                     </button>
                     <button
                       onClick={copyToClipboard}
-                      className="ml-4 text-gray-600 dark:text-gray-300 p-2 rounded hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      className="ml-2 text-gray-600 dark:text-gray-300 p-2 rounded hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      aria-label="Copy API Key"
                     >
-                      Copy
+                      <ClipboardIcon className="h-6 w-6" />
                     </button>
                     <button
                       onClick={deleteApiKey}
-                      className="ml-4 text-red-600 dark:text-red-400 p-2 rounded hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+                      className="ml-2 text-red-600 dark:text-red-400 p-2 rounded hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+                      aria-label="Delete API Key"
                     >
-                      Delete
+                      <TrashIcon className="h-6 w-6" />
                     </button>
                   </div>
                 </div>
@@ -277,7 +297,7 @@ print(response.json())
             <div className="playground-tab bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
               <h3 className="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-100">AI Playground</h3>
               <div className="flex flex-col space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                   <div className="space-y-6">
                     <div>
                       <label
@@ -288,7 +308,7 @@ print(response.json())
                       </label>
                       <div className="relative">
                         <input
-                          type={showApiKey ? "text" : "password"}
+                          type={showApiKey ? 'text' : 'password'}
                           id="api-key"
                           value={apiKey}
                           onChange={(e) => setApiKey(e.target.value)}
@@ -298,11 +318,12 @@ print(response.json())
                         <button
                           onClick={toggleShowApiKey}
                           className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                          aria-label={showApiKey ? 'Hide API Key' : 'Show API Key'}
                         >
                           {showApiKey ? (
-                            <EyeIcon className="h-6 w-6 text-gray-400" />
-                          ) : (
                             <EyeSlashIcon className="h-6 w-6 text-gray-400" />
+                          ) : (
+                            <EyeIcon className="h-6 w-6 text-gray-400" />
                           )}
                         </button>
                       </div>
@@ -333,28 +354,77 @@ print(response.json())
                         value={playgroundInput}
                         onChange={(e) => setPlaygroundInput(e.target.value)}
                         placeholder="Enter your query"
-                        rows={5}
+                        rows={6}
                         className="w-full p-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                       />
                     </div>
                     <div>
-                      <label
-                        htmlFor="temperature"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      <button
+                        onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
+                        className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition"
                       >
-                        Temperature: {temperature}
-                      </label>
-                      <input
-                        type="range"
-                        id="temperature"
-                        min="0"
-                        max="1"
-                        step="0.1"
-                        value={temperature}
-                        onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                        className="w-full"
-                      />
+                        <AdjustmentsHorizontalIcon className="h-5 w-5 mr-2" />
+                        {showAdvancedOptions ? 'Hide' : 'Show'} Advanced Options
+                      </button>
                     </div>
+                    {showAdvancedOptions && (
+                      <div className="space-y-4">
+                        <div>
+                          <label
+                            htmlFor="temperature"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                          >
+                            Temperature: {temperature}
+                          </label>
+                          <input
+                            type="range"
+                            id="temperature"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={temperature}
+                            onChange={(e) => setTemperature(parseFloat(e.target.value))}
+                            className="w-full"
+                          />
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="max-tokens"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                          >
+                            Max Tokens: {maxTokens}
+                          </label>
+                          <input
+                            type="range"
+                            id="max-tokens"
+                            min="1"
+                            max="2048"
+                            step="1"
+                            value={maxTokens}
+                            onChange={(e) => setMaxTokens(parseInt(e.target.value))}
+                            className="w-full"
+                          />
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="top-p"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                          >
+                            Top P: {topP}
+                          </label>
+                          <input
+                            type="range"
+                            id="top-p"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={topP}
+                            onChange={(e) => setTopP(parseFloat(e.target.value))}
+                            className="w-full"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-6">
                     <div>
@@ -363,7 +433,7 @@ print(response.json())
                       >
                         Result
                       </label>
-                      <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-inner h-64 overflow-auto border border-gray-200 dark:border-gray-700">
+                      <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-inner h-80 overflow-auto border border-gray-200 dark:border-gray-700">
                         <p className="text-gray-800 dark:text-gray-100 whitespace-pre-wrap font-mono">
                           {displayedResult || 'Result will appear here'}
                         </p>
@@ -380,16 +450,16 @@ print(response.json())
                           Tokens: {responseMetrics.tokens}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Response Time: {responseMetrics.time}ms
+                          Response Time: {responseMetrics.time} ms
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-between items-center mt-6">
+                <div className="flex flex-col lg:flex-row justify-between items-center mt-6 space-y-4 lg:space-y-0">
                   <button
                     onClick={handlePlaygroundSubmit}
-                    className="bg-blue-600 text-white py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition transform hover:scale-105 flex items-center"
+                    className="bg-blue-600 text-white py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition transform hover:scale-105 flex items-center disabled:opacity-50"
                     disabled={!apiKey || apiUsage.requests >= apiUsage.limit}
                   >
                     <PlayIcon className="h-5 w-5 mr-2" />
