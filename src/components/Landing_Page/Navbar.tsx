@@ -43,9 +43,12 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
   }, [handleScroll]);
 
   useEffect(() => {
-    const darkModePreference = localStorage.getItem('darkMode') === 'true';
-    setIsDarkMode(darkModePreference);
-    document.documentElement.classList.toggle('dark', darkModePreference);
+    const darkModePreference = localStorage.getItem('darkMode');
+    if (darkModePreference !== null) {
+      const isDark = darkModePreference === 'true';
+      setIsDarkMode(isDark);
+      document.documentElement.classList.toggle('dark', isDark);
+    }
   }, []);
 
   const toggleMenu = () => {
@@ -81,9 +84,10 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
   };
 
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
-    localStorage.setItem('darkMode', (!isDarkMode).toString());
+    const newDarkMode = !isDarkMode;
+    setIsDarkMode(newDarkMode);
+    document.documentElement.classList.toggle('dark', newDarkMode);
+    localStorage.setItem('darkMode', newDarkMode.toString());
   };
 
   const navItems = [
