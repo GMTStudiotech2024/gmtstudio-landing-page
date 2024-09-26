@@ -1,9 +1,21 @@
 import React, { useState,  } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaHome, FaNewspaper, FaFlask, FaGraduationCap,  FaSignInAlt, FaInfoCircle, FaChevronDown,  FaProjectDiagram, FaRocket, FaRobot, FaDatabase, FaBug, FaExclamationTriangle, FaCode, FaPaintBrush, FaGlobe, FaAtom, FaBrain, FaComments, FaBars, FaSearch, FaChevronLeft, FaChevronRight, FaUserCircle } from 'react-icons/fa';
+import {  FaChevronDown,  FaProjectDiagram, FaRocket, FaRobot, FaDatabase, FaBug, FaExclamationTriangle, FaCode, FaPaintBrush, FaGlobe, FaAtom, FaBrain, FaComments, FaSearch, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import ThemeToggle from '../services/ThemeToggle';
+import { 
+  TbUserHexagon, 
+  TbHomeSignal,
+  TbNews,
+  TbFlask2,
+  TbBooks,
+  TbLogin,
+  TbInfoTriangle,
+  TbCode,
+  TbCodeAsterisk,
+  TbDeviceDesktopAnalytics,
 
+   } from "react-icons/tb";
 interface SidebarProps {
   className?: string;
   isOpen: boolean;
@@ -26,9 +38,9 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
   };
 
   const links = [
-    { to: '/', icon: FaHome, label: 'Home' },
+    { to: '/', icon: TbHomeSignal, label: 'Home' },
     { label: "Latest News", 
-      icon: FaNewspaper,
+      icon: TbNews,
       subItems: [
         { to: '/news1', label: 'New Project in Queue', icon: FaProjectDiagram },
         { to: '/news2', label: 'Launch Social Media Platform', icon: FaRocket },
@@ -50,18 +62,18 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
         { to: '/news18', label: 'Mazs AI v1.3.5 update', icon: FaComments },
       ],
     },
-    {label: 'Mazs AI Projects', icon: FaCode, 
+    {label: 'Mazs AI Projects', icon: TbCode, 
       subItems: [
         {to: '/website-builder', label: 'Mazs AI Website Builder', icon: FaCode},
-        {to: '/advanced-search', label: 'Mazs AI Search', icon: FaCode},
-        {to: '/mazsai', label: 'Mazs AI Lab', icon: FaCode},
+        {to: '/advanced-search', label: 'Mazs AI Search', icon: TbCode},
+        {to: '/mazsai', label: 'Mazs AI Lab', icon: TbCodeAsterisk},
       ],
     },
-    { label: 'Research', icon: FaFlask, to: '/Research' },
-    { label: 'Learning', icon: FaGraduationCap, to: '/Learning' },
-    { label: 'Systems Status', icon: FaBars, to: '/system-status' },
-    { to: '/SignUp', icon: FaSignInAlt, label: 'Sign Up' },
-    { to: '/help', icon: FaInfoCircle, label: 'Help' },
+    { label: 'Research', icon: TbFlask2, to: '/Research' },
+    { label: 'Learning', icon: TbBooks, to: '/Learning' },
+    { label: 'Systems Status', icon: TbDeviceDesktopAnalytics, to: '/system-status' },
+    { to: '/SignUp', icon: TbLogin, label: 'Sign Up' },
+    { to: '/help', icon: TbInfoTriangle, label: 'Help' },
  ];
 
   const filteredLinks = links.filter(link => 
@@ -88,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
           transition={{ delay: 0.2 }}
         >
           <h2 className="text-2xl font-semibold text-center text-gray-800 dark:text-white flex items-center">
-            <FaUserCircle className="mr-2 text-blue-500" />
+            <TbUserHexagon className="mr-2 text-blue-500" />
             Hello, User
           </h2>
           <ThemeToggle />

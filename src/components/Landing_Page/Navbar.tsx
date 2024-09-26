@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  FaBars, FaTimes, FaBell, FaChevronDown,
+  FaBars, FaTimes,  FaChevronDown,
 } from 'react-icons/fa';
 import { motion, AnimatePresence, useViewportScroll, useTransform } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
@@ -9,8 +9,7 @@ import { GiStripedSun } from 'react-icons/gi';
 import { TbHomeSignal } from 'react-icons/tb';
 import { LiaFlaskSolid } from 'react-icons/lia';
 import { GrChat } from 'react-icons/gr';
-import { FiCodesandbox } from "react-icons/fi";
-import { TbEggCracked } from 'react-icons/tb';
+import { TbEggCracked, TbBrandMinecraft, TbBellZFilled } from 'react-icons/tb';
 
 interface NavbarProps {
   onSearchClick: () => void;
@@ -96,7 +95,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick }) => {
     {
       name: 'Products',
       path: '/Products',
-      icon: <FiCodesandbox />,
+      icon: <TbBrandMinecraft />,
       isDropdown: true,
       subItems: [
         { name: 'Mazs AI lab preview', path: '/mazsai' },
@@ -410,7 +409,7 @@ const NotificationButton: React.FC<{
       aria-label="Notifications"
       aria-expanded={isNotificationOpen}
     >
-      <FaBell className={`w-5 h-5 ${isNotificationOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
+      <TbBellZFilled className={`w-5 h-5 ${isNotificationOpen ? 'text-blue-500 dark:text-yellow-400' : ''}`} />
       {unreadCount > 0 && (
         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
           {unreadCount}

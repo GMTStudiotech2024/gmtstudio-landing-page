@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaMoon, FaSun } from 'react-icons/fa';
+import { TbMoonStars, TbSunset2 } from 'react-icons/tb';
 
 const ThemeToggle: React.FC = () => {
   const [theme, setTheme] = useState(localStorage.theme || 'light');
@@ -15,7 +15,7 @@ const ThemeToggle: React.FC = () => {
 
   return (
     <button onClick={toggleTheme} className="text-xl">
-      {theme === 'light' ? <FaMoon className="text-purple-500" /> : <FaSun className="text-yellow-500" />}
+      {theme === 'light' ? <TbMoonStars className="text-purple-500" /> : <TbSunset2 className="text-yellow-500" />}
     </button>
   );
 }
