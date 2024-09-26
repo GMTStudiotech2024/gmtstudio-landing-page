@@ -8,7 +8,6 @@ import {
   ClipboardIcon,
   TrashIcon,
   AdjustmentsHorizontalIcon,
-  LightBulbIcon,
 } from '@heroicons/react/24/solid';
 
 type ApiUsage = {

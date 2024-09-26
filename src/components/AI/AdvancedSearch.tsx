@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { processChatbotQuery, getConversationSuggestions } from './MazsAI';
-import { FaSearch, FaLightbulb, FaFilter, FaSort, FaImage, FaHistory, FaTimes, FaChevronDown, FaChevronUp, FaTimesCircle } from 'react-icons/fa';
+import { 
+  FaSearch, 
+  FaLightbulb, 
+  FaFilter, 
+  FaImage, 
+  FaHistory, 
+  FaTimes, 
+  FaChevronDown, 
+  FaChevronUp 
+} from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AdvancedSearch: React.FC = () => {
@@ -10,9 +19,7 @@ const AdvancedSearch: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [showHistory, setShowHistory] = useState(false);
-  const [expandedResult, setExpandedResult] = useState<number | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [wikiResults, setWikiResults] = useState<any[]>([]);
   const [typingResult, setTypingResult] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [searchType, setSearchType] = useState<'web' | 'images' | 'news'>('web');
@@ -89,7 +96,7 @@ const AdvancedSearch: React.FC = () => {
       summary += `${index + 1}. ${topic}\n`;
     });
 
-    summary += "\nNote: This summary combines AI-generated content and information from internet. For the most accurate and up-to-date information, please verify with authoritative sources.";
+    summary += "\nNote: This summary combines AI-generated content and information from the internet. For the most accurate and up-to-date information, please verify with authoritative sources.";
 
     return summary;
   };
@@ -159,10 +166,6 @@ const AdvancedSearch: React.FC = () => {
     }
   };
 
-  const toggleResultExpansion = (index: number) => {
-    setExpandedResult(expandedResult === index ? null : index);
-  };
-
   return (
     <div className={`min-h-screen ${isDarkMode ? 'dark' : ''} bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-in-out pt-20`}>
       <div className="max-w-4xl mx-auto">
@@ -194,6 +197,7 @@ const AdvancedSearch: React.FC = () => {
               onChange={(e) => setQuery(e.target.value)}
               className="appearance-none bg-transparent border-none w-full text-gray-700 dark:text-gray-300 mr-3 py-1 px-2 leading-tight focus:outline-none text-lg"
               placeholder="Search with AI..."
+              aria-label="Search input"
             />
             <motion.button
               type="submit"
@@ -201,6 +205,7 @@ const AdvancedSearch: React.FC = () => {
               disabled={isLoading}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              aria-label="Search button"
             >
               {isLoading ? 'Searching...' : 'Search'}
             </motion.button>
@@ -219,6 +224,7 @@ const AdvancedSearch: React.FC = () => {
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                aria-label={`${type} search button`}
               >
                 {type === 'web' && <FaSearch className="inline-block mr-2" />}
                 {type === 'images' && <FaImage className="inline-block mr-2" />}
@@ -238,6 +244,7 @@ const AdvancedSearch: React.FC = () => {
               type="button"
               onClick={() => setShowFilters(!showFilters)}
               className="flex items-center justify-center w-full py-2 bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 rounded-full hover:bg-white/70 dark:hover:bg-gray-700/70 transition duration-300"
+              aria-label="Toggle Filters"
             >
               <FaFilter className="mr-2" />
               {showFilters ? 'Hide Filters' : 'Show Filters'}
@@ -259,6 +266,7 @@ const AdvancedSearch: React.FC = () => {
                         value={filters.date}
                         onChange={(e) => setFilters({ ...filters, date: e.target.value })}
                         className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        aria-label="Date Range"
                       >
                         <option value="">Any time</option>
                         <option value="day">Past 24 hours</option>
@@ -273,11 +281,13 @@ const AdvancedSearch: React.FC = () => {
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value as 'relevance' | 'date')}
                         className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        aria-label="Sort By"
                       >
                         <option value="relevance">Relevance</option>
                         <option value="date">Date</option>
                       </select>
                     </div>
+                    {/* Add more filter options as needed */}
                   </div>
                 </motion.div>
               )}
@@ -342,6 +352,7 @@ const AdvancedSearch: React.FC = () => {
                   className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition duration-300 ease-in-out"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  aria-label={`Suggested query: ${suggestion}`}
                 >
                   <FaLightbulb className="mr-2" />
                   {suggestion}
@@ -363,6 +374,7 @@ const AdvancedSearch: React.FC = () => {
               <button
                 onClick={clearHistory}
                 className="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition duration-300"
+                aria-label="Clear search history"
               >
                 Clear History
               </button>
@@ -379,6 +391,7 @@ const AdvancedSearch: React.FC = () => {
                   <button
                     onClick={() => handleHistoryClick(item)}
                     className="text-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition duration-300"
+                    aria-label={`Search history item: ${item}`}
                   >
                     {item}
                   </button>
@@ -389,6 +402,7 @@ const AdvancedSearch: React.FC = () => {
                       setSearchHistory(newHistory);
                       localStorage.setItem('searchHistory', JSON.stringify(newHistory));
                     }}
+                    aria-label={`Delete search history item: ${item}`}
                   />
                 </motion.li>
               ))}

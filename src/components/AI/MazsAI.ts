@@ -27,9 +27,9 @@ class MultilayerPerceptron {
 
     for (let i = 1; i < layers.length; i++) {
       this.weights.push(Array(layers[i]).fill(0).map(() => 
-        Array(layers[i-1]).fill(0).map(() => this.initializeWeight())
+        Array(layers[i-1]).fill(0).map(() => this.initializeWeight(layers[i-1], layers[i]))
       ));
-      this.biases.push(Array(layers[i]).fill(0).map(() => this.initializeWeight()));
+      this.biases.push(Array(layers[i]).fill(0).map(() => this.initializeWeight(1, layers[i])));
       
       const activation = activations[i - 1] || 'relu';
       this.activations.push(this.getActivationFunction(activation));
@@ -37,10 +37,28 @@ class MultilayerPerceptron {
     }
   }
 
-  private initializeWeight(): number {
-    // Xavier/Glorot initialization
-    const limit = Math.sqrt(6 / (this.layers[0] + this.layers[this.layers.length - 1]));
-    return Math.random() * 2 * limit - limit;
+  private initializeWeight(inputSize: number, outputSize: number): number {
+    // Enhanced Xavier/Glorot initialization with He initialization for ReLU
+    const isReLU = this.activations.some(act => act.name.includes('relu'));
+    const fanIn = inputSize;
+    const fanOut = outputSize;
+    
+    if (isReLU) {
+      // He initialization for ReLU activation
+      const stdDev = Math.sqrt(2 / fanIn);
+      return this.gaussianRandom(0, stdDev);
+    } else {
+      // Xavier/Glorot initialization for other activations
+      const limit = Math.sqrt(6 / (fanIn + fanOut));
+      return Math.random() * 2 * limit - limit;
+    }
+  }
+
+  private gaussianRandom(mean: number, stdDev: number): number {
+    const u = 1 - Math.random(); // Converting [0,1) to (0,1]
+    const v = Math.random();
+    const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    return z * stdDev + mean;
   }
 
   private getActivationFunction(name: string): (x: number) => number {
@@ -54,16 +72,22 @@ class MultilayerPerceptron {
   }
 
   private getActivationDerivative(name: string): (x: number) => number {
-    switch (name) {
-      case 'sigmoid': return (x: number) => {
+    const derivatives: { [key: string]: (x: number) => number } = {
+      sigmoid: (x: number) => {
         const s = 1 / (1 + Math.exp(-x));
         return s * (1 - s);
-      };
-      case 'relu': return (x: number) => x > 0 ? 1 : 0;
-      case 'tanh': return (x: number) => 1 - Math.pow(Math.tanh(x), 2);
-      case 'leaky_relu': return (x: number) => x > 0 ? 1 : 0.01;
-      default: return (x: number) => x > 0 ? 1 : 0; // default to relu
-    }
+      },
+      relu: (x: number) => x > 0 ? 1 : 0,
+      tanh: (x: number) => 1 - Math.pow(Math.tanh(x), 2),
+      leaky_relu: (x: number) => x > 0 ? 1 : 0.01,
+      elu: (x: number) => x >= 0 ? 1 : Math.exp(x),
+      swish: (x: number) => {
+        const sigmoid = 1 / (1 + Math.exp(-x));
+        return sigmoid + x * sigmoid * (1 - sigmoid);
+      },
+    };
+
+    return derivatives[name] || ((x: number) => x > 0 ? 1 : 0); // default to relu derivative
   }
 
   // Add a method for batch normalization
@@ -86,49 +110,91 @@ class MultilayerPerceptron {
       let newActivation = [];
       for (let j = 0; j < this.weights[i].length; j++) {
         const sum = this.weights[i][j].reduce((sum, weight, k) => sum + weight * currentActivation[k], 0) + this.biases[i][j];
-        newActivation.push(this.activations[i](sum));
+        const activatedValue = this.activations[i](sum);
+        newActivation.push(this.applyDropout([activatedValue], 0.1)[0]); // Apply lightweight dropout
       }
       activation = this.batchNormalize(newActivation);
+      
+      // Add skip connection if not the last layer
+      if (i < this.weights.length - 1 && activation.length === currentActivation.length) {
+        activation = activation.map((val, idx) => val + currentActivation[idx]);
+      }
     }
-    // Convert confidence scores to binary values (0 or 1)
-    const threshold = 0.5; // Set your desired threshold here
-    return activation.map((score) => (score >= threshold ? 1 : 0));
+    
+    // Apply softmax to get probabilities
+    const expValues = activation.map(Math.exp);
+    const sumExpValues = expValues.reduce((a, b) => a + b, 0);
+    const probabilities = expValues.map(value => value / sumExpValues);
+    
+    // Use dynamic thresholding
+    const meanProb = probabilities.reduce((a, b) => a + b, 0) / probabilities.length;
+    const threshold = meanProb * 0.8; // Adjust this factor as needed
+    
+    return probabilities.map((prob) => (prob >= threshold ? 1 : 0));
   }
 
   // Modify the train method to include dropout and advanced optimizers
   train(input: number[], target: number[], learningRate: number = 0.001, momentum: number = 0.9, dropoutRate: number = 0.2) {
-    // Forward pass
-    let activations: number[][] = [input];
+    // Forward pass with lightweight enhancements
+    let activations: number[][] = [this.batchNormalize(input)];
     let weightedSums: number[][] = [];
+    let dropoutMasks: boolean[][] = [];
 
     for (let i = 0; i < this.weights.length; i++) {
-      let newActivation: number[] = [];
-      let newWeightedSum: number[] = [];
-      for (let j = 0; j < this.weights[i].length; j++) {
-        const sum = this.weights[i][j].reduce((sum, weight, k) => sum + weight * activations[i][k], 0) + this.biases[i][j];
-        newWeightedSum.push(sum);
-        newActivation.push(this.activations[i](sum));
-      }
+      const [newActivation, newWeightedSum] = this.forwardLayer(activations[i], this.weights[i], this.biases[i], this.activations[i]);
       weightedSums.push(newWeightedSum);
-      activations.push(newActivation);
+      
+      // Apply dropout
+      const mask = this.generateDropoutMask(newActivation.length, dropoutRate);
+      dropoutMasks.push(mask);
+      const droppedActivation = newActivation.map((a, idx) => mask[idx] ? a / (1 - dropoutRate) : 0);
+      
+      // Apply batch normalization and add to activations
+      activations.push(this.batchNormalize(droppedActivation));
     }
 
-    // Backward pass
-    let deltas = [activations[activations.length - 1].map((output, i) => 
-      (output - target[i]) * this.activationDerivatives[this.activationDerivatives.length - 1](weightedSums[weightedSums.length - 1][i])
-    )];
+    // Backward pass with improvements
+    let deltas = this.calculateOutputDeltas(activations[activations.length - 1], target, weightedSums[weightedSums.length - 1]);
 
     for (let i = this.weights.length - 1; i > 0; i--) {
-      let layerDelta = [];
-      for (let j = 0; j < this.weights[i-1].length; j++) {
-        const error = this.weights[i].reduce((sum, neuronWeights, k) => sum + neuronWeights[j] * deltas[0][k], 0);
-        layerDelta.push(error * this.activationDerivatives[i-1](weightedSums[i-1][j]));
-      }
-      deltas.unshift(layerDelta);
+      deltas = [this.calculateHiddenDeltas(deltas[0], this.weights[i], weightedSums[i-1], this.activationDerivatives[i-1]), ...deltas];
     }
 
-    // Update weights and biases with advanced optimizer
+    // Update weights and biases with advanced optimizer and regularization
     this.optimizer.update(this.weights, this.biases, activations, deltas, learningRate, momentum, dropoutRate);
+    this.applyWeightDecay(learningRate * 0.0001); // Lightweight L2 regularization
+  }
+
+  private forwardLayer(inputs: number[], weights: number[][], biases: number[], activation: (x: number) => number): [number[], number[]] {
+    const weightedSum = weights.map((neuronWeights, j) => 
+      neuronWeights.reduce((sum, weight, k) => sum + weight * inputs[k], 0) + biases[j]
+    );
+    return [weightedSum.map(activation), weightedSum];
+  }
+
+  private generateDropoutMask(size: number, rate: number): boolean[] {
+    return Array(size).fill(0).map(() => Math.random() > rate);
+  }
+
+  private calculateOutputDeltas(outputs: number[], targets: number[], weightedSums: number[]): number[][] {
+    return [outputs.map((output, i) => 
+      (output - targets[i]) * this.activationDerivatives[this.activationDerivatives.length - 1](weightedSums[i])
+    )];
+  }
+
+  private calculateHiddenDeltas(nextDeltas: number[], weights: number[][], weightedSums: number[], activationDerivative: (x: number) => number): number[] {
+    return weightedSums.map((sum, j) => {
+      const error = weights.reduce((acc, neuronWeights, k) => acc + neuronWeights[j] * nextDeltas[k], 0);
+      return error * activationDerivative(sum);
+    });
+  }
+
+  private applyWeightDecay(decayRate: number) {
+    this.weights = this.weights.map(layer => 
+      layer.map(neuron => 
+        neuron.map(weight => weight * (1 - decayRate))
+      )
+    );
   }
 
   // Add a method for L2 regularization
@@ -513,10 +579,15 @@ class NaturalLanguageProcessor {
       organization: [],
       location: [],
       date: [],
-      misc: []
+      misc: [],
+      // New entity types
+      event: [],
+      product: [],
+      time: [],
+      money: [],
+      percentage: []
     };
 
-    // Simple rule-based NER
     const words = text.split(' ');
     const sentenceEnds = new Set(['.', '!', '?']);
     let isStartOfSentence = true;
@@ -525,46 +596,98 @@ class NaturalLanguageProcessor {
       const word = words[i];
       const nextWord = words[i + 1] || '';
       const prevWord = words[i - 1] || '';
+      const nextTwoWords = words.slice(i + 1, i + 3).join(' ');
 
-      // Person names (capitalized words not at the start of a sentence, or consecutive capitalized words)
+      // Person names (improved detection)
       if ((/^[A-Z][a-z]+$/.test(word) && !isStartOfSentence) || 
           (/^[A-Z][a-z]+$/.test(word) && /^[A-Z][a-z]+$/.test(nextWord))) {
-        entities.person.push(word);
-        if (/^[A-Z][a-z]+$/.test(nextWord)) {
-          entities.person[entities.person.length - 1] += ' ' + nextWord;
-          i++; // Skip the next word as it's part of the name
+        let fullName = word;
+        while (i + 1 < words.length && /^[A-Z][a-z]+$/.test(words[i + 1])) {
+          fullName += ' ' + words[i + 1];
+          i++;
         }
+        entities.person.push(fullName);
       }
-      // Organizations (all caps words, or known organization suffixes)
+      // Organizations (expanded detection)
       else if (/^[A-Z]{2,}$/.test(word) || 
-               (['Inc.', 'Corp.', 'LLC', 'Ltd.'].includes(word) && /^[A-Z][a-z]+$/.test(prevWord))) {
-        if (['Inc.', 'Corp.', 'LLC', 'Ltd.'].includes(word)) {
-          entities.organization[entities.organization.length - 1] += ' ' + word;
-        } else {
-          entities.organization.push(word);
+               (['Inc.', 'Corp.', 'LLC', 'Ltd.', 'Co.', 'Group', 'Association', 'Foundation'].includes(word) && /^[A-Z][a-z]+$/.test(prevWord)) ||
+               (/^[A-Z][a-z]+$/.test(word) && ['Company', 'Corporation', 'Institute', 'University'].includes(nextWord))) {
+        let orgName = /^[A-Z]{2,}$/.test(word) ? word : prevWord + ' ' + word;
+        if (['Company', 'Corporation', 'Institute', 'University'].includes(nextWord)) {
+          orgName += ' ' + nextWord;
+          i++;
         }
+        entities.organization.push(orgName);
       }
-      // Locations (capitalized words followed by common location words, or known location prefixes)
-      else if ((/^[A-Z][a-z]+$/.test(word) && ['City', 'Street', 'Avenue', 'Road', 'Park', 'River', 'Mountain', 'Lake'].includes(nextWord)) ||
-               (['North', 'South', 'East', 'West', 'New', 'San', 'Los', 'Las'].includes(word) && /^[A-Z][a-z]+$/.test(nextWord))) {
-        entities.location.push(word + ' ' + nextWord);
-        i++; // Skip the next word as it's part of the location
+      // Locations (expanded detection)
+      else if ((/^[A-Z][a-z]+$/.test(word) && ['City', 'Street', 'Avenue', 'Road', 'Park', 'River', 'Mountain', 'Lake', 'Ocean', 'Sea', 'Gulf', 'Bay', 'Forest', 'Desert', 'Island', 'Peninsula', 'Valley', 'Canyon'].includes(nextWord)) ||
+               (['North', 'South', 'East', 'West', 'New', 'San', 'Los', 'Las', 'El', 'La', 'De', 'Du', 'Von', 'Van'].includes(word) && /^[A-Z][a-z]+$/.test(nextWord))) {
+        let location = word + ' ' + nextWord;
+        i++;
+        while (i + 1 < words.length && /^[A-Z][a-z]+$/.test(words[i + 1])) {
+          location += ' ' + words[i + 1];
+          i++;
+        }
+        entities.location.push(location);
       }
-      // Dates (various date formats)
+      // Dates (expanded formats)
       else if (/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(word) || 
                /^\d{1,2}-\d{1,2}-\d{2,4}$/.test(word) ||
-               /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2},?\s\d{4}$/.test(word + ' ' + nextWord + ' ' + words[i + 2])) {
-        if (/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/.test(word)) {
-          entities.date.push(word + ' ' + nextWord + ' ' + words[i + 2]);
-          i += 2; // Skip the next two words as they're part of the date
+               /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2},?\s\d{4}$/.test(word + ' ' + nextTwoWords) ||
+               /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),?\s(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2}(,?\s\d{4})?$/.test(word + ' ' + nextTwoWords)) {
+        if (/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/.test(word) || /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/.test(word)) {
+          entities.date.push(word + ' ' + nextTwoWords);
+          i += 2;
         } else {
           entities.date.push(word);
         }
       }
-      // Misc (words with special characters, mixed case, or numeric values)
+      // Events (new entity type)
+      else if (['Festival', 'Conference', 'Summit', 'Olympics', 'World Cup', 'Exhibition', 'Concert', 'Award'].some(event => (word + ' ' + nextWord).includes(event))) {
+        let event = word;
+        while (i + 1 < words.length && !/^(in|at|on)$/.test(words[i + 1].toLowerCase())) {
+          event += ' ' + words[i + 1];
+          i++;
+        }
+        entities.event.push(event);
+      }
+      // Products (new entity type)
+      else if (/^(iPhone|iPad|MacBook|Galaxy|Pixel|Xbox|PlayStation)/.test(word) || 
+               (['Model', 'Edition', 'Series'].includes(nextWord) && /^[A-Z]/.test(word))) {
+        let product = word + ((['Model', 'Edition', 'Series'].includes(nextWord)) ? ' ' + nextWord : '');
+        entities.product.push(product);
+        if (['Model', 'Edition', 'Series'].includes(nextWord)) i++;
+      }
+      // Time (new entity type)
+      else if (/^\d{1,2}:\d{2}(:\d{2})?(\s?[AP]M)?$/.test(word) ||
+               /^([01]?[0-9]|2[0-3])([AaPp][Mm])$/.test(word)) {
+        entities.time.push(word);
+      }
+      // Money (new entity type)
+      else if (/^\$\d+(,\d{3})*(\.\d{2})?$/.test(word) ||
+               (/^\d+(,\d{3})*(\.\d{2})?$/.test(word) && ['dollars', 'USD', 'euros', 'pounds'].includes(nextWord.toLowerCase()))) {
+        let money = word;
+        if (['dollars', 'USD', 'euros', 'pounds'].includes(nextWord.toLowerCase())) {
+          money += ' ' + nextWord;
+          i++;
+        }
+        entities.money.push(money);
+      }
+      // Percentage (new entity type)
+      else if (/^\d+(\.\d+)?%$/.test(word) ||
+               (/^\d+(\.\d+)?$/.test(word) && nextWord.toLowerCase() === 'percent')) {
+        let percentage = word;
+        if (nextWord.toLowerCase() === 'percent') {
+          percentage += ' ' + nextWord;
+          i++;
+        }
+        entities.percentage.push(percentage);
+      }
+      // Misc (expanded criteria)
       else if (/[!@#$%^&*()]/.test(word) || 
                /[A-Z].*[a-z]|[a-z].*[A-Z]/.test(word) ||
-               /\d+/.test(word)) {
+               /\d+/.test(word) ||
+               word.length > 15) {  // Unusually long words
         entities.misc.push(word);
       }
 
@@ -572,7 +695,12 @@ class NaturalLanguageProcessor {
       isStartOfSentence = sentenceEnds.has(word[word.length - 1]);
     }
 
-    console.log("Performed NER on:", text);
+    // Post-processing: Remove duplicates and sort
+    Object.keys(entities).forEach(key => {
+      entities[key] = Array.from(new Set(entities[key])).sort();
+    });
+
+    console.log("Performed enhanced NER on:", text);
     console.log("Identified entities:", entities);
 
     return entities;
@@ -870,18 +998,103 @@ class NaturalLanguageProcessor {
   }
 
 
-  private analyzeContext(context: string): { sentiment: { score: number, explanation: string }, topics: string[], entities: { [key: string]: string }, keywords: string[] } {
+  private analyzeContext(context: string): {
+    sentiment: { score: number; explanation: string };
+    topics: string[];
+    entities: { [key: string]: string };
+    keywords: string[];
+    complexity: number;
+    emotionalTone: string;
+    intentClassification: string;
+  } {
     const sentiment = this.analyzeSentiment(context);
-    const topics = this.identifyTopics(context);
     const entities = this.extractEntities(context);
     const keywords = this.extractKeywords(this.tokenize(context));
+    const complexity = this.assessTextComplexity(context);
+    const emotionalTone = this.determineEmotionalTone(context);
+    const intentClassification = this.classifyIntent(context);
 
-    return { 
-      sentiment, 
-      topics,
-      entities,
-      keywords
+    // Perform deeper analysis on entities
+    const enhancedEntities = this.enhanceEntityAnalysis(entities, context);
+
+    // Perform topic modeling to get more detailed topic information
+    const detailedTopics = this.performTopicModeling(context);
+
+    // Analyze keyword importance and relevance
+    const rankedKeywords = this.rankKeywordsByImportance(keywords, context);
+
+    return {
+      sentiment,
+      topics: detailedTopics,
+      entities: enhancedEntities,
+      keywords: rankedKeywords,
+      complexity,
+      emotionalTone,
+      intentClassification,
     };
+  }
+
+  private assessTextComplexity(text: string): number {
+    // Implement text complexity assessment (e.g., readability score)
+    // This is a placeholder implementation
+    const words = this.tokenize(text);
+    const averageWordLength = words.reduce((sum, word) => sum + word.length, 0) / words.length;
+    return averageWordLength * 10; // Simple complexity score based on average word length
+  }
+
+  private determineEmotionalTone(text: string): string {
+    // Implement emotional tone analysis
+    // This is a placeholder implementation
+    const sentiment = this.analyzeSentiment(text);
+    if (sentiment.score > 0.5) return 'Positive';
+    if (sentiment.score < -0.5) return 'Negative';
+    return 'Neutral';
+  }
+
+  private classifyIntent(text: string): string {
+    // Implement intent classification
+    // This is a placeholder implementation
+    const lowercaseText = text.toLowerCase();
+    if (lowercaseText.includes('?')) return 'Question';
+    if (lowercaseText.includes('!')) return 'Exclamation';
+    return 'Statement';
+  }
+
+  private enhanceEntityAnalysis(entities: { [key: string]: string }, context: string): { [key: string]: string } {
+    // Perform more detailed entity analysis
+    // This is a placeholder implementation
+    return Object.entries(entities).reduce((acc, [entity, type]) => {
+      acc[entity] = `${type} | Frequency: ${this.getEntityFrequency(entity, context)}`;
+      return acc;
+    }, {} as { [key: string]: string });
+  }
+
+  private getEntityFrequency(entity: string, context: string): number {
+    const regex = new RegExp(entity, 'gi');
+    return (context.match(regex) || []).length;
+  }
+
+  private performTopicModeling(text: string): string[] {
+    // Implement more sophisticated topic modeling
+    // This is a placeholder implementation
+    const topics = this.identifyTopics(text);
+    return topics.map(topic => `${topic} (Confidence: ${this.getTopicConfidence(topic, text)}%)`);
+  }
+
+  private getTopicConfidence(topic: string, text: string): number {
+    // Placeholder implementation for topic confidence
+    return Math.floor(Math.random() * 100);
+  }
+
+  private rankKeywordsByImportance(keywords: string[], context: string): string[] {
+    // Implement keyword ranking based on importance and relevance
+    // This is a placeholder implementation
+    return keywords.sort((a, b) => this.getKeywordScore(b, context) - this.getKeywordScore(a, context));
+  }
+
+  private getKeywordScore(keyword: string, context: string): number {
+    // Placeholder implementation for keyword scoring
+    return this.getEntityFrequency(keyword, context) * keyword.length;
   }
 
   private adjustWordBasedOnAnalysis(word: string, sentiment: { score: number, explanation: string }, topics: string[]): string {
@@ -952,25 +1165,94 @@ class NaturalLanguageProcessor {
   }
 
   private calculateSimilarity(word1: string, word2: string): number {
-    // Implement a method to calculate similarity between two words
-    // This could be based on edit distance, semantic similarity, etc.
-    return this.semanticSimilarity(word1, word2);
+    // Implement multiple methods to calculate similarity between two words
+    const editDistance = this.levenshteinDistance(word1, word2);
+    const semanticSim = this.semanticSimilarity(word1, word2);
+    const phoneticalSim = this.soundexSimilarity(word1, word2);
+
+    // Combine different similarity measures
+    return (
+      0.4 * (1 - editDistance / Math.max(word1.length, word2.length)) +
+      0.4 * semanticSim +
+      0.2 * phoneticalSim
+    );
   }
-  semanticSimilarity(word1: string, word2: string): number {
+
+  private levenshteinDistance(s1: string, s2: string): number {
+    const costs: number[] = [];
+    for (let i = 0; i <= s1.length; i++) {
+      let lastValue = i;
+      for (let j = 0; j <= s2.length; j++) {
+        if (i === 0) costs[j] = j;
+        else if (j > 0) {
+          let newValue = costs[j - 1];
+          if (s1.charAt(i - 1) !== s2.charAt(j - 1))
+            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+          costs[j - 1] = lastValue;
+          lastValue = newValue;
+        }
+      }
+      if (i > 0) costs[s2.length] = lastValue;
+    }
+    return costs[s2.length];
+  }
+
+  private semanticSimilarity(word1: string, word2: string): number {
     if (!this.wordVectors.has(word1) || !this.wordVectors.has(word2)) {
-        return 0;
+      return 0;
     }
     const vec1 = this.wordVectors.get(word1)!;
     const vec2 = this.wordVectors.get(word2)!;
     const similarity = this.cosineSimilarity(vec1, vec2);
     return similarity;
-}
+  }
+
+  private soundexSimilarity(word1: string, word2: string): number {
+    const soundex1 = this.getSoundex(word1);
+    const soundex2 = this.getSoundex(word2);
+    return soundex1 === soundex2 ? 1 : 0;
+  }
+
+  private getSoundex(word: string): string {
+    const a = word.toLowerCase().split('');
+    const firstLetter = a.shift();
+    const codes = {
+      a: '', e: '', i: '', o: '', u: '',
+      b: 1, f: 1, p: 1, v: 1,
+      c: 2, g: 2, j: 2, k: 2, q: 2, s: 2, x: 2, z: 2,
+      d: 3, t: 3,
+      l: 4,
+      m: 5, n: 5,
+      r: 6
+    };
+    const soundex = a
+      .map(v => codes[v as keyof typeof codes] ?? '')
+      .filter((v, i, arr) => i === 0 || v !== arr[i - 1])
+      .filter(v => v !== '')
+      .join('');
+    return (firstLetter + soundex + '000').slice(0, 4);
+  }
+
   private findWordWithSimilarSentiment(word: string, targetSentiment: number): string {
-    const similarWords = this.findSimilarWords(word, 10);
-    return similarWords.find(w => {
-      const sentiment = this.analyzeSentiment(w).score;
-      return Math.abs(sentiment - targetSentiment) < 0.3;
-    }) || word;
+    const similarWords = this.findSimilarWords(word, 20);
+    const wordScores = similarWords.map(w => ({
+      word: w,
+      score: this.analyzeSentiment(w).score,
+      similarity: this.calculateSimilarity(word, w)
+    }));
+
+    // Sort by a combination of sentiment similarity and word similarity
+    wordScores.sort((a, b) => {
+      const aSentimentDiff = Math.abs(a.score - targetSentiment);
+      const bSentimentDiff = Math.abs(b.score - targetSentiment);
+      const sentimentWeight = 0.7;
+      const similarityWeight = 0.3;
+      
+      return (aSentimentDiff * sentimentWeight + (1 - a.similarity) * similarityWeight) -
+             (bSentimentDiff * sentimentWeight + (1 - b.similarity) * similarityWeight);
+    });
+
+    return wordScores[0]?.word || word;
   }
 
   private getNgramCandidates(ngram: string, n: number): Map<string, number> {
@@ -980,6 +1262,13 @@ class NaturalLanguageProcessor {
         candidates.set(key, count);
       }
     });
+
+    // Apply smoothing to avoid zero probabilities
+    const smoothingFactor = 0.1;
+    candidates.forEach((count, key) => {
+      candidates.set(key, count + smoothingFactor);
+    });
+
     return candidates;
   }
 
@@ -989,9 +1278,18 @@ class NaturalLanguageProcessor {
     }
 
     const totalFrequency = Array.from(candidates.values()).reduce((sum, freq) => sum + freq, 0);
-    let random = Math.random() * totalFrequency;
     
-    const entries = Array.from(candidates.entries());
+    // Apply temperature to control randomness
+    const temperature = 0.7;
+    const adjustedCandidates = new Map<string, number>();
+    candidates.forEach((freq, word) => {
+      adjustedCandidates.set(word, Math.pow(freq / totalFrequency, 1 / temperature));
+    });
+
+    const adjustedTotal = Array.from(adjustedCandidates.values()).reduce((sum, freq) => sum + freq, 0);
+    let random = Math.random() * adjustedTotal;
+    
+    const entries = Array.from(adjustedCandidates.entries());
     for (const [word, freq] of entries) {
       random -= freq;
       if (random <= 0) return word;

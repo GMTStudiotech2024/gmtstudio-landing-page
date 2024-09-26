@@ -79,6 +79,7 @@ const NEWS18: React.FC = () => {
 
               <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
                 <p className="font-semibold text-blue-800 dark:text-blue-200">We look forward to sharing more details about this exciting new project with you soon. Thank you for your continued support.</p>
+                <p className="font-semibold text-black dark:text-white">Also, We added some easter in the website, please find it and enjoy the reward.</p>
               </div>
             </div>
           </div>
