@@ -8,7 +8,7 @@ type ApiUsage = {
 };
 
 const ApiPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'api' | 'key' | 'playground'>('api');
+  const [activeTab, setActiveTab] = useState<'playground' | 'key' | 'api'>('playground');
   const [language, setLanguage] = useState<'javascript' | 'python'>('javascript');
   const [apiKey, setApiKey] = useState<string>('');
   const [apiUsage, setApiUsage] = useState<ApiUsage>({ requests: 0, limit: 10 });
@@ -173,12 +173,12 @@ print(response.json())
           className="tabs flex justify-center space-x-8 mb-12 border-b border-gray-200 dark:border-gray-800"
           role="tablist"
         >
-          {['api', 'key', 'playground'].map((tab) => (
+          {['playground', 'key', 'api'].map((tab) => (
             <button
               key={tab}
               role="tab"
               aria-selected={activeTab === tab}
-              onClick={() => setActiveTab(tab as 'api' | 'key' | 'playground')}
+              onClick={() => setActiveTab(tab as 'playground' | 'key' | 'api')}
               className={`text-lg font-semibold pb-2 transition-colors duration-300 ${
                 activeTab === tab
                   ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
