@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState,  } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaHome, FaNewspaper, FaFlask, FaGraduationCap, FaEnvelope, FaSignInAlt, FaInfoCircle, FaChevronDown, FaChevronUp, FaProjectDiagram, FaRocket, FaRobot, FaDatabase, FaBug, FaExclamationTriangle, FaCode, FaPaintBrush, FaGlobe, FaAtom, FaBrain, FaComments, FaBars, FaSearch, FaChevronLeft, FaChevronRight, FaSun, FaMoon, FaUserCircle } from 'react-icons/fa';
+import { FaHome, FaNewspaper, FaFlask, FaGraduationCap,  FaSignInAlt, FaInfoCircle, FaChevronDown,  FaProjectDiagram, FaRocket, FaRobot, FaDatabase, FaBug, FaExclamationTriangle, FaCode, FaPaintBrush, FaGlobe, FaAtom, FaBrain, FaComments, FaBars, FaSearch, FaChevronLeft, FaChevronRight, FaUserCircle } from 'react-icons/fa';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import ThemeToggle from '../services/ThemeToggle';
 
@@ -47,6 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
         { to: '/news15', label: 'Mazs AI v1.0 Anatra update', icon: FaComments },
         { to: '/news16', label: 'Mazs AI v1.1.0 update', icon: FaComments },
         { to: '/news17', label: 'Mazs AI v1.2.0 update', icon: FaComments },
+        { to: '/news18', label: 'Mazs AI v1.3.5 update', icon: FaComments },
       ],
     },
     {label: 'Mazs AI Projects', icon: FaCode, 

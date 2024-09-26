@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { FaSearch, FaTimes, FaHistory, FaInfoCircle, FaExternalLinkAlt, FaChevronDown } from 'react-icons/fa';
+import { FaSearch, FaTimes, FaInfoCircle, FaExternalLinkAlt, FaChevronDown } from 'react-icons/fa';
 import { processChatbotQuery } from '../AI/MazsAI';
 
 interface SearchProps {
@@ -11,8 +11,8 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Array<{ title: string; link: string; isAIResponse?: boolean }>>([]);
   const [chatbotResponse, setChatbotResponse] = useState<string | null>(null);
-  const [botResponse, setBotResponse] = useState<string | null>(null);
-  const [isAdvancedSearch, setIsAdvancedSearch] = useState(false);
+  const [, setBotResponse] = useState<string | null>(null);
+  const [isAdvancedSearch,] = useState(false);
   const [wikiSearchResults, setWikiSearchResults] = useState<Array<{ title: string; snippet: string; pageid: number }>>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [showHistory, setShowHistory] = useState(false);
@@ -107,10 +107,6 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
   const handleResultClick = (link: string) => {
     onClose();
     window.location.href = link;
-  };
-
-  const toggleAdvancedSearch = () => {
-    setIsAdvancedSearch(!isAdvancedSearch);
   };
 
   const itemVariants: Variants = {

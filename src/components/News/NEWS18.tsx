@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import blogImage2 from '../assetss/GMTStudio_p.png';
 
-const NEWS17: React.FC = () => {
+const NEWS18: React.FC = () => {
   const navigate = useNavigate();
 
   const handleBackToBlog = () => {
@@ -15,11 +15,11 @@ const NEWS17: React.FC = () => {
         <article className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
           <img 
             src={blogImage2} 
-            alt="Mazs AI v1.2.0 Anatra update" 
+            alt="Theta Social Media Application" 
             className="w-full h-64 object-cover"
           />
           <div className="p-6">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Mazs AI v1.2.0 Anatra update</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Mazs AI v1.3.5 Anatra update</h1>
             <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
               <img src="/api/placeholder/40/40" alt="Author" className="w-10 h-10 rounded-full mr-4" />
               <div>
@@ -37,12 +37,12 @@ const NEWS17: React.FC = () => {
               <p>
                  we updated Mazs AI to version 1.2.0, here are some key changes:
                 <p>We have added Math solver to Mazs AI, which can solve math problem and generate math problem.</p>
-                <p>The three model Anatra, Canard, and pato are still exist but will not be available in official website. the original model will be Mazs AI v1.2.0 anatra, which is our enhanced version of the original model.</p>
+                <p>The three model Anatra, Canard, and pato are still exist but will not be available in official website. the original model will be Mazs AI v1.3.5 anatra, which is our enhanced version of the original model.</p>
                 </p>
-                <h2>Mazs AI v1.2.0 Anatra model information</h2>
+                <h2>Mazs AI v1.3.5 Anatra model information</h2>
                 <h3 className="text-xl font-semibold mt-6 mb-3">Model Architecture</h3>
                 <p>
-                  Mazs AI v1.2.0 Anatra is built on a sophisticated multi-layered architecture:
+                  Mazs AI v1.3.5 Anatra is built on a sophisticated multi-layered architecture:
                 </p>
                 <ul className="list-disc pl-6 mb-4">
                   <li>Multilayer Perceptron (MLP) for intent classification</li>
@@ -63,7 +63,7 @@ const NEWS17: React.FC = () => {
 
                 <h3 className="text-xl font-semibold mt-6 mb-3">Model Specifications</h3>
                 <p>
-                  While compact compared to large language models, Mazs AI v1.2.0 Anatra boasts:
+                  While compact compared to large language models, Mazs AI v1.3.5 Anatra boasts:
                 </p>
                 <ul className="list-disc pl-6 mb-4">
                   <li>Extensible vocabulary that grows with training</li>
@@ -74,7 +74,7 @@ const NEWS17: React.FC = () => {
                 </ul>
 
                 <p className="mt-4">
-                  This focused design allows Mazs AI v1.2.0 Anatra to excel in GMTStudio-specific tasks while maintaining strong general conversational abilities.
+                  This focused design allows Mazs AI v1.3.5 Anatra to excel in GMTStudio-specific tasks while maintaining strong general conversational abilities.
                 </p>
 
               <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
@@ -96,4 +96,4 @@ const NEWS17: React.FC = () => {
   );
 }
 
-export default NEWS17;
+export default NEWS18;

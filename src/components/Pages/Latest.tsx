@@ -22,7 +22,7 @@ import AI from '../assets/images/AI.png';
 import GMTStudio from '../assets/images/GMTStudio_a.png';
 import MazsAI12 from '../assets/images/MazsAI_v1.2.0.png';
 import MazsAI11 from '../assets/images/MazsAI_v1.1.0.png';
-
+import MazsAI13 from '../assets/images/Mazs13.png'
 interface BlogPost {
   image: string;
   title: string;
@@ -34,6 +34,15 @@ interface BlogPost {
 }
 
 const blogPosts: BlogPost[] = [
+  {
+    image: MazsAI13,
+    title: "Mazs AI v1.3.5 Anatra update",
+    excerpt: "Mazs AI v1.3.5 Anatra is now updated, adding new features and updating the UI.",
+    author: "Alston Chang",
+    date: "September 12, 2024",
+    link: "/news18",
+    category: "AI",
+  },
   {
     image: MazsAI12,
     title: "Mazs AI v1.2.0 Anatra update",
@@ -193,7 +202,7 @@ const Latest: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage, setPostsPerPage] = useState(6);
+  const [postsPerPage,] = useState(6);
   const [isGridView, setIsGridView] = useState(true);
 
   const categories = useMemo(

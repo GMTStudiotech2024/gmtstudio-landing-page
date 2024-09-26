@@ -159,7 +159,7 @@ const LaunchMazsAI: React.FC = () => {
                 animate={{ y: 0 }}
                 transition={{ duration: 0.7 }}
               >
-                clue : Searching for intelligent support   "is"  the answer.
+                clue : Searching for intelligent support   "is"   the answer.
               </motion.p>
               <button
                 onClick={() => setShowEasterEgg(false)}

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Globe2, Play, Pause, Sun, Moon } from 'lucide-react';    
 
 const Hero: React.FC = () => {
-  const [scrollY, setScrollY] = useState(0);
+  const [, setScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [isFloating, setIsFloating] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(() => 
@@ -54,13 +54,6 @@ const Hero: React.FC = () => {
       }
     },
     static: { y: 0, x: 0 }
-  };
-
-  const scrollToNextSection = () => {
-    const nextSection = document.getElementById('blog');
-    if (nextSection) {
-      nextSection.scrollIntoView({ behavior: 'smooth' });
-    }
   };
 
   const letterVariants = {

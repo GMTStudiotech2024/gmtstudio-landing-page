@@ -35,6 +35,7 @@ import NEWS14 from './components/News/NEWS14';
 import NEWS15 from './components/News/NEWS15';
 import NEWS16 from './components/News/NEWS16';
 import NEWS17 from './components/News/NEWS17';
+import NEWS18 from './components/News/NEWS18';
 import Products from './components/Pages/Products';
 import Help from './components/Pages/Help';
 import LaunchGMTStudio from './components/Landing_Page/LaunchGMTStudio';
@@ -119,6 +120,7 @@ const AppContent: React.FC = () => {
           <Route path="/news15" element={<NEWS15 />} />
           <Route path="/news16" element={<NEWS16 />} />
           <Route path="/news17" element={<NEWS17 />} />
+          <Route path="/news18" element={<NEWS18 />} />
           <Route path="/research" element={<Research />} />
           <Route path="/learning" element={<Learning />} />
           <Route path="*" element={<Error />} />

@@ -6,8 +6,10 @@ import {
   TbEggFried,
   TbBrandMinecraft,
   TbTicket,
+  TbMap,
 } from 'react-icons/tb';
-import { Link } from 'react-router-dom';
+import { GiAchievement } from "react-icons/gi";
+import { TbBorderAll } from "react-icons/tb";
 
 const EggHuntGame: React.FC = () => {
   // Define the egg types with their prices and probabilities
@@ -32,7 +34,7 @@ const EggHuntGame: React.FC = () => {
       price: 1,
       winMultiplier: 2,
       winChance: 90, // 90% chance to win
-      bigWinChance: 5, // 5% chance for big win
+      bigWinChance: 2, // Reduced big win chance
       smallWinAmount: 5, // Small win amount
       color: '#FFD700',
       icon: <TbEgg className="w-16 h-16 text-yellow-500" />,
@@ -117,7 +119,32 @@ const EggHuntGame: React.FC = () => {
       description: 'A mystic egg shrouded in mystery.',
       unlockLevel: 12,
     },
-    // Add more eggs as needed
+    {
+      id: 8,
+      name: 'Shadow Egg',
+      price: 500000,
+      winMultiplier: 50,
+      winChance: 10,
+      bigWinChance: 25,
+      smallWinAmount: 50000,
+      color: '#0D0D0D',
+      icon: <TbEgg className="w-16 h-16 text-gray-900" />,
+      description: 'An enigmatic egg with mysterious powers.',
+      unlockLevel: 15,
+    },
+    {
+      id: 9,
+      name: 'Celestial Egg',
+      price: 1000000,
+      winMultiplier: 100,
+      winChance: 5,
+      bigWinChance: 30,
+      smallWinAmount: 100000,
+      color: '#E0FFFF',
+      icon: <TbEgg className="w-16 h-16 text-blue-200" />,
+      description: 'A legendary egg from the heavens.',
+      unlockLevel: 20,
+    },
   ];
 
   type EggState =
@@ -132,9 +159,7 @@ const EggHuntGame: React.FC = () => {
   const [eggState, setEggState] = useState<EggState>('initial');
   const [isEggDisabled, setIsEggDisabled] = useState(false);
   const [funds, setFunds] = useState<number>(10);
-  const [eggInventory, setEggInventory] = useState<{ [key: number]: number }>(
-    {}
-  );
+  const [eggInventory, setEggInventory] = useState<{ [key: number]: number }>({});
   const [selectedEggType, setSelectedEggType] = useState<Egg | null>(null);
   const [message, setMessage] = useState<string>('');
   const [tickets, setTickets] = useState<number>(0);
@@ -143,69 +168,44 @@ const EggHuntGame: React.FC = () => {
   const [level, setLevel] = useState<number>(1);
   const [achievements, setAchievements] = useState<string[]>([]);
   const [showAchievements, setShowAchievements] = useState<boolean>(false);
+  const [quests, setQuests] = useState<string[]>([]);
+  const [showQuests, setShowQuests] = useState<boolean>(false);
+  const [showInventory, setShowInventory] = useState<boolean>(false);
 
   useEffect(() => {
-    // Load funds from localStorage
+    // Load data from localStorage
     const storedFunds = localStorage.getItem('funds');
-    if (storedFunds !== null) {
-      setFunds(parseFloat(storedFunds));
-    }
-    // Load egg inventory from localStorage
+    if (storedFunds !== null) setFunds(parseFloat(storedFunds));
+
     const storedInventory = localStorage.getItem('eggInventory');
-    if (storedInventory) {
-      setEggInventory(JSON.parse(storedInventory));
-    }
-    // Load tickets from localStorage
+    if (storedInventory) setEggInventory(JSON.parse(storedInventory));
+
     const storedTickets = localStorage.getItem('tickets');
-    if (storedTickets !== null) {
-      setTickets(parseInt(storedTickets));
-    }
-    // Load XP from localStorage
+    if (storedTickets !== null) setTickets(parseInt(storedTickets));
+
     const storedXp = localStorage.getItem('xp');
-    if (storedXp !== null) {
-      setXp(parseInt(storedXp));
-    }
-    // Load level from localStorage
+    if (storedXp !== null) setXp(parseInt(storedXp));
+
     const storedLevel = localStorage.getItem('level');
-    if (storedLevel !== null) {
-      setLevel(parseInt(storedLevel));
-    }
-    // Load achievements from localStorage
+    if (storedLevel !== null) setLevel(parseInt(storedLevel));
+
     const storedAchievements = localStorage.getItem('achievements');
-    if (storedAchievements) {
-      setAchievements(JSON.parse(storedAchievements));
-    }
+    if (storedAchievements) setAchievements(JSON.parse(storedAchievements));
+
+    const storedQuests = localStorage.getItem('quests');
+    if (storedQuests) setQuests(JSON.parse(storedQuests));
   }, []);
 
   useEffect(() => {
-    // Save funds to localStorage
+    // Save data to localStorage
     localStorage.setItem('funds', funds.toString());
-  }, [funds]);
-
-  useEffect(() => {
-    // Save egg inventory to localStorage
     localStorage.setItem('eggInventory', JSON.stringify(eggInventory));
-  }, [eggInventory]);
-
-  useEffect(() => {
-    // Save tickets to localStorage
     localStorage.setItem('tickets', tickets.toString());
-  }, [tickets]);
-
-  useEffect(() => {
-    // Save XP to localStorage
     localStorage.setItem('xp', xp.toString());
-  }, [xp]);
-
-  useEffect(() => {
-    // Save level to localStorage
     localStorage.setItem('level', level.toString());
-  }, [level]);
-
-  useEffect(() => {
-    // Save achievements to localStorage
     localStorage.setItem('achievements', JSON.stringify(achievements));
-  }, [achievements]);
+    localStorage.setItem('quests', JSON.stringify(quests));
+  }, [funds, eggInventory, tickets, xp, level, achievements, quests]);
 
   useEffect(() => {
     const newLevel = Math.floor(xp / 100) + 1;
@@ -225,6 +225,7 @@ const EggHuntGame: React.FC = () => {
           [egg.id]: (prevInventory[egg.id] || 0) + quantity,
         }));
         setMessage(`You purchased ${quantity} ${egg.name}(s)!`);
+        checkForQuests('PurchaseEggs');
       } else {
         setMessage(`You need to be level ${egg.unlockLevel} to buy ${egg.name}.`);
       }
@@ -253,9 +254,8 @@ const EggHuntGame: React.FC = () => {
       setTimeout(() => {
         setEggState('cracked');
         setIsEggDisabled(false);
-      }, 2000);
+      }, 1000);
     } else if (eggState === 'cracked') {
-      // Decrease the egg count here
       setEggInventory((prevInventory) => ({
         ...prevInventory,
         [selectedEggType.id]: Math.max(
@@ -266,19 +266,15 @@ const EggHuntGame: React.FC = () => {
 
       setEggState('shiver-fried');
       setTimeout(() => {
-        // Calculate outcome based on probabilities
         const randomNum = Math.random() * 100;
         if (randomNum < selectedEggType.winChance) {
-          // Win
           const bigWinNum = Math.random() * 100;
           if (bigWinNum < selectedEggType.bigWinChance) {
-            // Big win
             setEggState('big-win');
-            const winnings = selectedEggType.price * selectedEggType.winMultiplier;
+            const winnings = selectedEggType.price * selectedEggType.winMultiplier * 0.5;
             setFunds((prevFunds) => prevFunds + winnings);
             setMessage(`Jackpot! You won $${winnings.toLocaleString()}!`);
           } else {
-            // Small win
             setEggState('win');
             setFunds((prevFunds) => prevFunds + selectedEggType.smallWinAmount);
             setMessage(
@@ -286,31 +282,26 @@ const EggHuntGame: React.FC = () => {
             );
           }
           setXp((prevXp) => prevXp + 20);
+          checkForQuests('WinPrize');
         } else {
-          // Lose
           setEggState('fried');
           setMessage("Oh no! The egg was fried. You didn't get anything.");
           setXp((prevXp) => prevXp + 5);
         }
 
-        // 50% chance to get a ticket
         const ticketChance = Math.random() * 100;
         if (ticketChance < 50) {
           setTickets((prevTickets) => prevTickets + 1);
           setMessage((prev) => prev + ' You found a ticket!');
         }
 
-        // Check for achievements
         checkForAchievements();
-
-        // Reset after action completes
         setTimeout(() => {
           setEggState('initial');
-          // Do not reset selectedEggType here
           setMessage('');
-          setIsEggDisabled(false); // Make sure to enable the egg
-        }, 3000);
-      }, 2000);
+          setIsEggDisabled(false);
+        }, 2000);
+      }, 1000);
     }
   };
 
@@ -321,6 +312,7 @@ const EggHuntGame: React.FC = () => {
     setXp(0);
     setLevel(1);
     setAchievements([]);
+    setQuests([]);
     localStorage.clear();
     setMessage('Game over. Your game has been reset.');
     setSelectedEggType(null);
@@ -328,15 +320,30 @@ const EggHuntGame: React.FC = () => {
   };
 
   const checkForAchievements = () => {
-    if (funds >= 10000 && !achievements.includes('Rich')) {
-      setAchievements((prev) => [...prev, 'Rich']);
-      setMessage('Achievement Unlocked: Rich!');
+    if (funds >= 100000 && !achievements.includes('Wealthy')) {
+      setAchievements((prev) => [...prev, 'Wealthy']);
+      setMessage('Achievement Unlocked: Wealthy!');
     }
-    if (xp >= 500 && !achievements.includes('Experienced')) {
-      setAchievements((prev) => [...prev, 'Experienced']);
-      setMessage('Achievement Unlocked: Experienced!');
+    if (xp >= 1000 && !achievements.includes('Veteran')) {
+      setAchievements((prev) => [...prev, 'Veteran']);
+      setMessage('Achievement Unlocked: Veteran!');
     }
     // More achievement checks...
+  };
+
+  const checkForQuests = (action: string) => {
+    // Implement quest logic based on actions
+    if (action === 'PurchaseEggs' && !quests.includes('Egg Buyer')) {
+      setQuests((prev) => [...prev, 'Egg Buyer']);
+      setFunds((prevFunds) => prevFunds + 10);
+      setMessage('Quest Completed: Egg Buyer! You received $10!');
+    }
+    if (action === 'WinPrize' && !quests.includes('Lucky Winner')) {
+      setQuests((prev) => [...prev, 'Lucky Winner']);
+      setXp((prevXp) => prevXp + 1);
+      setMessage('Quest Completed: Lucky Winner! You gained 100 XP!');
+    }
+    // More quest conditions...
   };
 
   const handlePlaySlotMachine = () => {
@@ -346,7 +353,6 @@ const EggHuntGame: React.FC = () => {
     }
 
     setTickets(tickets - 1);
-    // Enhanced slot machine logic
     const outcomes = ['Win', 'Lose', 'Win', 'Lose', 'Jackpot'];
     const result = outcomes[Math.floor(Math.random() * outcomes.length)];
     if (result === 'Win') {
@@ -364,42 +370,81 @@ const EggHuntGame: React.FC = () => {
     }
   };
 
+  // useEffect hook to monitor egg counts
+  useEffect(() => {
+    if (selectedEggType && eggInventory[selectedEggType.id] === 0) {
+      // Find the next available egg that the user has
+      const availableEgg = eggs.find(
+        (egg) => eggInventory[egg.id] > 0 && level >= egg.unlockLevel
+      );
+      setSelectedEggType(availableEgg || null);
+
+      if (!availableEgg) {
+        setMessage('No eggs available. Please purchase more eggs.');
+      } else {
+        setMessage(`Switched to ${availableEgg.name} as you ran out of ${selectedEggType.name}s.`);
+      }
+    }
+  }, [eggInventory, selectedEggType, level]);
+
+  // Updated handlePlay function
+  const handlePlay = () => {
+    if (!selectedEggType) {
+      setMessage('No egg selected or no eggs available.');
+      return;
+    }
+
+    if (eggInventory[selectedEggType.id] <= 0) {
+      setMessage(`No ${selectedEggType.name}s left. Please buy more or select another egg.`);
+      return;
+    }
+
+    // ... existing play logic ...
+
+    // Deduct one egg
+    setEggInventory((prevInventory) => ({
+      ...prevInventory,
+      [selectedEggType.id]: prevInventory[selectedEggType.id] - 1,
+    }));
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gradient-to-b from-purple-400 to-blue-600 dark:from-gray-900 dark:to-gray-800 pt-20">
+    <div className="container mx-auto px-4 py-8 pt-20 bg-white dark:bg-gray-900">
       {/* Header */}
-      <div className="w-full flex justify-between items-center px-8 py-4 bg-white/10">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-0">
           Egg Hunt Game
         </h1>
-        <div className="flex items-center space-x-4">
-          <div className="text-xl text-gray-700 dark:text-gray-300">
-            Funds: ${funds.toLocaleString()}
-          </div>
-          <div className="text-xl text-gray-700 dark:text-gray-300">
-            Level: {level}
-          </div>
-          <div className="text-xl text-gray-700 dark:text-gray-300">
-            XP: {xp}
-          </div>
-          <div className="flex items-center">
-            <TbTicket className="w-8 h-8 text-yellow-500 mr-1" />
-            <span className="text-xl text-gray-700 dark:text-gray-300">
-              x {tickets}
-            </span>
-          </div>
-          {funds <= 0 && (
-            <button
-              onClick={handleResetGame}
-              className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-full text-white font-semibold"
-            >
-              Reset Game
-            </button>
-          )}
+        <div className="flex flex-wrap justify-center sm:justify-end gap-4">
+          <p className="text-xl text-gray-800 dark:text-white">
+            Funds: ${funds.toFixed(2)}
+          </p>
+          <p className="text-xl text-gray-800 dark:text-white">
+            Tickets: {tickets}
+          </p>
+          <p className="text-xl text-gray-800 dark:text-white">
+            Level: {level} (XP: {xp})
+          </p>
           <button
             onClick={() => setShowAchievements(true)}
-            className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-full text-white font-semibold"
+            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-full text-white font-semibold flex items-center"
           >
+            <GiAchievement className="w-5 h-5 mr-2" />
             Achievements
+          </button>
+          <button
+            onClick={() => setShowQuests(true)}
+            className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-full text-white font-semibold flex items-center"
+          >
+            <TbMap className="w-5 h-5 mr-2" />
+            Quests
+          </button>
+          <button
+            onClick={() => setShowInventory(true)}
+            className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 rounded-full text-white font-semibold flex items-center"
+          >
+            <TbBorderAll className="w-5 h-5 mr-2" />
+            Inventory
           </button>
         </div>
       </div>
@@ -434,14 +479,63 @@ const EggHuntGame: React.FC = () => {
         </div>
       )}
 
+      {/* Quests Modal */}
+      {showQuests && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+              Quests
+            </h2>
+            <ul className="list-disc list-inside">
+              {quests.length > 0 ? (
+                quests.map((quest, index) => (
+                  <li key={index} className="text-gray-700 dark:text-gray-300">
+                    {quest}
+                  </li>
+                ))
+              ) : (
+                <li className="text-gray-700 dark:text-gray-300">
+                  No quests completed yet.
+                </li>
+              )}
+            </ul>
+            <button
+              onClick={() => setShowQuests(false)}
+              className="mt-4 px-4 py-2 bg-green-500 hover:bg-green-600 rounded-full text-white font-semibold"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Inventory Modal */}
+      {showInventory && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          {/* Inventory content */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+              Inventory
+            </h2>
+            {/* Inventory items can be added here */}
+            <button
+              onClick={() => setShowInventory(false)}
+              className="mt-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 rounded-full text-white font-semibold"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Egg Inventory */}
-      <div className="w-full flex flex-wrap justify-center items-center mt-4">
+      <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 mt-4">
         {eggs.map((egg) => (
           <div
             key={egg.id}
-            className={`flex flex-col items-center m-2 ${
+            className={`flex flex-col items-center p-2 rounded-lg ${
               eggInventory[egg.id] > 0
-                ? 'cursor-pointer'
+                ? 'cursor-pointer bg-white/10'
                 : 'opacity-50 cursor-not-allowed'
             }`}
             onClick={() => eggInventory[egg.id] > 0 && handleEggSelect(egg)}
@@ -450,7 +544,7 @@ const EggHuntGame: React.FC = () => {
               className: 'w-12 h-12',
               color: egg.color,
             })}
-            <span className="text-gray-800 dark:text-white">
+            <span className="text-sm text-center text-gray-800 dark:text-white mt-2">
               {egg.name} x {eggInventory[egg.id] || 0}
             </span>
           </div>
@@ -477,7 +571,6 @@ const EggHuntGame: React.FC = () => {
                   : {}
               }
             >
-              {/* Egg states rendering */}
               {eggState === 'initial' && (
                 React.cloneElement(selectedEggType.icon, {
                   className: 'w-40 h-40 mx-auto',
@@ -499,7 +592,7 @@ const EggHuntGame: React.FC = () => {
           )}
         </div>
         <motion.p
-          className="text-xl mt-4 text-gray-800 dark:text-white"
+          className="text-xl mt-4 text-gray-800 dark:text-white text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
@@ -509,10 +602,10 @@ const EggHuntGame: React.FC = () => {
 
       {/* Slot Machine */}
       {tickets > 0 && (
-        <div className="mt-8">
+        <div className="mt-8 flex justify-center">
           <button
             onClick={handlePlaySlotMachine}
-            className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 rounded-full text-white font-semibold flex items-center"
+            className="px-6 py-3 bg-purple-500 hover:bg-purple-600 rounded-full text-white font-semibold flex items-center"
           >
             <TbTicket className="w-6 h-6 mr-2" />
             Play Slot Machine
@@ -521,24 +614,24 @@ const EggHuntGame: React.FC = () => {
       )}
 
       {slotResult && (
-        <div className="mt-4 text-xl text-gray-800 dark:text-white">
+        <div className="mt-4 text-xl text-gray-800 dark:text-white text-center">
           {slotResult}
         </div>
       )}
 
       {/* Egg Shop */}
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 mt-8">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
         {eggs.map((egg) => (
           <div
             key={egg.id}
-            className="group px-6 py-4 bg-white/10 rounded-lg flex flex-col items-center relative shadow-lg overflow-hidden"
+            className="group px-4 py-4 bg-white/10 rounded-lg flex flex-col items-center relative shadow-lg overflow-hidden"
           >
             {React.cloneElement(egg.icon, {
-              className: 'w-16 h-16',
+              className: 'w-12 h-12 sm:w-16 sm:h-16',
               color: egg.color,
             })}
             <div className="mt-4 text-center">
-              <p className="font-semibold text-gray-200 tracking-wider text-xl">
+              <p className="font-semibold text-gray-200 tracking-wider text-lg sm:text-xl">
                 {egg.name}
               </p>
               <p className="font-semibold text-gray-600 text-xs">
@@ -552,33 +645,45 @@ const EggHuntGame: React.FC = () => {
               <p className="text-[#abd373] font-semibold text-lg">
                 ${egg.price.toLocaleString()}
               </p>
-              <button
-                onClick={() => handleEggPurchase(egg, 1)}
-                className={`mt-2 px-4 py-2 bg-[#abd373] hover:bg-white/10 rounded-full text-gray-800 font-semibold ${
-                  funds < egg.price || level < egg.unlockLevel
-                    ? 'opacity-50 cursor-not-allowed'
-                    : ''
-                }`}
-                disabled={funds < egg.price || level < egg.unlockLevel}
-                title={`Buy 1 ${egg.name}`}
-              >
-                Buy 1 Egg
-              </button>
-              <button
-                onClick={() => handleEggPurchase(egg, 10)}
-                className={`mt-2 ml-2 px-4 py-2 bg-[#abd373] hover:bg-white/10 rounded-full text-gray-800 font-semibold ${
-                  funds < egg.price * 10 || level < egg.unlockLevel
-                    ? 'opacity-50 cursor-not-allowed'
-                    : ''
-                }`}
-                disabled={funds < egg.price * 10 || level < egg.unlockLevel}
-                title={`Buy 10 ${egg.name}s`}
-              >
-                Buy 10 Eggs
-              </button>
+              <div className="flex flex-col sm:flex-row justify-center gap-2 mt-2">
+                <button
+                  onClick={() => handleEggPurchase(egg, 1)}
+                  className={`px-4 py-2 bg-[#abd373] hover:bg-white/10 rounded-full text-gray-800 font-semibold ${
+                    funds < egg.price || level < egg.unlockLevel
+                      ? 'opacity-50 cursor-not-allowed'
+                      : ''
+                  }`}
+                  disabled={funds < egg.price || level < egg.unlockLevel}
+                  title={`Buy 1 ${egg.name}`}
+                >
+                  Buy 1 Egg
+                </button>
+                <button
+                  onClick={() => handleEggPurchase(egg, 10)}
+                  className={`px-4 py-2 bg-[#abd373] hover:bg-white/10 rounded-full text-gray-800 font-semibold ${
+                    funds < egg.price * 10 || level < egg.unlockLevel
+                      ? 'opacity-50 cursor-not-allowed'
+                      : ''
+                  }`}
+                  disabled={funds < egg.price * 10 || level < egg.unlockLevel}
+                  title={`Buy 10 ${egg.name}s`}
+                >
+                  Buy 10 Eggs
+                </button>
+              </div>
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Reset Game Button */}
+      <div className="mt-8 flex justify-center">
+        <button
+          onClick={handleResetGame}
+          className="px-6 py-3 bg-red-500 hover:bg-red-600 rounded-full text-white font-semibold"
+        >
+          Reset Game
+        </button>
       </div>
     </div>
   );
