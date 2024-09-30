@@ -15,6 +15,8 @@ import {
   TbDeviceDesktopAnalytics,
 
    } from "react-icons/tb";
+import { Tooltip } from 'react-tooltip';
+
 interface SidebarProps {
   className?: string;
   isOpen: boolean;
@@ -34,6 +36,21 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
   const sidebarVariants = {
     open: { width: '18rem', transition: { duration: 0.3, ease: 'easeInOut' } },
     closed: { width: '4rem', transition: { duration: 0.3, ease: 'easeInOut' } },
+  };
+
+  const listVariants = {
+    open: {
+      transition: {
+        staggerChildren: 0.05,
+        delayChildren: 0.2
+      }
+    },
+    closed: {
+      transition: {
+        staggerChildren: 0.05,
+        staggerDirection: -1
+      }
+    }
   };
 
   const links = [
@@ -125,7 +142,12 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
       )}
       <nav>
         <AnimatePresence>
-          <ul className="space-y-2">
+          <motion.ul
+            className="space-y-2"
+            variants={listVariants}
+            initial="closed"
+            animate={isOpen ? 'open' : 'closed'}
+          >
             {filteredLinks.map((link, index) => (
               <motion.li 
                 key={link.label}
@@ -138,9 +160,13 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
                   <div>
                     <motion.button
                       onClick={() => toggleDropdown(link.label)}
+                      aria-expanded={openDropdown === link.label}
+                      aria-controls={`submenu-${link.label}`}
                       className={`flex items-center justify-between w-full p-2 rounded-lg transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 ${openDropdown === link.label ? 'bg-blue-50 dark:bg-blue-900' : ''}`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
+                      data-tooltip-id={`tooltip-${link.label}`}
+                      data-tooltip-content={isOpen ? '' : link.label}
                     >
                       <span className="flex items-center">
                         <link.icon className={`${!isOpen ? 'text-xl mx-auto' : 'mr-3'} text-blue-500`} />
@@ -156,9 +182,12 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
                         </motion.div>
                       )}
                     </motion.button>
+                    {!isOpen && <Tooltip id={`tooltip-${link.label}`} place="right" />}
                     <AnimatePresence>
                       {openDropdown === link.label && isOpen && (
                         <motion.ul 
+                          id={`submenu-${link.label}`}
+                          role="menu"
                           className="ml-6 mt-1 space-y-1"
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
@@ -198,14 +227,17 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
                         ? 'bg-blue-500 text-white'
                         : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                     }`}
+                    data-tooltip-id={`tooltip-${link.label}`}
+                    data-tooltip-content={isOpen ? '' : link.label}
                   >
                     <link.icon className={`${!isOpen ? 'text-xl mx-auto' : 'mr-3'} ${location.pathname === link.to ? 'text-white' : 'text-blue-500'}`} />
                     {isOpen && <span className="font-medium">{link.label}</span>}
                   </Link>
                 )}
+                {!isOpen && <Tooltip id={`tooltip-${link.label}`} place="right" />}
               </motion.li>
             ))}
-          </ul>
+          </motion.ul>
         </AnimatePresence>
       </nav>
       <motion.button
@@ -216,9 +248,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', isOpen, onToggle }) =
       >
         {isOpen ? <FaChevronLeft /> : <FaChevronRight />}
       </motion.button>
-      
     </motion.div>
-
   );
 };
 

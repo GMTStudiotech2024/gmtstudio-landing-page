@@ -1,0 +1,12 @@
+/* src/styles/sidebar.css */
+@media (max-width: 768px) {
+    .sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+    }
+  
+    .toggle-button {
+      display: block;
+    }
+  }

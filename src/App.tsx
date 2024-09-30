@@ -59,7 +59,6 @@ const AppContent: React.FC = () => {
 
   const isHomePage = location.pathname === '/';
   const isMazsAIPage = location.pathname === '/mazsai';
- const isEasterEggPage = location.pathname === '/egg-hunter';
   const toggleSearch = useCallback(() => {
     setIsSearchOpen(prev => !prev);
   }, []);
@@ -133,7 +132,6 @@ const AppContent: React.FC = () => {
           <Route path="/mazsapi" element={<MazsAPI/>} />
           <Route path="/egg-hunter" element={<EggHunt />} />
         </Routes>
-        {!isEasterEggPage && <Footer />}
         {!isMazsAIPage && <Footer />}
       </main>
       <Analytics />

@@ -1,0 +1,30 @@
+/* src/styles/themes.css */
+:root {
+    --sidebar-bg-light: #ffffff;
+    --sidebar-bg-dark: #1f2937;
+    --text-color-light: #1f2937;
+    --text-color-dark: #ffffff;
+    --hover-bg-light: #f3f4f6;
+    --hover-bg-dark: #374151;
+  }
+  
+  .dark {
+    --sidebar-bg: var(--sidebar-bg-dark);
+    --text-color: var(--text-color-dark);
+    --hover-bg: var(--hover-bg-dark);
+  }
+  
+  .light {
+    --sidebar-bg: var(--sidebar-bg-light);
+    --text-color: var(--text-color-light);
+    --hover-bg: var(--hover-bg-light);
+  }
+  
+  .sidebar {
+    background-color: var(--sidebar-bg);
+    color: var(--text-color);
+  }
+  
+  .sidebar a:hover {
+    background-color: var(--hover-bg);
+  }
