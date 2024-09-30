@@ -11,7 +11,7 @@ import {
   FaChevronUp 
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-
+   
 const AdvancedSearch: React.FC = () => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<string[]>([]);
