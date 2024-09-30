@@ -35,6 +35,15 @@ interface BlogPost {
 
 const blogPosts: BlogPost[] = [
   {
+    image:GMTStudio,
+    title: 'website migration',
+    excerpt:"We move our website to new domain",
+    author: "Alston Chang",
+    date:"September 30, 2024",
+    link:"/news19",
+    category:"Development log"
+  },
+  {
     image: MazsAI13,
     title: "Mazs AI v1.3.5 Anatra update",
     excerpt: "Mazs AI v1.3.5 Anatra is now updated, adding new features and updating the UI.",

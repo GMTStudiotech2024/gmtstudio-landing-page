@@ -6,9 +6,20 @@ import {
   FaEye, FaRegHeart 
 } from 'react-icons/fa';
 import MazsAI12 from '../assets/images/MazsAI_v1.2.0.png';
-import MazsAI11 from '../assets/images/MazsAI_v1.1.0.png';
+import GMTStudio from '../assets/images/GMTStudio_p.png'
 import MazsAI13 from '../assets/images/Mazs13.png';
 const blogPosts = [
+  {
+    image:GMTStudio,
+    title: 'website migration',
+    excerpt:"We move our website to new domain",
+    author: "Alston Chang",
+    date:"September 30, 2024",
+    link:"/news19",
+    category:"Development log",
+    views:100,
+    readTime:"1 min"
+  },
   {
     image:MazsAI13,
     title:"Mazs AI v1.2.0 Anatra update",
@@ -30,17 +41,6 @@ const blogPosts = [
     category:"Development Log",
     views:100,
     readTime:"1 min"
-  },
-  { 
-    image: MazsAI11, 
-    title: "Mazs AI: A Technical Deep Dive", 
-    excerpt: "Comprehensive analysis of a neural network-powered chatbot, exploring architecture, training, limitations, and future enhancements in conversational AI", 
-    author: "Alston Chang", 
-    date: "August 12, 2024",
-    link: "/news13",
-    category: "AI",
-    views: 30,
-    readTime: "1 min "
   },
 
 ];
