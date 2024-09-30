@@ -288,6 +288,10 @@ class MultilayerPerceptron {
 
     return [gradients, biasGradients];
   }
+
+  setLearningRate(newLearningRate: number) {
+    this.learningRate = newLearningRate;
+  }
 }
 
 // Optimizer classes
@@ -1923,13 +1927,29 @@ class GAN {
       const noise = this.generateNoise(batchSize);
       noise.forEach(n => {
         const fake = this.generator.predict(n);
-        this.generator.train(n, this.discriminator.predict(fake), 0.0002);
+        const target = this.discriminator.predict(fake).map(d => 1 - d); // Target is 1 for generator
+        this.generator.train(n, target, 0.0002);
       });
 
+      // Log progress and losses
       if (epoch % 10 === 0) {
-        console.log(`GAN Epoch ${epoch}: G Loss: ${this.generatorLoss()}, D Loss: ${this.discriminatorLoss()}`);
+        const gLoss = this.generatorLoss();
+        const dLoss = this.discriminatorLoss();
+        console.log(`GAN Epoch ${epoch}: G Loss: ${gLoss}, D Loss: ${dLoss}`);
+      }
+
+      // Adaptive learning rate adjustment
+      if (epoch % 50 === 0 && epoch > 0) {
+        this.adjustLearningRates(epoch);
       }
     }
+  }
+
+  private adjustLearningRates(epoch: number) {
+    const newLearningRate = 0.0002 * Math.pow(0.95, Math.floor(epoch / 50));
+    this.generator.setLearningRate(newLearningRate);
+    this.discriminator.setLearningRate(newLearningRate);
+    console.log(`Adjusted learning rates to ${newLearningRate}`);
   }
 
   private getBatch(data: number[][], batchSize: number): number[][] {
