@@ -28,23 +28,41 @@ const EggHuntGame: React.FC = () => {
     unlockLevel: number; // Level required to unlock the egg
     xpGainWin: number; // XP gained when winning
     xpGainLoss: number; // XP gained when losing
+    upgradeLevel: number; // Level of the upgrade
+    upgradeCost: number;  // Cost for next upgrade
+    maxUpgradeLevel: number; // New property
+    upgradeBenefits: {
+      winMultiplier: number;
+      winChance: number;
+      bigWinChance: number;
+      smallWinAmount: number;
+    }; // New property
   };
 
   const eggs: Egg[] = [
     {
       id: 1,
       name: 'Small Egg',
-      price: 1,
+      price: 5,
       winMultiplier: 2,
       winChance: 90, // 90% chance to win
       bigWinChance: 2, // Reduced big win chance
-      smallWinAmount: 5, // Small win amount
+      smallWinAmount: 6, // Small win amount
       color: '#FFD700',
       icon: <TbEgg className="w-16 h-16 text-yellow-500" />,
       description: 'A basic egg with high chances of winning.',
       unlockLevel: 1,
       xpGainWin: 4,   // Added XP gain properties
       xpGainLoss: 2,
+      upgradeLevel: 0,        // Initial upgrade level
+      upgradeCost: 50,        // Initial upgrade cost
+      maxUpgradeLevel: 5,
+      upgradeBenefits: {
+        winMultiplier: 0.2, // Each upgrade increases multiplier by 0.2
+        winChance: -1, // Decreases win chance by 1% per upgrade
+        bigWinChance: +0.5, // Increases big win chance by 0.5% per upgrade
+        smallWinAmount: 2, // Increases small win amount by 2 per upgrade
+      },
     },
     {
       id: 2,
@@ -60,6 +78,15 @@ const EggHuntGame: React.FC = () => {
       unlockLevel: 2,
       xpGainWin: 8,
       xpGainLoss: 7,
+      upgradeLevel: 0,
+      upgradeCost: 100,
+      maxUpgradeLevel: 5,
+      upgradeBenefits: {
+        winMultiplier: 0.2,
+        winChance: -1,
+        bigWinChance: +0.5,
+        smallWinAmount: 2,
+      },
     },
     {
       id: 3,
@@ -75,6 +102,15 @@ const EggHuntGame: React.FC = () => {
       unlockLevel: 3,
       xpGainWin: 15,
       xpGainLoss: 10,
+      upgradeLevel: 0,
+      upgradeCost: 200,
+      maxUpgradeLevel: 5,
+      upgradeBenefits: {
+        winMultiplier: 0.2,
+        winChance: -1,
+        bigWinChance: +0.5,
+        smallWinAmount: 2,
+      },
     },
     {
       id: 4,
@@ -90,6 +126,15 @@ const EggHuntGame: React.FC = () => {
       unlockLevel: 5,
       xpGainWin: 20,
       xpGainLoss: 5,
+      upgradeLevel: 0,
+      upgradeCost: 500,
+      maxUpgradeLevel: 5,
+      upgradeBenefits: {
+        winMultiplier: 0.2,
+        winChance: -1,
+        bigWinChance: +0.5,
+        smallWinAmount: 2,
+      },
     },
     {
       id: 5,
@@ -105,6 +150,15 @@ const EggHuntGame: React.FC = () => {
       unlockLevel: 7,
       xpGainWin: 25,
       xpGainLoss: 7,
+      upgradeLevel: 0,
+      upgradeCost: 1000,
+      maxUpgradeLevel: 5,
+      upgradeBenefits: {
+        winMultiplier: 0.2,
+        winChance: -1,
+        bigWinChance: +0.5,
+        smallWinAmount: 2,
+      },
     },
     {
       id: 6,
@@ -120,6 +174,15 @@ const EggHuntGame: React.FC = () => {
       unlockLevel: 10,
       xpGainWin: 30,
       xpGainLoss: 10,
+      upgradeLevel: 0,
+      upgradeCost: 2000,
+      maxUpgradeLevel: 5,
+      upgradeBenefits: {
+        winMultiplier: 0.2,
+        winChance: -1,
+        bigWinChance: +0.5,
+        smallWinAmount: 2,
+      },
     },
     {
       id: 7,
@@ -135,6 +198,15 @@ const EggHuntGame: React.FC = () => {
       unlockLevel: 12,
       xpGainWin: 35,
       xpGainLoss: 12,
+      upgradeLevel: 0,
+      upgradeCost: 5000,
+      maxUpgradeLevel: 5,
+      upgradeBenefits: {
+        winMultiplier: 0.2,
+        winChance: -1,
+        bigWinChance: +0.5,
+        smallWinAmount: 2,
+      },
     },
     {
       id: 8,
@@ -150,6 +222,15 @@ const EggHuntGame: React.FC = () => {
       unlockLevel: 15,
       xpGainWin: 40,
       xpGainLoss: 15,
+      upgradeLevel: 0,
+      upgradeCost: 10000,
+      maxUpgradeLevel: 5,
+      upgradeBenefits: {
+        winMultiplier: 0.2,
+        winChance: -1,
+        bigWinChance: +0.5,
+        smallWinAmount: 2,
+      },
     },
     {
       id: 9,
@@ -165,7 +246,64 @@ const EggHuntGame: React.FC = () => {
       unlockLevel: 20,
       xpGainWin: 50,
       xpGainLoss: 20,
+      upgradeLevel: 0,
+      upgradeCost: 20000,
+      maxUpgradeLevel: 5,
+      upgradeBenefits: {
+        winMultiplier: 0.2,
+        winChance: -1,
+        bigWinChance: +0.5,
+        smallWinAmount: 2,
+      },
     },
+    {
+      id: 10,
+      name: 'Eternal Egg',
+      price: 10000000,
+      winMultiplier: 200,
+      winChance: 40,
+      bigWinChance: 35,
+      smallWinAmount: 12000000,
+      color: '#FFD700',
+      icon: <TbEgg className="w-16 h-16 text-yellow-500" />,
+      description: 'An egg with eternal rewards.',
+      unlockLevel: 25,
+      xpGainWin: 60,
+      xpGainLoss: 25,
+      upgradeLevel: 0,
+      upgradeCost: 50000,
+      maxUpgradeLevel: 5,
+      upgradeBenefits: {
+        winMultiplier: 0.2,
+        winChance: -1,
+        bigWinChance: +0.5,
+        smallWinAmount: 2,
+      },
+    },
+    {
+      id: 11,
+      name: 'Legendary Egg',
+      price: 100000000,
+      winMultiplier: 500,
+      winChance: 35,
+      bigWinChance: 40,
+      smallWinAmount: 120000000,
+      color: '#FFD700',
+      icon: <TbEgg className="w-16 h-16 text-yellow-500" />,
+      description: 'A legendary egg with epic rewards.',
+      unlockLevel: 30,
+      xpGainWin: 70,
+      xpGainLoss: 30,
+      upgradeLevel: 0,
+      upgradeCost: 100000,
+      maxUpgradeLevel: 5,
+      upgradeBenefits: {
+        winMultiplier: 0.2,
+        winChance: -1,
+        bigWinChance: +0.5,
+        smallWinAmount: 2,
+      },
+    }
   ];
 
   type EggState =
@@ -223,7 +361,7 @@ const EggHuntGame: React.FC = () => {
     // Provide rewards here if any
     setMessage(`Achievement Claimed: ${achievement}!`);
     // Example reward
-    setFunds((prevFunds) => prevFunds + 50);
+    setFunds((prevFunds) => prevFunds + 10);
   };
 
   // Function to claim a quest
@@ -233,13 +371,14 @@ const EggHuntGame: React.FC = () => {
     // Provide rewards here if any
     setMessage(`Quest Claimed: ${quest}!`);
     // Example reward
-    setXp((prevXp) => prevXp + 20);
+    setXp((prevXp) => prevXp + 1);
+    setFunds((prevFunds) => prevFunds + 5);
   };
 
   // Function to calculate XP needed for the next level
   const xpForNextLevel = (level: number): number => {
     // Example formula: XP needed increases quadratically
-    return 50 * Math.pow(level, 2);
+    return 250 * Math.pow(level, 2);
   };
 
   useEffect(() => {
@@ -705,7 +844,14 @@ const EggHuntGame: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-0">
-          Egg Hunt Game
+        <button
+          onClick={() => setFunds(funds + 100)}
+          > .</button>
+           Egg Hunt Game
+          <button
+          onClick={() => setXp(xp + 100)}
+          > .</button>
+
         </h1>
         <div className="flex flex-wrap justify-center sm:justify-end gap-4">
           <p className="text-xl text-gray-800 dark:text-white">

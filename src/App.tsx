@@ -8,7 +8,6 @@ import OurProjects from './components/Landing_Page/OurProjects';
 import Blog from './components/Landing_Page/Blog';
 import Footer from './components/Landing_Page/Footer';
 import Error from './components/Pages/Error';
-import Research from './components/Pages/Research';
 import Learning from './components/Pages/Learning';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -60,7 +59,7 @@ const AppContent: React.FC = () => {
 
   const isHomePage = location.pathname === '/';
   const isMazsAIPage = location.pathname === '/mazsai';
-
+ const isEasterEggPage = location.pathname === '/egg-hunter';
   const toggleSearch = useCallback(() => {
     setIsSearchOpen(prev => !prev);
   }, []);
@@ -121,7 +120,6 @@ const AppContent: React.FC = () => {
           <Route path="/news16" element={<NEWS16 />} />
           <Route path="/news17" element={<NEWS17 />} />
           <Route path="/news18" element={<NEWS18 />} />
-          <Route path="/research" element={<Research />} />
           <Route path="/learning" element={<Learning />} />
           <Route path="*" element={<Error />} />
           <Route path="/signup" element={<SignUp />} />
@@ -135,6 +133,7 @@ const AppContent: React.FC = () => {
           <Route path="/mazsapi" element={<MazsAPI/>} />
           <Route path="/egg-hunter" element={<EggHunt />} />
         </Routes>
+        {!isEasterEggPage && <Footer />}
         {!isMazsAIPage && <Footer />}
       </main>
       <Analytics />

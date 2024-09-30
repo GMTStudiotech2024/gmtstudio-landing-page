@@ -26,7 +26,6 @@ const Search: React.FC<SearchProps> = ({ onClose }) => {
     { title: "Home", link: "/" },
     { title: "Latest News", link: "/Latest" },
     { title: "Products", link: "/Products" },
-    { title: "Research", link: "/Research" },
     { title: "Learning", link: "/Learning" },
     { title: "Contact", link: "/Contact" },
     { title: "System Status", link: "/system-status" },
