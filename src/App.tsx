@@ -46,7 +46,6 @@ import MazsAPI from './components/AI/MazsAPI';
 import MazsAI from './components/AI/MazsAI_UI';
 import CustomCursor from './components/CustomCursor';
 import EggHunt from './components/Pages/EggHunt';
-
 const AppContent: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);

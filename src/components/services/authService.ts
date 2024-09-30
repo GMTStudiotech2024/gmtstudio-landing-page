@@ -2,17 +2,13 @@ import { kv } from '@vercel/kv';
 import bcrypt from 'bcryptjs';
 
 const getKVClient = () => {
-  if (!process.env.KV_REST_API_URL) {
-    console.error('KV_REST_API_URL is not set');
-  }
-  if (!process.env.KV_REST_API_TOKEN) {
-    console.error('KV_REST_API_TOKEN is not set');
-  }
-  if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+  if (!process.env.REAC_KV_REST_API_URL || !process.env.REAC_KV_REST_API_TOKEN) {
+    console.error('KV environment variables are not set correctly');
     return null;
   }
   return kv;
 };
+
 export async function signUp(email: string, username: string, password: string) {
   const kvClient = getKVClient();
   if (!kvClient) {
